@@ -9,15 +9,16 @@ import yargs from "yargs"
 import Pkg   from "./app-pkg"
 
 export default class Argv {
-    public help       = false
-    public version    = false
-    public logLevel   = 0
-    public logFile    = ""
-    public stateDir   = ""
-    public httpAddr   = ""
-    public httpPort   = 0
-    public vmix1Addr  = ""
-    public vmix2Addr  = ""
+    public help           = false
+    public version        = false
+    public logLevel       = 0
+    public logFile        = ""
+    public stateDir       = ""
+    public httpAddr       = ""
+    public httpPort       = 0
+    public vsetInputRegex = ""
+    public vmix1Addr      = ""
+    public vmix2Addr      = ""
     constructor (
         private pkg: Pkg
     ) {}
@@ -29,11 +30,11 @@ export default class Argv {
             .usage(
                 "Usage: $0 [-h] [-V] " +
                 "[-v <log-level>] [-l|--log-file <log-file>] " +
-                "[-c <canvas-dir>] " +
                 "[-s <state-dir>] " +
                 "[-a <http-addr>] [-p <http-port>] " +
-                "[-A <freed-addr>] [-P <freed-port>]" +
-                "[-C <camera-addr>:<camera-name> [...]]"
+                "[-I <vset-input-regex>] " +
+                "[-A <vmix1-addr>]" +
+                "[-B <vmix2-addr>]"
             )
             .help("h").alias("h", "help").default("h", false)
                 .describe("h", "show usage help")
@@ -49,6 +50,8 @@ export default class Argv {
                 .describe("a", "HTTP/Websocket listen IP address")
             .number("p").nargs("p", 1).alias("p", "http-port").default("p", 8080)
                 .describe("p", "HTTP/Websocket listen TCP port")
+            .string("I").nargs("I", 1).alias("I", "vset-input-regex").default("I", "VPTZ-.+")
+                .describe("I", "vMix VirtualSet input name regex pattern")
             .string("A").nargs("A", 1).alias("A", "vmix1-addr").default("A", "0.0.0.0:8099")
                 .describe("A", "vMix 1 listen IP address")
             .string("B").nargs("B", 1).alias("B", "vmix2-addr").default("B", "0.0.0.0:8099")
@@ -60,15 +63,16 @@ export default class Argv {
             .parse(process.argv.slice(2)) as any
 
         /*  shuffle results  */
-        this.help       = args.help
-        this.version    = args.version
-        this.logLevel   = args.logLevel
-        this.logFile    = args.logFile
-        this.stateDir   = args.stateDir
-        this.httpAddr   = args.httpAddr
-        this.httpPort   = args.httpPort
-        this.vmix1Addr  = args.vmix1Addr
-        this.vmix2Addr  = args.vmix2Addr
+        this.help           = args.help
+        this.version        = args.version
+        this.logLevel       = args.logLevel
+        this.logFile        = args.logFile
+        this.stateDir       = args.stateDir
+        this.httpAddr       = args.httpAddr
+        this.httpPort       = args.httpPort
+        this.vsetInputRegex = args.vsetInputRegex
+        this.vmix1Addr      = args.vmix1Addr
+        this.vmix2Addr      = args.vmix2Addr
 
         /*  short-circuit processing of "-V" command-line option  */
         if (this.version) {

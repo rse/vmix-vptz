@@ -98,7 +98,7 @@ export default class RESTWS extends Latching {
                 if (!ducky.validate(request.payload, "{ cmd: string, arg?: string }"))
                     return Boom.badRequest("invalid request")
                 const { cmd, arg } = request.payload as any satisfies { cmd: string, arg: any }
-                return Boom.badRequest("not implemented")
+                return Boom.badRequest("not implemented") // FIXME
                 return h.response().code(204)
             }
         })

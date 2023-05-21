@@ -53,16 +53,42 @@ export default class RESTState {
             }
         })
 
-        /*  change current state  */
+        /*  select PTZ  */
         this.rest.server!.route({
             method: "GET",
-            path: "/state/{input}/{op}/{arg}",
+            path: "/ptz/{slot}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                return this.db.transaction(Transaction.WRITE, 4000, async () => {
+                    const slot = parseInt(req.params.slot)
+                    this.vMix.setPTZ(slot)
+                    return h.response().code(204)
+                })
+            }
+        })
+
+        /*  change VPTZ  */
+        this.rest.server!.route({
+            method: "GET",
+            path: "/vptz/{input}/{op}/{arg}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 return this.db.transaction(Transaction.WRITE, 4000, async () => {
                     const input = req.params.input
                     const op    = req.params.op
                     const arg   = req.params.arg
-                    this.vMix.operation(input, op, arg)
+                    this.vMix.changeVPTZ(input, op, arg)
+                    return h.response().code(204)
+                })
+            }
+        })
+
+        /*  cut preview into program  */
+        this.rest.server!.route({
+            method: "GET",
+            path: "/cut/{mode}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                return this.db.transaction(Transaction.WRITE, 4000, async () => {
+                    const mode = req.params.mode
+                    this.vMix.cutPreview(mode)
                     return h.response().code(204)
                 })
             }
