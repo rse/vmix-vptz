@@ -1,5 +1,5 @@
 
-<img src="https://raw.githubusercontent.com/rse/vmix-vptz/master/res/app-icon.svg" width="200" align="right" alt=""/>
+<img src="https://raw.githubusercontent.com/rse/vmix-vptz/master/src/client/app-icon.svg" width="200" align="right" alt=""/>
 
 vMix-VPTZ
 =========
