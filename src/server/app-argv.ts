@@ -83,5 +83,7 @@ export default class Argv {
             process.exit(0)
         }
     }
+    async shutdown () {
+    }
 }
 

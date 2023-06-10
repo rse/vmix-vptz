@@ -16,13 +16,17 @@ import HAPIDucky      from "hapi-plugin-ducky"
 import Pkg            from "./app-pkg"
 import Argv           from "./app-argv"
 import Log            from "./app-log"
+import State          from "./app-state"
+import VMix           from "./app-vmix"
 
 export default class REST {
     public server: Server | null = null
     constructor (
-        private pkg:  Pkg,
-        private argv: Argv,
-        private log:  Log
+        private pkg:    Pkg,
+        private argv:   Argv,
+        private log:    Log,
+        private state:  State,
+        private vMix:   VMix
     ) {}
     async init () {
         /*  establish network service  */
@@ -90,10 +94,62 @@ export default class REST {
                 }
             }
         })
+
+        /*  load current state  */
+        this.server.route({
+            method: "GET",
+            path: "/state",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const ptz  = this.state.getPTZ()
+                const state = { ptz }
+                return h.response(state).code(200)
+            }
+        })
+
+        /*  select PTZ  */
+        this.server.route({
+            method: "GET",
+            path: "/ptz/{slot}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const slot = parseInt(req.params.slot)
+                this.vMix.setPTZ(slot)
+                return h.response().code(204)
+            }
+        })
+
+        /*  change VPTZ  */
+        this.server.route({
+            method: "GET",
+            path: "/vptz/{input}/{op}/{arg}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const input = req.params.input
+                const op    = req.params.op
+                const arg   = req.params.arg
+                this.vMix.changeVPTZ(input, op, arg)
+                return h.response().code(204)
+            }
+        })
+
+        /*  cut preview into program  */
+        this.server.route({
+            method: "GET",
+            path: "/cut/{mode}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const mode = req.params.mode
+                this.vMix.cutPreview(mode)
+                return h.response().code(204)
+            }
+        })
     }
     async start () {
         /*  start service  */
         await this.server!.start()
         this.log.log(2, `started HTTP  network service: http://${this.argv.httpAddr}:${this.argv.httpPort}`)
+    }
+    async shutdown () {
+        if (this.server !== null) {
+            this.log.log(2, "stopping HTTP network service")
+            await this.server.stop()
+        }
     }
 }

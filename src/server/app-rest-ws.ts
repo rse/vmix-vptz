@@ -103,6 +103,8 @@ export default class RESTWS extends Latching {
             }
         })
     }
+    async shutdown () {
+    }
 
     /*  notify clients about state  */
     notifyState (state: StateType) {

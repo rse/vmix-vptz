@@ -28,5 +28,7 @@ export default class Pkg {
     }
     async init () {
     }
+    async shutdown () {
+    }
 }
 

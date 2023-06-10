@@ -5,18 +5,15 @@
 */
 
 /*  external requirements  */
-import path         from "node:path"
-import fs           from "node:fs"
 import * as vMixAPI from "node-vmix"
 import vMixUtils    from "vmix-js-utils"
 import EventEmitter from "eventemitter2"
-import jsYAML       from "js-yaml"
 
 /*  internal requirements  */
 import Argv         from "./app-argv"
 import Log          from "./app-log"
-import DB           from "./app-db"
-import RESTWS       from "./app-rest-ws"
+import State        from "./app-state"
+import type { XYZ } from "./app-state"
 
 /*  define our vMix input type  */
 type vMixInput = {
@@ -64,14 +61,14 @@ export default class VMix extends EventEmitter {
         program: [] as Array<string>
     }
     private ptz = 1
+    private vptz = new Map<string, XYZ>()
     private vptzSaveTimer: ReturnType<typeof setTimeout> | null = null
 
     /*  foreigns (injected)  */
     constructor (
         private argv:   Argv,
         private log:    Log,
-        private db:     DB,
-        private restWS: RESTWS
+        private state:  State
     ) {
         super()
         this.loadPTZ()
@@ -94,10 +91,10 @@ export default class VMix extends EventEmitter {
 
         /*  react on standard socket error events  */
         this.vmix1.on("error", (error: Error) => {
-            this.log.log(2, `vMix: connection error on vMix #1: ${error.toString()}`)
+            this.log.log(1, `vMix: connection error on vMix #1: ${error.toString()}`)
         })
         this.vmix2?.on("error", (error: Error) => {
-            this.log.log(2, `vMix: connection error on vMix #2: ${error.toString()}`)
+            this.log.log(1, `vMix: connection error on vMix #2: ${error.toString()}`)
         })
 
         /*  react on standard socket connect events  */
@@ -187,6 +184,17 @@ export default class VMix extends EventEmitter {
         })
     }
 
+    async shutdown () {
+        if (this.vmix1 !== null) {
+            this.log.log(2, "vMix: shutdown connection to vMix #1")
+            await this.vmix1.shutdown()
+        }
+        if (this.vmix2 !== null) {
+            this.log.log(2, "vMix: shutdown connection to vMix #2")
+            await this.vmix2.shutdown()
+        }
+    }
+
     /*  select (physical) PTZ  */
     setPTZ (slot: number) {
         this.ptz = slot
@@ -195,38 +203,27 @@ export default class VMix extends EventEmitter {
     }
 
     async loadPTZ () {
-        const stateFile = path.join(this.argv.stateDir, "state.yaml")
-        if (await (fs.promises.stat(stateFile).then(() => true).catch(() => false))) {
-            const txt = await this.db.readFile(stateFile)
-            const obj = jsYAML.load(txt) as { ptz: number }
-            this.ptz = obj.ptz
-        }
+        this.ptz = await this.state.getPTZ()
     }
     async savePTZ () {
-        const stateFile = path.join(this.argv.stateDir, "state.yaml")
-        const obj = { ptz: this.ptz }
-        const txt = jsYAML.dump(obj, { indent: 4, quotingType: "\"" })
-        await this.db.writeFile(stateFile, txt)
+        await this.state.setPTZ(this.ptz)
     }
 
     async loadVPTZ () {
-        const stateFile = path.join(this.argv.stateDir, `state-ptz-${this.ptz}.yaml`)
-        if (await (fs.promises.stat(stateFile).then(() => true).catch(() => false))) {
-            const txt = await this.db.readFile(stateFile)
-            const obj = jsYAML.load(txt) as { ptz: number }
-            this.ptz = obj.ptz
-            /*  FIXME  */
+        for (const input of []) {
+            const xyz = await this.state.getVPTZ(this.ptz, input)
+            this.vptz.set(input, xyz)
         }
     }
     async saveVPTZ () {
         if (this.vptzSaveTimer === null) {
             this.vptzSaveTimer = setTimeout(async () => {
                 this.vptzSaveTimer = null
-                const stateFile = path.join(this.argv.stateDir, `state-ptz-${this.ptz}.yaml`)
-                const obj = { ptz: this.ptz }
-                /*  FIXME  */
-                const txt = jsYAML.dump(obj, { indent: 4, quotingType: "\"" })
-                await this.db.writeFile(stateFile, txt)
+                for (const input of []) {
+                    const xyz = this.vptz.get(input)
+                    if (xyz)
+                        await this.state.setVPTZ(this.ptz, input, xyz)
+                }
             }, 10 * 1000)
         }
     }

@@ -32,6 +32,8 @@ export default class Log {
             this.stream = fs.createWriteStream(this.argv.logFile, { flags: "a", encoding: "utf8" })
         this.log(2, `starting ${this.pkg.name} ${this.pkg.version} (${this.pkg.date}) <${this.pkg.homepage}>`)
     }
+    async shutdown () {
+    }
     log (level: number, msg: string) {
         if (level <= this.argv.logLevel) {
             const timestamp = moment().format("YYYY-MM-DD hh:mm:ss.SSS")
