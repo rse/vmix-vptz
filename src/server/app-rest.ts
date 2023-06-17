@@ -109,14 +109,15 @@ export default class REST {
             ctx:  wsPeerCtx
             ws:   WebSocket
             req:  http.IncomingMessage
+            peer: string
         }
         const wsPeers = new Map<string, wsPeerInfo>()
         const stats = {
-            peers: 0
+            peers: {} as { [ peer: string ]: number }
         }
         this.server.route({
             method: "POST",
-            path:   "/ws",
+            path:   "/ws/{peer}",
             options: {
                 plugins: {
                     websocket: {
@@ -128,10 +129,14 @@ export default class REST {
                             const ctx: wsPeerCtx            = args.ctx
                             const ws:  WebSocket            = args.ws
                             const req: http.IncomingMessage = args.req
+                            const m = req.url!.match(/^\/ws\/(control|overlay)$/)
+                            const peer = m !== null ? m[1] : "unknown"
                             const id = `${req.socket.remoteAddress}:${req.socket.remotePort}`
                             ctx.id = id
-                            wsPeers.set(id, { ctx, ws, req })
-                            stats.peers++
+                            wsPeers.set(id, { ctx, ws, req, peer })
+                            if (stats.peers[peer] === undefined)
+                                stats.peers[peer] = 0
+                            stats.peers[peer]++
                             this.log.log(2, `WebSocket: connect: remote=${id}`)
                         },
 
@@ -139,7 +144,9 @@ export default class REST {
                         disconnect: (args: any) => {
                             const ctx: wsPeerCtx = args.ctx
                             const id = ctx.id
-                            stats.peers--
+                            const peer = wsPeers.get(id)!.peer
+                            if (stats.peers[peer] !== undefined)
+                                stats.peers[peer]--
                             wsPeers.delete(id)
                             this.log.log(2, `WebSocket: disconnect: remote=${id}`)
                         }
