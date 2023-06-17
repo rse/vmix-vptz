@@ -14,32 +14,46 @@ management of the virtual pan/tilt/zoom (PTZ) settings of *VirtualSet*'s
 in the video mixing application [vMix](https://www.vmix.com/). It has
 the following four distinct features:
 
-- **Track VPTZ per PTZ**: It tracks individual virtual PTZ settings of
-  VirtualSet inputs per each physical PTZ of a camera input. This allows
-  you to select a physical PTZ input of a camera and get a unique set of
-  virtual PTZ settings in the corresponding VirtualSet inputs. For this,
-  all virtual PTZ changes have to be routed through **vMix-VPTZ**, which
-  in turn adjusts vMix.
-
 - **Reset/Switch VPTZ**: It allows you to reset the virtual PTZ set
   belonging to a physical PTZ once after vMix startup, and automatically
   switches to the individual virtual PTZ set belonging to a physical
   PTZ on every physical PTZ activation. For this, the physical PTZ
   activations have to be routed through **vMix-VPTZ**, which in turn
-  adjusts vMix.
+  activates the physical PTZ in vMix and updates all corresponding
+  virtual PTZs.
+  Rationale: This allows you to have (and activate) a true individual
+  virtual PTZ per each physical PTZ.
 
 - **Track Preview/Program**: It tracks the program and preview for
-  active VirtualSet inputs to know which virtual PTZs are active.
+  active *VirtualSet* inputs to know which virtual PTZ(s) are currently
+  in preview.
+  Rationale: This allows **vMix-VPTZ** to know to which *VirtualSet*
+  a virtual PTZ adjustments is applied to.
 
-- **Cutted Drive**: It allows you to VPTZ drive from VPTZ A (in preview)
-  to B (in program) via a Cut and a subsequence Drive operation like `t
+- **Track VPTZ per PTZ**: It tracks individual virtual PTZ settings of
+  *VirtualSet* inputs per each physical PTZ of a camera input. This allows
+  you to select a physical PTZ input of a camera and get a unique set of
+  virtual PTZ settings in the corresponding *VirtualSet* inputs. For this,
+  all virtual PTZ adjustments have to be routed through **vMix-VPTZ**, which
+  records the virtual PTZ adjustments and routes them to vMix, too.
+  Rationale: This allows you to have a true individual virtual PTZ
+  per each physical PTZ.
+
+- **Cutted Drive**: It allows you to VPTZ-drive from VPTZ A (in preview)
+  to VPTZ B (in program) via a Cut and a subsequent Drive operation like `t
   = vptz(A), vptz(A, vptz(B)), cut(A), drive(A, t)`. In other words: it
-  remembers the target VPTZ of A, sets A to the VPTZ of B, cuts A into
-  program and then drives A to the remembered target VPTZ.
+  remembers the target virtual PTZ of A, sets A to the virtual PTZ of B, cuts A into
+  program and then drives A to the remembered target virtual PTZ.
+  Rationale: This allows the video mixing engineer to perform
+  a (usually pre-configured or ad-hoc) live camera drive between to
+  regular *VirtualSet* inputs.
 
-- **Direct Drive**: It allows you to VPTZ drive from VPTZ A (in preview)
+- **Direct Drive**: It allows you to VPTZ-drive from VPTZ A (in preview)
   to B (in program) via a direct Drive operation like `drive(B, vptz(A))`.
-  In other words: it drives B to the VPTZ of A without any Cuts.
+  In other words: it drives B to the virtual PTZ of A without any Cuts.
+  Rationale: This allows the video mixing engineer to perform
+  an ad-hoc camera drive for a regular *VirtualSet* input
+  based on a preview-only "scratch" *VirtualSet*.
 
 The application, written in
 [TypeScript](https://www.typescriptlang.org/), consists of a central
