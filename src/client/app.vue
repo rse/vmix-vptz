@@ -18,13 +18,13 @@
         ></app-control>
 
         <!--  Overlay UI  -->
-        <app-preview
+        <app-overlay
             ref="overlay"
             v-if="mode === 'overlay'"
             v-bind:options="options"
             v-bind:ws-url="wsURL"
             v-bind:sv-url="svURL"
-        ></app-preview>
+        ></app-overlay>
     </div>
 </template>
 
