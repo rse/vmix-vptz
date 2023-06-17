@@ -16,12 +16,12 @@
 
         <!--  BODY  -->
         <div class="body">
-            <app-preview
-                ref="preview"
+            <app-overlay
+                ref="overlay"
                 v-bind:options="{}"
                 v-bind:ws-url="wsUrl"
                 v-bind:sv-url="svUrl"
-            ></app-preview>
+            ></app-overlay>
         </div>
 
         <!--  FOOTER  -->
@@ -96,7 +96,7 @@
         width:  calc(100% - 2 * 10px)
         height: calc(100% - 2 * 10px)
         overflow: hidden
-        .app-preview
+        .app-overlay
             width: 400px
             height: auto
             aspect-ratio: 16 / 9
@@ -163,7 +163,7 @@ import { defineComponent } from "vue"
 import RecWebSocket        from "reconnecting-websocket"
 import Ducky               from "ducky"
 import axios               from "axios"
-import AppPreview          from "./app-preview.vue"
+import AppOverlay          from "./app-overlay.vue"
 import { StateType, StateSchema, StateDefault } from "../common/app-state"
 </script>
 
@@ -172,7 +172,7 @@ let statusTimer: ReturnType<typeof setTimeout> | null = null
 export default defineComponent({
     name: "app-control",
     components: {
-        "app-preview": AppPreview
+        "app-overlay": AppOverlay
     },
     props: {
         svUrl: { type: String, default: "" },
