@@ -5,6 +5,7 @@
 **  Licensed under GPL 3.0 <https://spdx.org/licenses/GPL-3.0-only>
 */
 
+import { AsyncLocalStorage }   from "node:async_hooks"
 import EventEmitter            from "eventemitter2"
 import promiseRetry            from "promise-retry"
 import Knex                    from "knex"
@@ -26,14 +27,16 @@ export default class DB extends EventEmitter {
     /*  public properties  */
     public loglevel = DB_LogLevels
     public knex: ReturnType<typeof Knex> | null = null
-    private url = "memory:"
 
     /*  private properties  */
+    private url = "memory:"
     private options = { debug: false } as DB_Options
+    private tls: AsyncLocalStorage<KnexNS.Transaction>
 
     /*  object constructor  */
     constructor () {
         super()
+        this.tls = new AsyncLocalStorage()
     }
 
     /*  configure the object  */
@@ -112,9 +115,18 @@ export default class DB extends EventEmitter {
         return promiseRetry<T>(async (retry: (error: any) => never, attempt: number) => {
             if (this.knex === null)
                 return Promise.reject(new Error("database (still) not opened"))
-            return this.knex.transaction<T>((trx) => {
-                return callback(trx)
-            }).then((result: T) => {
+            const trx = this.tls.getStore()
+            const promise = trx ?
+                new Promise<T>((resolve, reject) => {
+                    try { resolve(callback(trx)) }
+                    catch (ex) { reject(ex) }
+                }) :
+                this.knex.transaction<T>((trx) => {
+                    return this.tls.run(trx, () => {
+                        return callback(trx)
+                    })
+                })
+            return promise.then((result: T) => {
                 return result
             }).catch((err) => {
                 const errMsg = (typeof err !== "string" ? err.toString() : err)

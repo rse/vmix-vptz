@@ -100,8 +100,10 @@ export default class State extends DB {
     async getPTZ (cam: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        const rec = await this.knex("ptz").select("ptz").where({ cam }).limit(1)
-        return (rec.length === 1 ? rec[0].ptz : this.cfg.idPTZs[0])
+        return this.transaction(async (knex) => {
+            const rec = await knex("ptz").select("ptz").where({ cam }).limit(1)
+            return (rec.length === 1 ? rec[0].ptz : this.cfg.idPTZs[0])
+        })
     }
     async setPTZ (cam: string, ptz: string) {
         if (this.knex === null)
@@ -117,19 +119,23 @@ export default class State extends DB {
     async delPTZ (cam: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        await this.knex("ptz").delete().where({ cam })
+        await this.transaction(async (knex) => {
+            await knex("ptz").delete().where({ cam })
+        })
     }
 
     /*  data access object (DAO) methods for "VPTZ"  */
     async getVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        const rec = await this.knex("vptz").select("*").where({ cam, ptz, vptz })
-        return (
-            rec.length === 1 ?
-            { x: rec[0].x, y: rec[0].y, zoom: rec[0].zoom } as XYZ :
-            { x: 0, y: 0, zoom: 1.0 } as XYZ
-        )
+        return this.transaction(async (knex) => {
+            const rec = await knex("vptz").select("*").where({ cam, ptz, vptz })
+            return (
+                rec.length === 1 ?
+                { x: rec[0].x, y: rec[0].y, zoom: rec[0].zoom } as XYZ :
+                { x: 0, y: 0, zoom: 1.0 } as XYZ
+            )
+        })
     }
     async setVPTZ (cam: string, ptz: string, vptz: string, xyz: XYZ) {
         if (this.knex === null)
@@ -145,6 +151,8 @@ export default class State extends DB {
     async delVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        await this.knex("vptz").delete().where({ cam, ptz, vptz })
+        await this.transaction(async (knex) => {
+            await knex("vptz").delete().where({ cam, ptz, vptz })
+        })
     }
 }

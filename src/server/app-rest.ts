@@ -187,7 +187,7 @@ export default class REST {
 
         /*  ==== Endpoint: PTZ Switching ====  */
 
-        /*  select PTZ  */
+        /*  select PTZ of all cameras  */
         this.server.route({
             method: "GET",
             path: "/ptz/{ptz}",
@@ -197,6 +197,8 @@ export default class REST {
                 return h.response().code(204)
             }
         })
+
+        /*  select PTZ of single camera  */
         this.server.route({
             method: "GET",
             path: "/ptz/{ptz}/{cam}",
