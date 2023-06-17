@@ -211,7 +211,6 @@ export default class REST {
                 return h.response().code(204)
             }
         })
-
     }
     async start () {
         /*  start service  */
