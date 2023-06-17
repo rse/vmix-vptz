@@ -13,7 +13,6 @@ import Pkg            from "./app-pkg"
 import Argv           from "./app-argv"
 import Log            from "./app-log"
 import REST           from "./app-rest"
-import RESTWS         from "./app-rest-ws"
 import VMix           from "./app-vmix"
 import State          from "./app-state"
 

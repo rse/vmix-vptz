@@ -15,6 +15,7 @@ import HAPIHeader     from "hapi-plugin-header"
 import HAPITraffic    from "hapi-plugin-traffic"
 import HAPIDucky      from "hapi-plugin-ducky"
 import ducky          from "ducky"
+import WebSocket      from "ws"
 
 import Pkg            from "./app-pkg"
 import Argv           from "./app-argv"
@@ -100,53 +101,7 @@ export default class REST {
             }
         })
 
-        /*  load current state  */
-        this.server.route({
-            method: "GET",
-            path: "/state",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const ptz  = this.state.getPTZ()
-                const state = { ptz }
-                return h.response(state).code(200)
-            }
-        })
-
-        /*  select PTZ  */
-        this.server.route({
-            method: "GET",
-            path: "/ptz/{slot}",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const slot = parseInt(req.params.slot)
-                this.vMix.setPTZ(slot)
-                return h.response().code(204)
-            }
-        })
-
-        /*  change VPTZ  */
-        this.server.route({
-            method: "GET",
-            path: "/vptz/{input}/{op}/{arg}",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const input = req.params.input
-                const op    = req.params.op
-                const arg   = req.params.arg
-                this.vMix.changeVPTZ(input, op, arg)
-                return h.response().code(204)
-            }
-        })
-
-        /*  cut preview into program  */
-        this.server.route({
-            method: "GET",
-            path: "/cut/{mode}",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const mode = req.params.mode
-                this.vMix.cutPreview(mode)
-                return h.response().code(204)
-            }
-        })
-
-        /*  peer tracking  */
+        /*  serve WebSocket connections  */
         type wsPeerCtx = {
             id:   string
         }
@@ -156,13 +111,9 @@ export default class REST {
             req:  http.IncomingMessage
         }
         const wsPeers = new Map<string, wsPeerInfo>()
-
-        /*  statistics gathering  */
         const stats = {
             peers: 0
         }
-
-        /*  serve WebSocket connections  */
         this.server.route({
             method: "POST",
             path:   "/ws",
@@ -214,6 +165,53 @@ export default class REST {
             for (const info of wsPeers.values())
                 info.ws.send(msg)
         }
+
+        /*  load current state  */
+        this.server.route({
+            method: "GET",
+            path: "/state",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const ptz  = this.state.getPTZ()
+                const state = { ptz }
+                return h.response(state).code(200)
+            }
+        })
+
+        /*  select PTZ  */
+        this.server.route({
+            method: "GET",
+            path: "/ptz/{slot}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const slot = parseInt(req.params.slot)
+                this.vMix.setPTZ(slot)
+                return h.response().code(204)
+            }
+        })
+
+        /*  change VPTZ  */
+        this.server.route({
+            method: "GET",
+            path: "/vptz/{input}/{op}/{arg}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const input = req.params.input
+                const op    = req.params.op
+                const arg   = req.params.arg
+                this.vMix.changeVPTZ(input, op, arg)
+                return h.response().code(204)
+            }
+        })
+
+        /*  cut preview into program  */
+        this.server.route({
+            method: "GET",
+            path: "/cut/{mode}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const mode = req.params.mode
+                this.vMix.cutPreview(mode)
+                return h.response().code(204)
+            }
+        })
+
     }
     async start () {
         /*  start service  */
