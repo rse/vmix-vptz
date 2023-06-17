@@ -74,6 +74,24 @@ Unfortunately, vMix has very limited functionality to control
 the virtual PTZ information in a *VirtualSet*. This **vMix-VPTZ**
 application fixes the situation outside of vMix.
 
+Scenario
+--------
+
+Currently, the hard-coded scenario is to have the following distinct vMix input set:
+
+- 5 *PTZ*-type inputs (directly attached to the camera input), named
+  `PTZ - CAMx-W-V` ("wide-virtual") (`x` = `1` ... `5`), as the physical
+  PTZ input.
+
+- 5x4 *PTZ*-type inputs (directly attached to the camera input), named
+  `PTZ - CAMx-W-V-y` (`x` = `1`...`5`, `y` = `A`...`D`), as inputs just
+  holding pre-configured physical PTZ information for `PTZ - CAMx-W-V`.
+
+- 5x7 *VirtualSet*-type inputs (using the underlying `PTZ - CAMx-W-V` on
+  top of dynamically rendered background canvas inputs),
+  named `VPTZ - CAMx-z` (`x` = `1`...`5`, `z` = `C-L`/`C-C`/`C-R`/`F-L`/`F-C`/`F-R`/`W-C`),
+  as inputs for the virtual PTZ.
+
 Usage (Production)
 ------------------
 
