@@ -35,7 +35,7 @@
         "vmix-js-utils":                    "4.0.16",
         "vmix-function-list":               "26.0.24",
 
-        "@types/node":                      "20.2.5",
+        "@types/node":                      "20.3.1",
         "@types/hapi__inert":               "5.2.6",
         "@types/js-yaml":                   "4.0.5",
         "@types/urijs":                     "1.19.19",
@@ -73,12 +73,12 @@
     },
     "devDependencies": {
         "@rollup/plugin-yaml":              "4.1.0",
-        "@typescript-eslint/eslint-plugin": "5.59.9",
-        "@typescript-eslint/parser":        "5.59.9",
+        "@typescript-eslint/eslint-plugin": "5.59.11",
+        "@typescript-eslint/parser":        "5.59.11",
         "@vitejs/plugin-vue":               "4.2.3",
 
         "@vue/eslint-config-typescript":    "11.0.3",
-        "eslint":                           "8.42.0",
+        "eslint":                           "8.43.0",
         "eslint-config-standard":           "17.1.0",
         "eslint-plugin-import":             "2.27.5",
         "eslint-plugin-vue":                "9.14.1",
@@ -99,7 +99,7 @@
         "stylus":                           "0.59.0",
         "typescript":                       "5.1.3",
         "vite":                             "4.3.9",
-        "vue-tsc":                          "1.6.5",
+        "vue-tsc":                          "1.8.0",
         "delay-cli":                        "2.0.0",
         "nps":                              "5.10.0",
         "cross-env":                        "7.0.3",
