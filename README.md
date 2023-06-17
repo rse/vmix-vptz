@@ -21,13 +21,13 @@ the following four distinct features:
   activations have to be routed through **vMix-VPTZ**, which in turn
   activates the physical PTZ in vMix and updates all corresponding
   virtual PTZs.
-  Rationale: This allows you to have (and activate) a true individual
+  **Rationale:** This allows you to have (and activate) a true individual
   virtual PTZ per each physical PTZ.
 
 - **Track Preview/Program**: It tracks the program and preview for
   active *VirtualSet* inputs to know which virtual PTZ(s) are currently
   in preview.
-  Rationale: This allows **vMix-VPTZ** to know to which *VirtualSet*
+  **Rationale:** This allows **vMix-VPTZ** to know to which *VirtualSet*
   a virtual PTZ adjustments is applied to.
 
 - **Track VPTZ per PTZ**: It tracks individual virtual PTZ settings of
@@ -36,7 +36,7 @@ the following four distinct features:
   virtual PTZ settings in the corresponding *VirtualSet* inputs. For this,
   all virtual PTZ adjustments have to be routed through **vMix-VPTZ**, which
   records the virtual PTZ adjustments and routes them to vMix, too.
-  Rationale: This allows you to have a true individual virtual PTZ
+  **Rationale:** This allows you to have a true individual virtual PTZ
   per each physical PTZ.
 
 - **Cutted Drive**: It allows you to VPTZ-drive from VPTZ A (in preview)
@@ -44,14 +44,14 @@ the following four distinct features:
   = vptz(A), vptz(A, vptz(B)), cut(A), drive(A, t)`. In other words: it
   remembers the target virtual PTZ of A, sets A to the virtual PTZ of B, cuts A into
   program and then drives A to the remembered target virtual PTZ.
-  Rationale: This allows the video mixing engineer to perform
+  **Rationale:** This allows the video mixing engineer to perform
   a (usually pre-configured or ad-hoc) live camera drive between to
   regular *VirtualSet* inputs.
 
 - **Direct Drive**: It allows you to VPTZ-drive from VPTZ A (in preview)
   to B (in program) via a direct Drive operation like `drive(B, vptz(A))`.
   In other words: it drives B to the virtual PTZ of A without any Cuts.
-  Rationale: This allows the video mixing engineer to perform
+  **Rationale:** This allows the video mixing engineer to perform
   an ad-hoc camera drive for a regular *VirtualSet* input
   based on a preview-only "scratch" *VirtualSet*.
 
