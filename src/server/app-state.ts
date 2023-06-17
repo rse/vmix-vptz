@@ -8,18 +8,21 @@ import path  from  "node:path"
 
 import Argv  from "./app-argv"
 import Log   from "./app-log"
+import Cfg   from "./app-cfg"
 import DB    from "./app-db"
 
-export interface PTZ {
-    ptz:   number   /* active PTZ */
+export interface PTZ {  /* physical PTZ selection     */
+    cam:   string,      /* camera        (e.g. "1")   */
+    ptz:   string       /* physical PTZ  (e.g. "A")   */
 }
 
-export interface VPTZ {
-    ptz:   number,  /* assigned PTZ */
-    name:  string,  /* input name   */
-    x:     number,  /* x position   */
-    y:     number,  /* y position   */
-    zoom:  number   /* zoom level   */
+export interface VPTZ { /* virtual PTZ configuration  */
+    cam:   string,      /* camera        (e.g. "1")   */
+    ptz:   string,      /* physical PTZ  (e.g. "A")   */
+    vptz:  string,      /* virtual PTZ   (e.g. "W-C") */
+    x:     number,      /* x position    (e.g. 0)     */
+    y:     number,      /* y position    (e.g. 0)     */
+    zoom:  number       /* zoom level    (e.g. 1.0)   */
 }
 
 declare module "knex/types/tables" {
@@ -38,7 +41,8 @@ export type XYZ = {
 export default class State extends DB {
     constructor (
         private argv: Argv,
-        private log:  Log
+        private log:  Log,
+        private cfg:  Cfg
     ) {
         super()
     }
@@ -66,69 +70,81 @@ export default class State extends DB {
             const exists = await knex.schema.hasTable("ptz")
             if (!exists) {
                 await knex.schema.createTable("ptz", (table) => {
+                    table.string("cam").notNullable()
                     table.string("ptz").notNullable()
+                    table.index([ "cam" ], "ptz_index")
                 })
                 await knex.schema.createTable("vptz", (table) => {
+                    table.string("cam").notNullable()
                     table.string("ptz").notNullable()
-                    table.string("name").notNullable()
+                    table.string("vptz").notNullable()
                     table.float("x").notNullable()
                     table.float("y").notNullable()
                     table.float("zoom").notNullable()
-                    table.index([ "ptz", "name" ], "vptz_index")
+                    table.index([ "cam", "ptz", "vptz" ], "vptz_index")
                 })
+
+                /*  ad-hoc create initial database content  */
+                for (const cam of this.cfg.idCAMs) {
+                    const ptz = this.cfg.idPTZs[0]
+                    await knex("ptz").insert({ cam, ptz })
+                    for (const ptz of this.cfg.idPTZs)
+                        for (const vptz of this.cfg.idVPTZs)
+                            await knex("vptz").insert({ cam, ptz, vptz, x: 0, y: 0, zoom: 1.0 })
+                }
             }
         })
     }
 
     /*  data access object (DAO) methods for "PTZ"  */
-    async getPTZ () {
+    async getPTZ (cam: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        const rec = await this.knex("ptz").select("*").limit(1)
-        return (rec.length === 1 ? rec[0].ptz : 0)
+        const rec = await this.knex("ptz").select("ptz").where({ cam }).limit(1)
+        return (rec.length === 1 ? rec[0].ptz : this.cfg.idPTZs[0])
     }
-    async setPTZ (ptz: number) {
+    async setPTZ (cam: string, ptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
         await this.transaction(async (knex) => {
-            const rec = await knex("ptz").select()
+            const rec = await knex("ptz").select("ptz").where({ cam })
             if ((rec?.length ?? 0) > 0)
-                await knex("ptz").update({ ptz })
+                await knex("ptz").update({ ptz }).where({ cam })
             else
-                await knex("ptz").insert({ ptz })
+                await knex("ptz").insert({ ptz, cam })
         })
     }
-    async delPTZ () {
+    async delPTZ (cam: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        await this.knex!("ptz").delete()
+        await this.knex("ptz").delete().where({ cam })
     }
 
     /*  data access object (DAO) methods for "VPTZ"  */
-    async getVPTZ (ptz: number, name: string) {
+    async getVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        const rec = await this.knex!("vptz").select("*").where({ ptz, name })
+        const rec = await this.knex("vptz").select("*").where({ cam, ptz, vptz })
         return (
             rec.length === 1 ?
             { x: rec[0].x, y: rec[0].y, zoom: rec[0].zoom } as XYZ :
             { x: 0, y: 0, zoom: 1.0 } as XYZ
         )
     }
-    async setVPTZ (ptz: number, name: string, xyz: XYZ) {
+    async setVPTZ (cam: string, ptz: string, vptz: string, xyz: XYZ) {
         if (this.knex === null)
             throw new Error("database not opened")
         await this.transaction(async (knex) => {
-            const rec = await knex("vptz").select().where({ ptz, name })
+            const rec = await knex("vptz").select().where({ cam, ptz, vptz })
             if ((rec?.length ?? 0) > 0)
-                await knex("vptz").update({ x: xyz.x, y: xyz.y, zoom: xyz.zoom }).where({ ptz, name })
+                await knex("vptz").update({ x: xyz.x, y: xyz.y, zoom: xyz.zoom }).where({ cam, ptz, vptz })
             else
-                await knex("vptz").insert({ ptz, name, x: xyz.x, y: xyz.y, zoom: xyz.zoom })
+                await knex("vptz").insert({ cam, ptz, vptz, x: xyz.x, y: xyz.y, zoom: xyz.zoom })
         })
     }
-    async delVPTZ (ptz: number, name: string) {
+    async delVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        await this.knex!("vptz").delete().where({ ptz, name })
+        await this.knex("vptz").delete().where({ cam, ptz, vptz })
     }
 }

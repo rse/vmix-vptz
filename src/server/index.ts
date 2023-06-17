@@ -10,6 +10,7 @@ import * as awilix    from "awilix"
 
 /*  load internal requirements  */
 import Pkg            from "./app-pkg"
+import Cfg            from "./app-cfg"
 import Argv           from "./app-argv"
 import Log            from "./app-log"
 import REST           from "./app-rest"
@@ -33,20 +34,22 @@ class Main {
             this.container.register({
                 ctx:        awilix.asValue(ctx),
                 pkg:        awilix.asClass(Pkg        ).setLifetime(awilix.Lifetime.SINGLETON),
+                cfg:        awilix.asClass(Cfg        ).setLifetime(awilix.Lifetime.SINGLETON),
                 argv:       awilix.asClass(Argv       ).setLifetime(awilix.Lifetime.SINGLETON),
                 log:        awilix.asClass(Log        ).setLifetime(awilix.Lifetime.SINGLETON),
                 state:      awilix.asClass(State      ).setLifetime(awilix.Lifetime.SINGLETON),
                 rest:       awilix.asClass(REST       ).setLifetime(awilix.Lifetime.SINGLETON),
-                vMix:       awilix.asClass(VMix       ).setLifetime(awilix.Lifetime.SINGLETON)
+                vmix:       awilix.asClass(VMix       ).setLifetime(awilix.Lifetime.SINGLETON)
             })
 
             /*  initialize classes  */
             await this.container.cradle.pkg.init()
+            await this.container.cradle.cfg.init()
             await this.container.cradle.argv.init()
             await this.container.cradle.log.init()
             await this.container.cradle.state.init()
             await this.container.cradle.rest.init()
-            await this.container.cradle.vMix.init()
+            await this.container.cradle.vmix.init()
 
             /*  start classes  */
             await this.container.cradle.rest.start()
@@ -71,11 +74,12 @@ class Main {
     async shutdown (returnCode = 0) {
         /*  shutdown classes  */
         if (this.container !== null) {
-            await this.container.cradle.vMix.shutdown()
+            await this.container.cradle.vmix.shutdown()
             await this.container.cradle.rest.shutdown()
             await this.container.cradle.state.shutdown()
             await this.container.cradle.log.shutdown()
             await this.container.cradle.argv.shutdown()
+            await this.container.cradle.cfg.shutdown()
             await this.container.cradle.pkg.shutdown()
         }
 

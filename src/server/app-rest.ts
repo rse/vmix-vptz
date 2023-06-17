@@ -20,7 +20,6 @@ import WebSocket      from "ws"
 import Pkg            from "./app-pkg"
 import Argv           from "./app-argv"
 import Log            from "./app-log"
-import State          from "./app-state"
 import VMix           from "./app-vmix"
 
 import { StateType }  from "../common/app-state"
@@ -31,8 +30,7 @@ export default class REST {
         private pkg:    Pkg,
         private argv:   Argv,
         private log:    Log,
-        private state:  State,
-        private vMix:   VMix
+        private vmix:   VMix
     ) {}
     async init () {
         /*  establish network service  */
@@ -88,6 +86,8 @@ export default class REST {
             }
         })
 
+        /*  ==== Endpoint: User Interface (Files) ====  */
+
         /*  serve static client files  */
         this.server.route({
             method: "GET",
@@ -98,6 +98,18 @@ export default class REST {
                     redirectToSlash: true,
                     index: true
                 }
+            }
+        })
+
+        /*  ==== Endpoint: User Interface (State) ====  */
+
+        /*  load current state  */
+        this.server.route({
+            method: "GET",
+            path: "/state",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const state  = this.vmix.getState
+                return h.response(state).code(200)
             }
         })
 
@@ -173,27 +185,30 @@ export default class REST {
                 info.ws.send(msg)
         }
 
-        /*  load current state  */
-        this.server.route({
-            method: "GET",
-            path: "/state",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const ptz  = this.state.getPTZ()
-                const state = { ptz }
-                return h.response(state).code(200)
-            }
-        })
+        /*  ==== Endpoint: PTZ Switching ====  */
 
         /*  select PTZ  */
         this.server.route({
             method: "GET",
-            path: "/ptz/{slot}",
+            path: "/ptz/{ptz}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const slot = parseInt(req.params.slot)
-                this.vMix.setPTZ(slot)
+                const ptz = req.params.ptz
+                await this.vmix.setPTZAll(ptz)
                 return h.response().code(204)
             }
         })
+        this.server.route({
+            method: "GET",
+            path: "/ptz/{ptz}/{cam}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const ptz = req.params.ptz
+                const cam = req.params.cam
+                await this.vmix.setPTZCam(ptz, cam)
+                return h.response().code(204)
+            }
+        })
+
+        /*  ==== Endpoint: VPTZ Adjustment ====  */
 
         /*  change VPTZ  */
         this.server.route({
@@ -203,7 +218,7 @@ export default class REST {
                 const input = req.params.input
                 const op    = req.params.op
                 const arg   = req.params.arg
-                this.vMix.changeVPTZ(input, op, arg)
+                this.vmix.changeVPTZ(input, op, arg)
                 return h.response().code(204)
             }
         })
@@ -214,7 +229,7 @@ export default class REST {
             path: "/cut/{mode}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const mode = req.params.mode
-                this.vMix.cutPreview(mode)
+                this.vmix.cutPreview(mode)
                 return h.response().code(204)
             }
         })

@@ -83,8 +83,8 @@ Currently, the hard-coded scenario is to have the following distinct vMix input 
   `PTZ - CAMx-W-V` ("wide-virtual") (`x` = `1` ... `5`), as the physical
   PTZ input.
 
-- 5x4 *PTZ*-type inputs (directly attached to the camera input), named
-  `PTZ - CAMx-W-V-y` (`x` = `1`...`5`, `y` = `A`...`D`), as inputs just
+- 5x8 *PTZ*-type inputs (directly attached to the camera input), named
+  `PTZ - CAMx-W-V-y` (`x` = `1`...`5`, `y` = `A`...`H`), as inputs just
   holding pre-configured physical PTZ information for `PTZ - CAMx-W-V`.
 
 - 5x7 *VirtualSet*-type inputs (using the underlying `PTZ - CAMx-W-V` on
