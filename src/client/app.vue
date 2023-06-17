@@ -17,10 +17,10 @@
             v-bind:sv-url="svURL"
         ></app-control>
 
-        <!--  Preview UI  -->
+        <!--  Overlay UI  -->
         <app-preview
-            ref="preview"
-            v-if="mode === 'preview'"
+            ref="overlay"
+            v-if="mode === 'overlay'"
             v-bind:options="options"
             v-bind:ws-url="wsURL"
             v-bind:sv-url="svURL"
@@ -32,7 +32,7 @@
 import { defineComponent } from "vue"
 import URI                 from "urijs"
 import AppControl          from "./app-control.vue"
-import AppPreview          from "./app-preview.vue"
+import AppOverlay          from "./app-overlay.vue"
 </script>
 
 <script lang="ts">
@@ -40,7 +40,7 @@ export default defineComponent({
     name: "app",
     components: {
         "app-control": AppControl,
-        "app-preview": AppPreview
+        "app-overlay": AppOverlay
     },
     data: () => ({
         mode:       "control",

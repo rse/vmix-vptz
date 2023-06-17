@@ -7,9 +7,9 @@
 -->
 
 <template>
-    <div class="app-preview" ref="root">
+    <div class="app-overlay" ref="root">
         <div ref="canvas" class="canvas">
-            <div ref="preview" class="preview"
+            <div ref="overlay" class="overlay"
                 v-bind:style="{
                     left:   (canvas.w * (state.preview.x / camera.w)) + 'px',
                     top:    (canvas.h * (state.preview.y / camera.h)) + 'px',
@@ -40,7 +40,7 @@
 </template>
 
 <style lang="stylus">
-.app-preview
+.app-overlay
     width: 100%
     height: auto
     aspect-ratio: 16 / 9
@@ -93,12 +93,11 @@ import Ducky                      from "ducky"
 import moment                     from "moment"
 import axios                      from "axios"
 import { StateType, StateSchema, StateDefault } from "../common/app-state"
-import { number } from "joi"
 </script>
 
 <script lang="ts">
 export default defineComponent({
-    name: "app-preview",
+    name: "app-overlay",
     components: {},
     props: {
         options: { type: Object, default: new Map<string, string | boolean>() },
@@ -113,7 +112,7 @@ export default defineComponent({
     async mounted () {
         /*  connect to server for PTZ and state updates  */
         this.log("INFO", "establish WebSocket server connection")
-        const ws = new RecWebSocket(this.wsUrl + "/preview", [], {
+        const ws = new RecWebSocket(this.wsUrl + "/overlay", [], {
             reconnectionDelayGrowFactor: 1.3,
             maxReconnectionDelay:        4000,
             minReconnectionDelay:        1000,
@@ -160,6 +159,7 @@ export default defineComponent({
         const errors = [] as Array<string>
         if (!Ducky.validate(state, StateSchema, errors))
             throw new Error(`invalid schema of loaded state: ${errors.join(", ")}`)
+        // FIXME
         // this.state = state as StateType
 
         const fetchCanvasSize = () => {
