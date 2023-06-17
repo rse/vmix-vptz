@@ -5,19 +5,24 @@
 */
 
 import path           from "node:path"
+import http           from "node:http"
 import * as HAPI      from "@hapi/hapi"
+import Boom           from "@hapi/boom"
 import { Server }     from "@hapi/hapi"
 import Inert          from "@hapi/inert"
 import HAPIWebSocket  from "hapi-plugin-websocket"
 import HAPIHeader     from "hapi-plugin-header"
 import HAPITraffic    from "hapi-plugin-traffic"
 import HAPIDucky      from "hapi-plugin-ducky"
+import ducky          from "ducky"
 
 import Pkg            from "./app-pkg"
 import Argv           from "./app-argv"
 import Log            from "./app-log"
 import State          from "./app-state"
 import VMix           from "./app-vmix"
+
+import { StateType }  from "../common/app-state"
 
 export default class REST {
     public server: Server | null = null
@@ -140,6 +145,75 @@ export default class REST {
                 return h.response().code(204)
             }
         })
+
+        /*  peer tracking  */
+        type wsPeerCtx = {
+            id:   string
+        }
+        type wsPeerInfo = {
+            ctx:  wsPeerCtx
+            ws:   WebSocket
+            req:  http.IncomingMessage
+        }
+        const wsPeers = new Map<string, wsPeerInfo>()
+
+        /*  statistics gathering  */
+        const stats = {
+            peers: 0
+        }
+
+        /*  serve WebSocket connections  */
+        this.server.route({
+            method: "POST",
+            path:   "/ws",
+            options: {
+                plugins: {
+                    websocket: {
+                        only: true,
+                        autoping: 30 * 1000,
+
+                        /*  on WebSocket connection open  */
+                        connect: (args: any) => {
+                            const ctx: wsPeerCtx            = args.ctx
+                            const ws:  WebSocket            = args.ws
+                            const req: http.IncomingMessage = args.req
+                            const id = `${req.socket.remoteAddress}:${req.socket.remotePort}`
+                            ctx.id = id
+                            wsPeers.set(id, { ctx, ws, req })
+                            stats.peers++
+                            this.log.log(2, `WebSocket: connect: remote=${id}`)
+                        },
+
+                        /*  on WebSocket connection close  */
+                        disconnect: (args: any) => {
+                            const ctx: wsPeerCtx = args.ctx
+                            const id = ctx.id
+                            stats.peers--
+                            wsPeers.delete(id)
+                            this.log.log(2, `WebSocket: disconnect: remote=${id}`)
+                        }
+                    }
+                }
+            },
+            handler: (request: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                /*  on WebSocket message transfer  */
+                const { ctx, ws } = request.websocket()
+                if (typeof request.payload !== "object" || request.payload === null)
+                    return Boom.badRequest("invalid request")
+                if (!ducky.validate(request.payload, "{ cmd: string, arg?: string }"))
+                    return Boom.badRequest("invalid request")
+                const { cmd, arg } = request.payload as any satisfies { cmd: string, arg: any }
+                return Boom.badRequest("not implemented") // FIXME
+                return h.response().code(204)
+            }
+        })
+
+        /*  notify clients about state  */
+        const notifyState = (state: StateType) => {
+            const msg = JSON.stringify({ cmd: "STATE", arg: { state } })
+            for (const info of wsPeers.values())
+                info.ws.send(msg)
+        }
     }
     async start () {
         /*  start service  */
