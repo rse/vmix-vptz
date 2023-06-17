@@ -60,6 +60,20 @@ The application, written in
 [Node.js](https://nodejs.org)-based server component and a HTML5
 Single-Page Application (SPA) as the client component.
 
+Motivation
+----------
+
+In case of a greenscreen-based production, you can combine vMix with
+[Studio-Canvas](https://github.com/rse/studio-canvas) and render the
+chroma-keyed background with the help of a game engine and synchronize
+its orientation with the physical PTZ information of your cameras.
+That works just fine. For more flexibility, you usually then also want
+to use multile virtual PTZ for each physical PTZ. This can be achieved
+with the help of *VirtualSet* inputs inside vMix.
+Unfortunately, vMix has very limited functionality to control
+the virtual PTZ information in a *VirtualSet*. This **vMix-VPTZ**
+application fixes the situation outside of vMix.
+
 Usage (Production)
 ------------------
 
