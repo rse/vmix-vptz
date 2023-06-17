@@ -38,7 +38,6 @@ class Main {
                 log:        awilix.asClass(Log        ).setLifetime(awilix.Lifetime.SINGLETON),
                 state:      awilix.asClass(State      ).setLifetime(awilix.Lifetime.SINGLETON),
                 rest:       awilix.asClass(REST       ).setLifetime(awilix.Lifetime.SINGLETON),
-                restWS:     awilix.asClass(RESTWS     ).setLifetime(awilix.Lifetime.SINGLETON),
                 vMix:       awilix.asClass(VMix       ).setLifetime(awilix.Lifetime.SINGLETON)
             })
 
@@ -48,7 +47,6 @@ class Main {
             await this.container.cradle.log.init()
             await this.container.cradle.state.init()
             await this.container.cradle.rest.init()
-            await this.container.cradle.restWS.init()
             await this.container.cradle.vMix.init()
 
             /*  start classes  */
@@ -75,7 +73,6 @@ class Main {
         /*  shutdown classes  */
         if (this.container !== null) {
             await this.container.cradle.vMix.shutdown()
-            await this.container.cradle.restWS.shutdown()
             await this.container.cradle.rest.shutdown()
             await this.container.cradle.state.shutdown()
             await this.container.cradle.log.shutdown()
