@@ -182,7 +182,8 @@ export default class REST {
         const notifyState = (state: StateType) => {
             const msg = JSON.stringify({ cmd: "STATE", arg: { state } })
             for (const info of wsPeers.values())
-                info.ws.send(msg)
+                if (info.ws.readyState === WebSocket.OPEN)
+                    info.ws.send(msg)
         }
 
         /*  forward state changes to clients  */

@@ -26,6 +26,13 @@ type vMixInput = {
     xyz:   XYZ
 }
 
+/*  define our vMix command type  */
+type vMixCommand = {
+    Function: string,
+    Input?:   string,
+    Value?:   string
+}
+
 /*  define vMix command and XYZ modification operation  */
 type CMD = { f: string, v: string }
 type MOD = (xyz: XYZ) => void
@@ -90,6 +97,13 @@ export default class VMix extends EventEmitter {
 
     /*  initialize instance  */
     async init () {
+        /*  initialize state  */
+        for (const cam of this.cfg.idCAMs) {
+            const ptz = await this.state.getPTZ(cam)
+            this.cam2ptz.set(cam, ptz)
+            await this.setPTZCam(ptz, cam)
+        }
+
         /*  establish connection to vMix instance(s)  */
         const [ hostA, portA ] = this.argv.vmix1Addr.split(":")
         const [ hostB, portB ] = this.argv.vmix1Addr.split(":")
@@ -106,9 +120,11 @@ export default class VMix extends EventEmitter {
         this.vmix1.on("error", (error: Error) => {
             this.log.log(1, `vMix: connection error on vMix #1: ${error.toString()}`)
         })
-        this.vmix2?.on("error", (error: Error) => {
-            this.log.log(1, `vMix: connection error on vMix #2: ${error.toString()}`)
-        })
+        if (this.vmix2 !== null) {
+            this.vmix2.on("error", (error: Error) => {
+                this.log.log(1, `vMix: connection error on vMix #2: ${error.toString()}`)
+            })
+        }
 
         /*  react on standard socket connect events  */
         let initialized = 0
@@ -121,17 +137,18 @@ export default class VMix extends EventEmitter {
         }
         this.vmix1.on("connect", () => {
             this.log.log(2, "vMix: connection established to vMix #1")
-            this.vmix1!.send("XML")
-            if (!this.vmix2)
-                this.vmix1!.send("SUBSCRIBE TALLY")
+            this.vmixCommand(this.vmix1, "XML")
+            this.vmixCommand(this.vmix1, "SUBSCRIBE TALLY")
             onConnect()
         })
-        this.vmix2?.on("connect", () => {
-            this.log.log(2, "vMix: connection established to vMix #2")
-            this.vmix2!.send("XML")
-            this.vmix2!.send("SUBSCRIBE TALLY")
-            onConnect()
-        })
+        if (this.vmix2 !== null) {
+            this.vmix2.on("connect", () => {
+                this.log.log(2, "vMix: connection established to vMix #2")
+                this.vmixCommand(this.vmix2, "XML")
+                this.vmixCommand(this.vmix2, "SUBSCRIBE TALLY")
+                onConnect()
+            })
+        }
 
         /*  react on custom TALLY events  */
         const onTallyStatus = (instance: "A" | "B", data: string) => {
@@ -139,17 +156,20 @@ export default class VMix extends EventEmitter {
             this.tally.preview = tally.preview.map((n) => `${instance}:${n}`)
             this.tally.program = tally.program.map((n) => `${instance}:${n}`)
             this.emit("tally", this.tally)
-            this.vmix1!.send("XML")
-            this.vmix2?.send("XML")
+            this.vmixCommand(this.vmix1, "XML")
+            if (this.vmix2 !== null)
+                this.vmixCommand(this.vmix2, "XML")
         }
         this.vmix1.on("tally", (data: string) => {
             this.log.log(2, "vMix: received TALLY status on vMix #1")
             onTallyStatus("A", data)
         })
-        this.vmix2?.on("tally", (data: string) => {
-            this.log.log(2, "vMix: received TALLY status on vMix #2")
-            onTallyStatus("B", data)
-        })
+        if (this.vmix2 !== null) {
+            this.vmix2.on("tally", (data: string) => {
+                this.log.log(2, "vMix: received TALLY status on vMix #2")
+                onTallyStatus("B", data)
+            })
+        }
 
         /*  react on custom XML events  */
         const onXmlStatus = (instance: "A" | "B", xml: string) => {
@@ -194,18 +214,22 @@ export default class VMix extends EventEmitter {
             this.log.log(2, "vMix: received XML status on vMix #1")
             onXmlStatus("A", xml)
         })
-        this.vmix2?.on("tally", (xml: string) => {
-            this.log.log(2, "vMix: received XML status on vMix #2")
-            onXmlStatus("B", xml)
-        })
+        if (this.vmix2 !== null) {
+            this.vmix2.on("tally", (xml: string) => {
+                this.log.log(2, "vMix: received XML status on vMix #2")
+                onXmlStatus("B", xml)
+            })
+        }
 
         /*  react on standard socket close events  */
         this.vmix1.on("close", () => {
             this.log.log(2, "vMix: connection closed to vMix #1")
         })
-        this.vmix2?.on("close", () => {
-            this.log.log(2, "vMix: connection closed to vMix #2")
-        })
+        if (this.vmix2 !== null) {
+            this.vmix2.on("close", () => {
+                this.log.log(2, "vMix: connection closed to vMix #2")
+            })
+        }
     }
 
     async shutdown () {
@@ -295,7 +319,7 @@ export default class VMix extends EventEmitter {
                 this.log.log(2, `vMix: restore vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
 
                 /*  iterate over all corresponding virtual PTZ...  */
-                const cmds = [] as Array<{ Function: string, Input: string, Value?: string }>
+                const cmds = [] as Array<vMixCommand>
                 for (const vptz of this.cfg.idVPTZs) {
                     this.log.log(2, `vMix: restore virtual PTZ "${vptz}" of camera "${cam}"`)
                     const xyz = await this.state.getVPTZ(cam, ptz, vptz)
@@ -305,7 +329,7 @@ export default class VMix extends EventEmitter {
                     cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
                     cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
                 }
-                this.vmix1?.send(cmds)
+                this.vmixCommand(this.vmix1, cmds)
             }
         })
 
@@ -333,14 +357,14 @@ export default class VMix extends EventEmitter {
         this.cam2ptz.set(cam, ptz)
         const input1 = this.cfg.inputNamePTZ(cam, ptz)
         const input2 = this.cfg.inputNameCAM(cam)
-        this.vmix1?.send([
+        this.vmixCommand(this.vmix1, [
             { Function: "PTZMoveToVirtualInputPosition", Input: input1 },
             { Function: "PTZUpdateVirtualInput",         Input: input2 }
         ])
 
         /*  load corresponding VPTZ settings and update vMix VirtualSet inputs  */
         this.state.transaction(async () => {
-            const cmds = [] as Array<{ Function: string, Input: string, Value?: string }>
+            const cmds = [] as Array<vMixCommand>
             for (const vptz of this.cfg.idVPTZs) {
                 this.log.log(2, `vMix: activating virtual PTZ "${vptz}" of camera "${cam}"`)
                 const xyz = await this.state.getVPTZ(cam, ptz, vptz)
@@ -350,10 +374,18 @@ export default class VMix extends EventEmitter {
                 cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
                 cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
             }
-            this.vmix1?.send(cmds)
+            this.vmixCommand(this.vmix1, cmds)
         })
 
         this.notifyState()
+    }
+
+    /*  send command to vMix  */
+    async vmixCommand (vmix: vMixAPI.ConnectionTCP | null, cmds: string | Array<string> | vMixCommand | Array<vMixCommand>) {
+        if (vmix !== null && vmix.connected())
+            await vmix.send(cmds)
+        else
+            this.log.log(1, "vMix: failed to send command(s) -- (still) not connected")
     }
 
     /*  change virtual PTZ  */
@@ -451,7 +483,7 @@ export default class VMix extends EventEmitter {
 
         /*  determine vMix commands  */
         const input = this.cfg.inputNameVPTZ(cam, vptz)
-        const cmds = [] as Array<{Function: string, Input: string, Value?: string }>
+        const cmds = [] as Array<vMixCommand>
         cmds.push({ Function: cmd1!.f, Input: input, Value: cmd1!.v })
         if (cmd2 !== null)
             cmds.push({ Function: cmd2.f, Input: input, Value: cmd2.v })
@@ -468,7 +500,7 @@ export default class VMix extends EventEmitter {
 
         /*  finally perform VPTZ adjustment operation  */
         await AsyncLoop(() => {
-            this.vmix1?.send(cmds)
+            this.vmixCommand(this.vmix1, cmds)
             mod1!(xyz!)
             if (mod2 !== null)
                 mod2!(xyz!)
@@ -590,15 +622,15 @@ export default class VMix extends EventEmitter {
             previewXYZ.x    = programXYZ.x
             previewXYZ.y    = programXYZ.y
             previewXYZ.zoom = programXYZ.zoom
-            const cmds = [] as Array<{Function: string, Input: string, Value?: string }>
+            const cmds = [] as Array<vMixCommand>
             cmds.push({ Function: "SetPanX", Input: preview, Value: (previewXYZ.x * 2).toString() })
             cmds.push({ Function: "SetPanY", Input: preview, Value: (previewXYZ.y * 2).toString() })
             cmds.push({ Function: "SetZoom", Input: preview, Value: (previewXYZ.zoom ).toString() })
-            this.vmix1?.send(cmds)
+            this.vmixCommand(this.vmix1, cmds)
             await AsyncDelay(100)
 
             /*  cut preview into program  */
-            this.vmix1?.send({ Function: "Cut" })
+            this.vmixCommand(this.vmix1, { Function: "Cut" })
             await AsyncDelay(50)
 
             /*  determine drive path from program (which was the preview) to original preview  */
@@ -624,11 +656,11 @@ export default class VMix extends EventEmitter {
                 this.notifyState()
 
                 /*  change vMix  */
-                const cmds = [] as Array<{Function: string, Input: string, Value?: string }>
+                const cmds = [] as Array<vMixCommand>
                 cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
                 cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
                 cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
-                this.vmix1?.send(cmds)
+                this.vmixCommand(this.vmix1, cmds)
             }
         }, (cancelled) => {
             this.state.setVPTZ(cam, ptz, vptz, path[path.length - 1])
