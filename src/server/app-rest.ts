@@ -271,21 +271,19 @@ export default class REST {
                 const op    = req.params.op
                 const arg   = req.params.arg
                 queue = queue.then(() => {
-                    this.vmix.changeVPTZ(cam, vptz, op, arg)
+                    return this.vmix.changeVPTZ(cam, vptz, op, arg)
                 })
                 return h.response().code(204)
             }
         })
 
-        /*  cut preview into program  */
+        /*  drive preview into program  */
         this.server.route({
             method: "GET",
-            path: "/cut/{mode}",
+            path: "/drive/{mode}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const mode = req.params.mode
-                queue = queue.then(() => {
-                    this.vmix.cutPreview(mode)
-                })
+                await this.vmix.drive(mode)
                 return h.response().code(204)
             }
         })

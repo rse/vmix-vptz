@@ -71,7 +71,6 @@ export default class VMix extends EventEmitter {
     }
     private cam2ptz  = new Map<string, string>()
     private vptz2xyz = new Map<string, XYZ>()
-    private vptzSaveTimer: ReturnType<typeof setTimeout> | null = null // FIXME: unused
 
     /*  foreigns (injected)  */
     constructor (
@@ -437,22 +436,28 @@ export default class VMix extends EventEmitter {
         }, { duration, fps })
     }
 
-    /*  cut preview into program  */
-    cutPreview (mode: "apply" | "cut" = "cut") {
-        const areOnSameCamera = true
-        if (areOnSameCamera) {
-            if (mode === "apply") {
-                /*  mode 1: apply VPTZ of preview directly onto program  */
-            }
-            else {
-                /*  mode 2: temporarily apply VPTZ of program to preview,
-                    cut preview into program and apply previous VPTZ again  */
-            }
+    /*  drive preview into program  */
+    async drive (mode: "apply" | "cut" = "cut") {
+        /*  determine program and preview inputs  */
+        const program = this.active.program.B !== "" ? this.active.program.B : this.active.program.A
+        const preview = this.active.preview.B !== "" ? this.active.preview.B : this.active.preview.A
+        const programCam = this.cfg.cameraOfInputName(program)
+        const previewCam = this.cfg.cameraOfInputName(preview)
+
+        /*  sanity check situation  */
+        if (programCam !== previewCam)
+            throw new Error("program and preview inputs are not on same camera")
+
+        /*  perform drive operation  */
+        if (mode === "apply") {
+            /*  mode 1: apply VPTZ of preview directly onto program  */
         }
-        else {
-            /*  mode 3: not on same camera, so just cut preview to program  */
-            this.vmix1?.send({ Function: "Cut" })
+        else if (mode === "cut") {
+            /*  mode 2: temporarily apply VPTZ of program to preview,
+                cut preview into program and apply previous VPTZ again  */
         }
+        else
+            throw new Error("invalid drive mode")
     }
 }
 

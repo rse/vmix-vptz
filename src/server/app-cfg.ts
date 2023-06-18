@@ -28,5 +28,11 @@ export default class Config {
     inputNameVPTZ (cam: string, vptz: string) {
         return `VPTZ - CAM${cam}-${vptz}`
     }
+    cameraOfInputName (inputName: string) {
+        let m
+        if ((m = inputName.match(/^V?PTZ - CAM(\d+)-.+$/)) !== null)
+            return m[1]
+        return undefined
+    }
 }
 
