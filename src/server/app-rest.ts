@@ -108,7 +108,7 @@ export default class REST {
             method: "GET",
             path: "/state",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const state  = this.vmix.getState
+                const state = this.vmix.getState()
                 return h.response(state).code(200)
             }
         })
@@ -173,7 +173,7 @@ export default class REST {
                 if (!ducky.validate(request.payload, "{ cmd: string, arg?: string }"))
                     return Boom.badRequest("invalid request")
                 const { cmd, arg } = request.payload as any satisfies { cmd: string, arg: any }
-                return Boom.badRequest("not implemented") // FIXME
+                return Boom.badRequest("not implemented") // FIXME: TODO
                 return h.response().code(204)
             }
         })
@@ -184,6 +184,23 @@ export default class REST {
             for (const info of wsPeers.values())
                 info.ws.send(msg)
         }
+
+        /*  forward state changes to clients  */
+        let notifyTimer: ReturnType<typeof setTimeout> | null = null
+        let notifyData:  StateType | null = null
+        this.vmix!.on("state", (state: StateType) => {
+            notifyData = state
+            if (notifyTimer === null) {
+                notifyTimer = setTimeout(() => {
+                    notifyTimer = null
+                    if (notifyData !== null) {
+                        const data = notifyData
+                        notifyData = null
+                        notifyState(data)
+                    }
+                }, 200)
+            }
+        })
 
         /*  ==== Endpoint: State Backup/Restore ====  */
 
