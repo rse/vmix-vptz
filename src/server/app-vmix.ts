@@ -29,6 +29,13 @@ type vMixInput = {
 type CMD = { f: string, v: string }
 type MOD = (xyz: XYZ) => void
 
+/*  asynchronous delay  */
+const AsyncDelay = (ms: number) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => { resolve(true) }, ms)
+    })
+}
+
 /*  asynchronous loop utility  */
 const AsyncLoop = (step: () => void, finish: (cancelled: boolean) => void, _options = {}) => {
     const options = { duration: 1000, fps: 60, ..._options }
@@ -42,9 +49,7 @@ const AsyncLoop = (step: () => void, finish: (cancelled: boolean) => void, _opti
             while (timeSteps > 0 && !cancelled) {
                 timeSteps = timeSteps - 1
                 step()
-                await new Promise((resolve, reject) => {
-                    setTimeout(() => resolve(true), timeSlice)
-                })
+                await AsyncDelay(timeSlice)
             }
             resolve(!cancelled)
         })()
@@ -441,23 +446,153 @@ export default class VMix extends EventEmitter {
         /*  determine program and preview inputs  */
         const program = this.active.program.B !== "" ? this.active.program.B : this.active.program.A
         const preview = this.active.preview.B !== "" ? this.active.preview.B : this.active.preview.A
-        const programCam = this.cfg.cameraOfInputName(program)
-        const previewCam = this.cfg.cameraOfInputName(preview)
+
+        /*  determine camera and VPTZ of program and preview inputs  */
+        const programCam  = this.cfg.camOfInputName(program)
+        const previewCam  = this.cfg.camOfInputName(preview)
+        const programVPTZ = this.cfg.vptzOfInputName(program)
+        const previewVPTZ = this.cfg.vptzOfInputName(preview)
 
         /*  sanity check situation  */
         if (programCam !== previewCam)
             throw new Error("program and preview inputs are not on same camera")
+        if (programVPTZ === "" || previewVPTZ === "")
+            throw new Error("program or preview inputs are not VPTZ inputs")
 
-        /*  perform drive operation  */
+        /*  helper function: clone a XYZ object  */
+        const cloneXYZ = (xyz: XYZ) => ({ ...xyz } as XYZ)
+
+        /*  helper function: calculate path from source to destination XYZ  */
+        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 1920, H = 1080, factor = 1.5) => {
+            /*  calculate mid state  */
+            const mid = {
+                x:    src.x    + Math.round((dst.x    - src.x   ) / 2),
+                y:    src.y    + Math.round((dst.y    - src.y   ) / 2),
+                zoom: src.zoom + Math.round((dst.zoom - src.zoom) / 2)
+            }
+
+            /*  calculate mid state resize factor  */
+            while (factor >= 1.0) {
+                const x = mid.x - Math.round(((mid.zoom * W * factor) - mid.zoom * W) / 2)
+                const y = mid.y - Math.round(((mid.zoom * H * factor) - mid.zoom * H) / 2)
+                const w = mid.zoom * W * factor
+                const h = mid.zoom * H * factor
+                if (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
+                    break
+                factor -= 0.01
+            }
+
+            /*  resize mid state  */
+            mid.x = mid.x - Math.round(((mid.zoom * W * factor) - mid.zoom * W) / 2)
+            mid.y = mid.y - Math.round(((mid.zoom * H * factor) - mid.zoom * H) / 2)
+            mid.zoom = Math.round(mid.zoom * factor)
+
+            /*  initialize loop  */
+            const path = [] as Array<XYZ>
+            const state = cloneXYZ(src)
+            const steps = Math.round(duration / (1000 / fps))
+            const k = Math.round(steps / 2)
+            let i = 0
+
+            /*  ease in to mid state  */
+            while (i < k) {
+                state.x    = src.x    + Math.round( (mid.x    - src.x)    * Math.pow(i / k, 3) )
+                state.y    = src.y    + Math.round( (mid.y    - src.y)    * Math.pow(i / k, 3) )
+                state.zoom = src.zoom + Math.round( (mid.zoom - src.zoom) * Math.pow(i / k, 3) )
+                path.push(cloneXYZ(state))
+                i++
+            }
+
+            /*  ease out from mid state  */
+            while (i < steps) {
+                state.x    = mid.x    + Math.round( (dst.x    - mid.x)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
+                state.y    = mid.y    + Math.round( (dst.y    - mid.y)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
+                state.zoom = mid.zoom + Math.round( (dst.zoom - mid.zoom) * (1 - Math.pow(1 - ((i - k) / k), 3)) )
+                path.push(cloneXYZ(state))
+                i++
+            }
+
+            return path
+        }
+
+        /*  driving configuration  */
+        const fps      = 30
+        const duration = 1000
+
+        /*  driving parameters  */
+        let cam   = ""
+        let vptz  = ""
+        let input = ""
+        let path  = [] as Array<XYZ>
+
+        /*  determine XYZ of preview and program inputs  */
+        const ptz = this.cam2ptz.get(programCam)!
+        const previewXYZ = await this.state.getVPTZ(previewCam, ptz, previewVPTZ)
+        const programXYZ = await this.state.getVPTZ(programCam, ptz, programVPTZ)
+
+        /*  perform drive operation (individual phase 1/2)  */
         if (mode === "apply") {
             /*  mode 1: apply VPTZ of preview directly onto program  */
+
+            /*  determine drive path from program to preview  */
+            path = pathCalc(programXYZ, previewXYZ, fps, duration)
+
+            /*  apply drive path to program  */
+            input = program
+            cam   = programCam
+            vptz  = programVPTZ
         }
         else if (mode === "cut") {
             /*  mode 2: temporarily apply VPTZ of program to preview,
                 cut preview into program and apply previous VPTZ again  */
+
+            /*  remember original VPTZ of preview  */
+            const tempXYZ = cloneXYZ(previewXYZ)
+
+            /*  apply VPTZ of program to preview  */
+            previewXYZ.x    = programXYZ.x
+            previewXYZ.y    = programXYZ.y
+            previewXYZ.zoom = programXYZ.zoom
+            const cmds = [] as Array<{Function: string, Input: string, Value?: string }>
+            cmds.push({ Function: "SetPanX", Input: preview, Value: (previewXYZ.x * 2).toString() })
+            cmds.push({ Function: "SetPanY", Input: preview, Value: (previewXYZ.y * 2).toString() })
+            cmds.push({ Function: "SetZoom", Input: preview, Value: (previewXYZ.zoom ).toString() })
+            this.vmix1?.send(cmds)
+            await AsyncDelay(100)
+
+            /*  cut preview into program  */
+            this.vmix1?.send({ Function: "Cut" })
+            await AsyncDelay(50)
+
+            /*  determine drive path from program (which was the preview) to original preview  */
+            path = pathCalc(previewXYZ, tempXYZ, fps, duration)
+
+            /*  apply drive path to program (which was the preview)  */
+            input = preview
+            cam   = previewCam
+            vptz  = previewVPTZ
         }
         else
             throw new Error("invalid drive mode")
+
+        /*  perform drive operation (common phase 2/2)  */
+        await AsyncLoop(() => {
+            if (path.length > 0) {
+                const xyz = path.shift()!
+
+                /*  change locally  */
+                this.vptz2xyz.set(input, xyz)
+
+                /*  change vMix  */
+                const cmds = [] as Array<{Function: string, Input: string, Value?: string }>
+                cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
+                cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
+                cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
+                this.vmix1?.send(cmds)
+            }
+        }, (cancelled) => {
+            this.state.setVPTZ(cam, ptz, vptz, path[path.length - 1])
+        }, { duration, fps })
     }
 }
 
