@@ -22,11 +22,10 @@ type vMixInput = {
     num:   number,
     name:  string,
     type:  string,
-    x?:    number,
-    y?:    number,
-    zoom?: number
+    xyz:   XYZ
 }
 
+/*  define vMix command and XYZ modification operation  */
 type CMD = { f: string, v: string }
 type MOD = (xyz: XYZ) => void
 
@@ -56,6 +55,7 @@ const AsyncLoop = (step: () => void, finish: (cancelled: boolean) => void, _opti
     return { promise, cancel }
 }
 
+/*  the vMix management class  */
 export default class VMix extends EventEmitter {
     /*  internals  */
     private vmix1: vMixAPI.ConnectionTCP | null = null
@@ -71,7 +71,7 @@ export default class VMix extends EventEmitter {
     }
     private cam2ptz  = new Map<string, string>()
     private vptz2xyz = new Map<string, XYZ>()
-    private vptzSaveTimer: ReturnType<typeof setTimeout> | null = null
+    private vptzSaveTimer: ReturnType<typeof setTimeout> | null = null // FIXME: unused
 
     /*  foreigns (injected)  */
     constructor (
@@ -106,12 +106,12 @@ export default class VMix extends EventEmitter {
         })
 
         /*  react on standard socket connect events  */
-        let connected = 0
+        let initialized = 0
         const onConnect = () => {
-            connected++
-            if ((!this.vmix2 && connected === 1) || (this.vmix2 && connected === 2)) {
-                connected = 0
-                this.restoreVPTZ()
+            initialized++
+            if ((!this.vmix2 && initialized === 1) || (this.vmix2 && initialized === 2)) {
+                initialized = 0
+                this.restoreState()
             }
         }
         this.vmix1.on("connect", () => {
@@ -166,15 +166,14 @@ export default class VMix extends EventEmitter {
                 const item = {
                     num:  input.number,
                     name: input.title,
-                    type: input.type
+                    type: input.type,
+                    xyz:  { x: 0, y: 0, zoom: 1.0 }
                 } as vMixInput
-                /*
                 if (input.type === "VirtualSet") {
-                    item.x    = ((input as any).currentPosition?.panX  ?? 0.0) / 2
-                    item.y    = ((input as any).currentPosition?.panY  ?? 0.0) / 2
-                    item.zoom = ((input as any).currentPosition?.zoomX ?? 1.0)
+                    item.xyz.x    = ((input as any).currentPosition?.panX  ?? 0.0) / 2
+                    item.xyz.y    = ((input as any).currentPosition?.panY  ?? 0.0) / 2
+                    item.xyz.zoom = ((input as any).currentPosition?.zoomX ?? 1.0)
                 }
-                */
                 this.inputs.set(`${instance}:${item.num}`, item)
             }
 
@@ -217,6 +216,64 @@ export default class VMix extends EventEmitter {
         return {} // FIXME: TODO
     }
 
+    /*  backup state from vMix  */
+    async backupState () {
+        /*  index all inputs by name  */
+        const index = new Map<string, vMixInput>()
+        for (const input of this.inputs.values())
+            if (input.type === "VirtualSet")
+                index.set(input.name, input)
+
+        /*  use a transaction to...  */
+        this.state.transaction(async () => {
+            /*  ...iterate over all cameras and their current physical PTZ...  */
+            for (const cam of this.cfg.idCAMs) {
+                const ptz = this.cam2ptz.get(cam)
+                if (ptz === undefined)
+                    continue
+                this.log.log(2, `vMix: backup vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
+
+                /*  iterate over all corresponding virtual PTZ...  */
+                for (const vptz of this.cfg.idVPTZs) {
+                    const name = this.cfg.inputNameVPTZ(cam, vptz)
+                    const input = index.get(name)
+                    if (input === undefined)
+                        continue
+
+                    /*  ...and persist the current XYZ information  */
+                    await this.state.setVPTZ(cam, ptz, vptz, input.xyz)
+                }
+            }
+        })
+    }
+
+    /*  restore persisted state to vMix  */
+    async restoreState () {
+        /*  use a transaction to...  */
+        this.state.transaction(async () => {
+            /*  ...iterate over all cameras and their current physical PTZ...  */
+            for (const cam of this.cfg.idCAMs) {
+                const ptz = this.cam2ptz.get(cam)
+                if (ptz === undefined)
+                    continue
+                this.log.log(2, `vMix: restore vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
+
+                /*  iterate over all corresponding virtual PTZ...  */
+                const cmds = [] as Array<{ Function: string, Input: string, Value?: string }>
+                for (const vptz of this.cfg.idVPTZs) {
+                    this.log.log(2, `vMix: restore virtual PTZ "${vptz}" of camera "${cam}"`)
+                    const xyz = await this.state.getVPTZ(cam, ptz, vptz)
+                    this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+                    const input = this.cfg.inputNameVPTZ(cam, vptz)
+                    cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
+                    cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
+                    cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
+                }
+                this.vmix1?.send(cmds)
+            }
+        })
+    }
+
     /*  activate all physical PTZ of a camera  */
     async setPTZAll (ptz: string) {
         this.log.log(2, `vMix: activating physical PTZ "${ptz}" of all cameras`)
@@ -257,11 +314,6 @@ export default class VMix extends EventEmitter {
             }
             this.vmix1?.send(cmds)
         })
-    }
-
-    /*  restore VPTZ onto vMix  */
-    async restoreVPTZ () {
-        /*  FIXME  */
     }
 
     /*  change virtual PTZ  */

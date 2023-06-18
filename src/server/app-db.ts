@@ -111,12 +111,12 @@ export default class DB extends EventEmitter {
     }
 
     /*  perform a database atomic (= transactional leaf) operation  */
-    async atomic<T> (callback: (trx: KnexNS | KnexNS.Transaction) => Promise<T>) {
+    async atomic<T> (callback: (trx?: KnexNS | KnexNS.Transaction) => Promise<T>) {
         return this.transaction(callback, true)
     }
 
     /*  perform a database transaction (= group) operation  */
-    async transaction<T> (callback: (trx: KnexNS | KnexNS.Transaction) => Promise<T>, atomic = false) {
+    async transaction<T> (callback: (trx?: KnexNS | KnexNS.Transaction) => Promise<T>, atomic = false) {
         return promiseRetry<T>(async (retry: (error: any) => never, attempt: number) => {
             if (this.knex === null)
                 return Promise.reject(new Error("database (still) not opened"))

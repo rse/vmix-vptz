@@ -185,6 +185,32 @@ export default class REST {
                 info.ws.send(msg)
         }
 
+        /*  ==== Endpoint: State Backup/Restore ====  */
+
+        /*  manually backup the state of vMix  */
+        this.server.route({
+            method: "GET",
+            path: "/state/backup",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                queue = queue.then(() => {
+                    return this.vmix.backupState()
+                })
+                return h.response().code(204)
+            }
+        })
+
+        /*  manually restore the state of vMix  */
+        this.server.route({
+            method: "GET",
+            path: "/state/restore",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                queue = queue.then(() => {
+                    return this.vmix.restoreState()
+                })
+                return h.response().code(204)
+            }
+        })
+
         /*  ==== Endpoint: PTZ Switching ====  */
 
         let queue = Promise.resolve()
