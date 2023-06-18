@@ -20,4 +20,5 @@ rules:
     stylus/single-line-comment: null
     stylus/selector-list-comma: "always"
     color-hex-length: null
+    declaration-block-no-redundant-longhand-properties: null
 

@@ -13,8 +13,7 @@
             ref="control"
             v-if="mode === 'control'"
             v-bind:options="options"
-            v-bind:ws-url="wsURL"
-            v-bind:sv-url="svURL"
+            v-on:log="onLog"
         ></app-control>
 
         <!--  Overlay UI  -->
@@ -22,17 +21,24 @@
             ref="overlay"
             v-if="mode === 'overlay'"
             v-bind:options="options"
-            v-bind:ws-url="wsURL"
-            v-bind:sv-url="svURL"
+            v-on:log="onLog"
         ></app-overlay>
     </div>
 </template>
 
 <script setup lang="ts">
-import { defineComponent } from "vue"
+
+import { defineComponent, toHandlerKey, toHandlers } from "vue"
 import URI                 from "urijs"
+import RecWebSocket        from "reconnecting-websocket"
+import Ducky               from "ducky"
+import moment              from "moment"
+import axios               from "axios"
+
 import AppControl          from "./app-control.vue"
 import AppOverlay          from "./app-overlay.vue"
+import { StateType, StateSchema, StateDefault } from "../common/app-state"
+
 </script>
 
 <script lang="ts">
@@ -46,7 +52,9 @@ export default defineComponent({
         mode:       "control",
         options:    new Map<string, string | boolean>(),
         svURL:      "",
-        wsURL:      ""
+        wsURL:      "",
+        state:      StateDefault as StateType,
+        online:     false
     }),
     created () {
         /*  determine mode  */
@@ -83,6 +91,74 @@ export default defineComponent({
         url.search("")
         url.hash("")
         this.svURL = url.toString()
+    },
+    async mounted () {
+        /*  load state once  */
+        this.log("INFO", "initially loading state")
+        const state = await axios({
+            method: "GET",
+            url:    `${this.svURL}state`
+        }).then((response) => response.data).catch(() => null)
+        if (state !== null) {
+            const errors = [] as Array<string>
+            if (Ducky.validate(state, StateSchema, errors)) {
+                this.state = state as StateType
+            }
+            else
+                this.log("ERROR", `invalid schema of loaded state: ${errors.join(", ")}`)
+        }
+        else
+            this.log("ERROR", "failed to state")
+
+        /*  establish server connection  */
+        const ws = new RecWebSocket(this.wsURL + "/control", [], {
+            reconnectionDelayGrowFactor: 1.3,
+            maxReconnectionDelay:        4000,
+            minReconnectionDelay:        1000,
+            connectionTimeout:           4000,
+            minUptime:                   5000
+        })
+        ws.addEventListener("open", (ev) => {
+            this.online = true
+        })
+        ws.addEventListener("close", (ev) => {
+            this.online = false
+            this.log("ERROR", "WebSocket connection failed/closed")
+        })
+
+        /*  receive server messages  */
+        ws.addEventListener("message", (ev: MessageEvent) => {
+            if (typeof ev.data !== "string") {
+                this.log("WARNING", "invalid WebSocket message received")
+                return
+            }
+            const data: any = JSON.parse(ev.data)
+            if (!(typeof data === "object" && typeof data.cmd === "string" && data.arg !== undefined)) {
+                this.log("WARNING", "invalid WebSocket message received")
+                return
+            }
+            if (data.cmd === "STATE") {
+                const state = data.arg.state as StateType
+                const errors = [] as Array<string>
+                if (!Ducky.validate(state, StateSchema, errors)) {
+                    this.log("WARNING", `invalid schema of loaded state: ${errors.join(", ")}`)
+                    return
+                }
+                if (this.mode === "control")
+                    (this.$refs.control as typeof AppControl).setState(state)
+                else if (this.mode === "overlay")
+                    (this.$refs.overlay as typeof AppOverlay).setState(state)
+            }
+        })
+    },
+    methods: {
+        log (level: string, msg: string) {
+            const timestamp = moment().format("YYYY-MM-DD hh:mm:ss.SSS")
+            console.log(`${timestamp} [${level}]: ${msg}`)
+        },
+        onLog (level: string, msg: string) {
+            this.log(level, msg)
+        }
     }
 })
 </script>

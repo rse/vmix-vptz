@@ -187,6 +187,8 @@ export default class VMix extends EventEmitter {
             this.active.program[instance] = this.inputs.get(`${instance}:${n}`)?.name ?? ""
             n = XPath.select1("/vmix/preview", doc).toString()
             this.active.preview[instance] = this.inputs.get(`${instance}:${n}`)?.name ?? ""
+
+            this.notifyState()
         }
         this.vmix1.on("xml", (xml: string) => {
             this.log.log(2, "vMix: received XML status on vMix #1")
@@ -217,10 +219,7 @@ export default class VMix extends EventEmitter {
         }
     }
 
-    async getState (cam: string) {
-        /*  determine PTZ of camera  */
-        const ptz = this.cam2ptz.get(cam)!
-
+    async getState () {
         /*  determine program and preview inputs  */
         const program = this.active.program.B !== "" ? this.active.program.B : this.active.program.A
         const preview = this.active.preview.B !== "" ? this.active.preview.B : this.active.preview.A
@@ -233,16 +232,22 @@ export default class VMix extends EventEmitter {
 
         /*  generate state record  */
         const state = StateDefault
-        state.cam = cam
-        for (const vptz of this.cfg.idVPTZs) {
-            const xyz = await this.state.getVPTZ(cam, ptz, vptz)
-            state.vptz[vptz].program = (programCam === cam && programVPTZ === vptz)
-            state.vptz[vptz].preview = (previewCam === cam && previewVPTZ === vptz)
-            state.vptz[vptz].x       = xyz.x
-            state.vptz[vptz].y       = xyz.y
-            state.vptz[vptz].zoom    = xyz.zoom
+        for (const cam of this.cfg.idCAMs) {
+            const ptz = this.cam2ptz.get(cam)!
+            for (const vptz of this.cfg.idVPTZs) {
+                const xyz = await this.state.getVPTZ(cam, ptz, vptz)
+                state[cam][vptz].program = (programCam === cam && programVPTZ === vptz)
+                state[cam][vptz].preview = (previewCam === cam && previewVPTZ === vptz)
+                state[cam][vptz].x       = xyz.x
+                state[cam][vptz].y       = xyz.y
+                state[cam][vptz].zoom    = xyz.zoom
+            }
         }
         return state
+    }
+
+    notifyState () {
+        this.emit("state-change")
     }
 
     /*  backup state from vMix  */
@@ -274,6 +279,8 @@ export default class VMix extends EventEmitter {
                 }
             }
         })
+
+        this.notifyState()
     }
 
     /*  restore persisted state to vMix  */
@@ -301,6 +308,8 @@ export default class VMix extends EventEmitter {
                 this.vmix1?.send(cmds)
             }
         })
+
+        this.notifyState()
     }
 
     /*  activate all physical PTZ of a camera  */
@@ -343,6 +352,8 @@ export default class VMix extends EventEmitter {
             }
             this.vmix1?.send(cmds)
         })
+
+        this.notifyState()
     }
 
     /*  change virtual PTZ  */
@@ -461,6 +472,7 @@ export default class VMix extends EventEmitter {
             mod1!(xyz!)
             if (mod2 !== null)
                 mod2!(xyz!)
+            this.notifyState()
         }, (cancelled) => {
             this.state.setVPTZ(cam, ptz, vptz, xyz!)
         }, { duration, fps })
@@ -488,7 +500,7 @@ export default class VMix extends EventEmitter {
         const cloneXYZ = (xyz: XYZ) => ({ ...xyz } as XYZ)
 
         /*  helper function: calculate path from source to destination XYZ  */
-        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 1920, H = 1080, factor = 1.5) => {
+        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 1.5) => {
             /*  calculate mid state  */
             const mid = {
                 x:    src.x    + Math.round((dst.x    - src.x   ) / 2),
@@ -606,7 +618,10 @@ export default class VMix extends EventEmitter {
                 const xyz = path.shift()!
 
                 /*  change locally  */
-                this.vptz2xyz.set(input, xyz)
+                const cam  = this.cfg.camOfInputName(input)
+                const vptz = this.cfg.vptzOfInputName(input)
+                this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+                this.notifyState()
 
                 /*  change vMix  */
                 const cmds = [] as Array<{Function: string, Input: string, Value?: string }>

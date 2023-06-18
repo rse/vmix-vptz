@@ -106,10 +106,9 @@ export default class REST {
         /*  load current state  */
         this.server.route({
             method: "GET",
-            path: "/state/{cam}",
+            path: "/state",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const cam = req.params.ptz
-                const state = await this.vmix.getState(cam)
+                const state = await this.vmix.getState()
                 return h.response(state).code(200)
             }
         })
@@ -189,8 +188,8 @@ export default class REST {
         /*  forward state changes to clients  */
         let notifyTimer: ReturnType<typeof setTimeout> | null = null
         let notifyData:  StateType | null = null
-        this.vmix!.on("state", (state: StateType) => {
-            notifyData = state
+        this.vmix!.on("state-change", async () => {
+            notifyData = await this.vmix.getState()
             if (notifyTimer === null) {
                 notifyTimer = setTimeout(() => {
                     notifyTimer = null
@@ -199,7 +198,7 @@ export default class REST {
                         notifyData = null
                         notifyState(data)
                     }
-                }, 200)
+                }, 50)
             }
         })
 
