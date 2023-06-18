@@ -124,7 +124,7 @@ export default class DB extends EventEmitter {
             const knex = this.knex as KnexNS<any, any[]>
             const promise = (trx || atomic) ?
                 new Promise<T>((resolve, reject) => {
-                    try { resolve(callback(atomic ? knex : trx!)) }
+                    try { resolve(callback(trx ?? knex)) }
                     catch (ex) { reject(ex) }
                 }) :
                 this.knex.transaction<T>((trx) => {
