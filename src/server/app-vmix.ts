@@ -27,6 +27,9 @@ type vMixInput = {
     zoom?: number
 }
 
+type CMD = { f: string, v: string }
+type MOD = (xyz: XYZ) => void
+
 /*  asynchronous loop utility  */
 const AsyncLoop = (step: () => void, finish: (cancelled: boolean) => void, _options = {}) => {
     const options = { duration: 1000, fps: 60, ..._options }
@@ -78,8 +81,6 @@ export default class VMix extends EventEmitter {
         private state:  State
     ) {
         super()
-        this.loadPTZ()
-        this.loadVPTZ()
     }
 
     /*  initialize instance  */
@@ -213,7 +214,7 @@ export default class VMix extends EventEmitter {
     }
 
     getState () {
-        return {} // FIXME
+        return {} // FIXME: TODO
     }
 
     /*  activate all physical PTZ of a camera  */
@@ -243,43 +244,19 @@ export default class VMix extends EventEmitter {
         ])
 
         /*  load corresponding VPTZ settings and update vMix VirtualSet inputs  */
-        const cmds = [] as Array<{ Function: string, Input: string, Value?: string }>
-        for (const vptz of this.cfg.idVPTZs) {
-            this.log.log(2, `vMix: activating virtual PTZ "${vptz}" of camera "${cam}"`)
-            const xyz = await this.state.getVPTZ(cam, ptz, vptz)
-            this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
-            const input = this.cfg.inputNameVPTZ(cam, vptz)
-            cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
-            cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
-            cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
-        }
-        this.vmix1?.send(cmds)
-    }
-
-    async loadPTZ () {
-        // this.ptz = await this.state.getPTZ()
-    }
-    async savePTZ () {
-        // await this.state.setPTZ(this.ptz)
-    }
-
-    async loadVPTZ () {
-        // for (const input of []) {
-        // const xyz = await this.state.getVPTZ(this.ptz, input)
-        // this.vptz.set(input, xyz)
-        // }
-    }
-    async saveVPTZ () {
-        // if (this.vptzSaveTimer === null) {
-        //     this.vptzSaveTimer = setTimeout(async () => {
-        //         this.vptzSaveTimer = null
-        //         for (const input of []) {
-        //             const xyz = this.vptz.get(input)
-        //             if (xyz)
-        //                 await this.state.setVPTZ(this.ptz, input, xyz)
-        //         }
-        //     }, 10 * 1000)
-        // }
+        this.state.transaction(async () => {
+            const cmds = [] as Array<{ Function: string, Input: string, Value?: string }>
+            for (const vptz of this.cfg.idVPTZs) {
+                this.log.log(2, `vMix: activating virtual PTZ "${vptz}" of camera "${cam}"`)
+                const xyz = await this.state.getVPTZ(cam, ptz, vptz)
+                this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+                const input = this.cfg.inputNameVPTZ(cam, vptz)
+                cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
+                cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
+                cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
+            }
+            this.vmix1?.send(cmds)
+        })
     }
 
     /*  restore VPTZ onto vMix  */
@@ -288,100 +265,123 @@ export default class VMix extends EventEmitter {
     }
 
     /*  change virtual PTZ  */
-    changeVPTZ (input: string, op: string, arg: string) {
+    async changeVPTZ (cam: string, vptz: string, op: string, arg: string) {
+        /*  sanity check arguments  */
+        if (!this.cfg.idCAMs.find((id) => id === cam))
+            throw new Error(`invalid CAM id "${cam}"`)
+        if (!this.cfg.idVPTZs.find((id) => id === vptz))
+            throw new Error(`invalid VPTZ id "${vptz}"`)
         if (op !== "pan" && op !== "zoom")
             throw new Error("invalid operation")
+
+        /*  constants  */
         const fps        = 30
         const duration   = 500
+        const steps      = duration / (1000 / fps)
         const deltaPan   = 0.10
         const deltaZoom  = 0.10
-        let   func1      = ""
-        let   func2      = ""
-        let   value1     = ""
-        let   value2     = ""
-        let   delta      = 0
+
+        /*  variables  */
+        let   cmd1: CMD | null = null
+        let   cmd2: CMD | null = null
+        let   mod1: MOD | null = null
+        let   mod2: MOD | null = null
+
+        /*  dispatch according to operation  */
         if (op === "pan") {
-            delta = deltaPan
-            if (arg === "up-left") {
-                func1  = "SetPanY"
-                func2  = "SetPanX"
-                value1 = "-="
-                value2 = "+="
+            const delta = deltaPan / steps
+            if (arg === "reset") {
+                cmd1 = { f: "SetPanY", v: "0" }
+                cmd2 = { f: "SetPanX", v: "0" }
+                mod1 = (xyz: XYZ) => { xyz.y = 0 }
+                mod2 = (xyz: XYZ) => { xyz.x = 0 }
+            }
+            else if (arg === "up-left") {
+                cmd1 = { f: "SetPanY", v: `-=${delta}` }
+                cmd2 = { f: "SetPanX", v: `+=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                mod2 = (xyz: XYZ) => { xyz.x += delta }
             }
             else if (arg === "up") {
-                func1  = "SetPanY"
-                value1 = "-="
+                cmd1 = { f: "SetPanY", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
             }
             else if (arg === "up-right") {
-                func1  = "SetPanY"
-                func2  = "SetPanX"
-                value1 = "-="
-                value2 = "-="
+                cmd1 = { f: "SetPanY", v: `-=${delta}` }
+                cmd2 = { f: "SetPanX", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                mod2 = (xyz: XYZ) => { xyz.x -= delta }
             }
             else if (arg === "left") {
-                func1  = "SetPanX"
-                value1 = "+="
-            }
-            else if (arg === "reset") {
-                func1  = "SetPanY"
-                func2  = "SetPanX"
+                cmd1 = { f: "SetPanX", v: `+=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.x += delta }
             }
             else if (arg === "right") {
-                func1  = "SetPanX"
-                value1 = "-="
+                cmd1 = { f: "SetPanX", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.x -= delta }
             }
             else if (arg === "down-left") {
-                func1  = "SetPanY"
-                func2  = "SetPanX"
-                value1 = "+="
-                value2 = "+="
+                cmd1 = { f: "SetPanY", v: `+=${delta}` }
+                cmd2 = { f: "SetPanX", v: `+=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod2 = (xyz: XYZ) => { xyz.x += delta }
             }
             else if (arg === "down") {
-                func1  = "SetPanY"
-                value1 = "+="
+                cmd1 = { f: "SetPanY", v: `+=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
             }
             else if (arg === "down-right") {
-                func1  = "SetPanY"
-                func2  = "SetPanX"
-                value1 = "+="
-                value2 = "-="
+                cmd1 = { f: "SetPanY", v: `+=${delta}` }
+                cmd2 = { f: "SetPanX", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod2 = (xyz: XYZ) => { xyz.x -= delta }
             }
             else
                 throw new Error("invalid argument")
         }
         else if (op === "zoom") {
-            delta = deltaZoom
-            func1 = "SetZoom"
+            const delta = deltaZoom / steps
             if (arg === "reset") {
-                /*  no-op  */
+                cmd1 = { f: "SetZoom", v: "1.0" }
+                mod1 = (xyz: XYZ) => { xyz.zoom = 1.0 }
             }
-            else if (arg === "decrease")
-                value1 = "-="
-            else if (arg === "increase")
-                value1 = "+="
+            else if (arg === "decrease") {
+                cmd1 = { f: "SetZoom", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.zoom -= delta }
+            }
+            else if (arg === "increase") {
+                cmd1 = { f: "SetZoom", v: `+=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.zoom += delta }
+            }
             else
                 throw new Error("invalid argument")
         }
-        const steps = duration / (1000 / fps)
-        const deltaStep = delta / steps
-        if (value1 !== "")
-            value1 = `${value1}${deltaStep}`
-        else
-            value1 = "0"
-        if (func2 !== "") {
-            if (value2 !== "")
-                value2 = `${value2}${deltaStep}`
-            else
-                value2 = "0"
+
+        /*  determine vMix commands  */
+        const input = this.cfg.inputNameVPTZ(cam, vptz)
+        const cmds = [] as Array<{Function: string, Input: string, Value?: string }>
+        cmds.push({ Function: cmd1!.f, Input: input, Value: cmd1!.v })
+        if (cmd2 !== null)
+            cmds.push({ Function: cmd2.f, Input: input, Value: cmd2.v })
+
+        /*  determine XYZ object  */
+        let xyz = this.vptz2xyz.get(`${cam}:${vptz}`)
+        if (xyz === undefined) {
+            xyz = { x: 0, y: 0, zoom: 1.0 }
+            this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
         }
-        const funcs = [] as Array<{Function: string, Input: string, Value: string }>
-        funcs.push({ Function: func1, Input: input, Value: value1 })
-        if (func2 !== "")
-            funcs.push({ Function: func2, Input: input, Value: value2 })
-        return AsyncLoop(() => {
-            this.vmix1?.send(funcs)
+
+        /*  determine physical PTZ of camera  */
+        const ptz = this.cam2ptz.get(cam) ?? this.cfg.idPTZs[0]
+
+        /*  finally perform VPTZ adjustment operation  */
+        await AsyncLoop(() => {
+            this.vmix1?.send(cmds)
+            mod1!(xyz!)
+            if (mod2 !== null)
+                mod2!(xyz!)
         }, (cancelled) => {
-            this.saveVPTZ()
+            this.state.setVPTZ(cam, ptz, vptz, xyz!)
         }, { duration, fps })
     }
 

@@ -187,13 +187,17 @@ export default class REST {
 
         /*  ==== Endpoint: PTZ Switching ====  */
 
+        let queue = Promise.resolve()
+
         /*  select PTZ of all cameras  */
         this.server.route({
             method: "GET",
             path: "/ptz/{ptz}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const ptz = req.params.ptz
-                await this.vmix.setPTZAll(ptz)
+                queue = queue.then(() => {
+                    return this.vmix.setPTZAll(ptz)
+                })
                 return h.response().code(204)
             }
         })
@@ -205,7 +209,9 @@ export default class REST {
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const ptz = req.params.ptz
                 const cam = req.params.cam
-                await this.vmix.setPTZCam(ptz, cam)
+                queue = queue.then(() => {
+                    return this.vmix.setPTZCam(ptz, cam)
+                })
                 return h.response().code(204)
             }
         })
@@ -215,12 +221,15 @@ export default class REST {
         /*  change VPTZ  */
         this.server.route({
             method: "GET",
-            path: "/vptz/{input}/{op}/{arg}",
+            path: "/vptz/{cam}/{vptz}/{op}/{arg}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const input = req.params.input
+                const cam   = req.params.cam
+                const vptz  = req.params.vptz
                 const op    = req.params.op
                 const arg   = req.params.arg
-                this.vmix.changeVPTZ(input, op, arg)
+                queue = queue.then(() => {
+                    this.vmix.changeVPTZ(cam, vptz, op, arg)
+                })
                 return h.response().code(204)
             }
         })
@@ -231,7 +240,9 @@ export default class REST {
             path: "/cut/{mode}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const mode = req.params.mode
-                this.vmix.cutPreview(mode)
+                queue = queue.then(() => {
+                    this.vmix.cutPreview(mode)
+                })
                 return h.response().code(204)
             }
         })
