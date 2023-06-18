@@ -129,7 +129,7 @@ export default class State extends DB {
         if (this.knex === null)
             throw new Error("database not opened")
         return this.atomic(async (knex) => {
-            const rec = await knex("vptz").select("*").where({ cam, ptz, vptz })
+            const rec = await knex("vptz").select([ "x", "y", "zoom" ]).where({ cam, ptz, vptz })
             return (
                 rec.length === 1 ?
                 { x: rec[0].x, y: rec[0].y, zoom: rec[0].zoom } as XYZ :
