@@ -110,15 +110,21 @@ export default class DB extends EventEmitter {
             await this.knex.raw("PRAGMA journal_mode = WAL")
     }
 
-    /*  perform a database transaction  */
-    async transaction<T> (callback: (trx: KnexNS.Transaction) => Promise<T>) {
+    /*  perform a database atomic (= transactional leaf) operation  */
+    async atomic<T> (callback: (trx: KnexNS | KnexNS.Transaction) => Promise<T>) {
+        return this.transaction(callback, true)
+    }
+
+    /*  perform a database transaction (= group) operation  */
+    async transaction<T> (callback: (trx: KnexNS | KnexNS.Transaction) => Promise<T>, atomic = false) {
         return promiseRetry<T>(async (retry: (error: any) => never, attempt: number) => {
             if (this.knex === null)
                 return Promise.reject(new Error("database (still) not opened"))
-            const trx = this.tls.getStore()
-            const promise = trx ?
+            const trx  = this.tls.getStore()
+            const knex = this.knex as KnexNS<any, any[]>
+            const promise = (trx || atomic) ?
                 new Promise<T>((resolve, reject) => {
-                    try { resolve(callback(trx)) }
+                    try { resolve(callback(atomic ? knex : trx!)) }
                     catch (ex) { reject(ex) }
                 }) :
                 this.knex.transaction<T>((trx) => {

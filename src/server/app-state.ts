@@ -100,7 +100,7 @@ export default class State extends DB {
     async getPTZ (cam: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        return this.transaction(async (knex) => {
+        return this.atomic(async (knex) => {
             const rec = await knex("ptz").select("ptz").where({ cam }).limit(1)
             return (rec.length === 1 ? rec[0].ptz : this.cfg.idPTZs[0])
         })
@@ -119,7 +119,7 @@ export default class State extends DB {
     async delPTZ (cam: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        await this.transaction(async (knex) => {
+        await this.atomic(async (knex) => {
             await knex("ptz").delete().where({ cam })
         })
     }
@@ -128,7 +128,7 @@ export default class State extends DB {
     async getVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        return this.transaction(async (knex) => {
+        return this.atomic(async (knex) => {
             const rec = await knex("vptz").select("*").where({ cam, ptz, vptz })
             return (
                 rec.length === 1 ?
@@ -151,7 +151,7 @@ export default class State extends DB {
     async delVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
-        await this.transaction(async (knex) => {
+        await this.atomic(async (knex) => {
             await knex("vptz").delete().where({ cam, ptz, vptz })
         })
     }
