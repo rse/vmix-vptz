@@ -16,27 +16,44 @@
 
         <!--  BODY  -->
         <div class="body">
-            <div class="overlay-grid">
-                <app-overlay class="overlay-cam1"
-                    ref="overlay-cam1"
-                    v-bind:options="{ cam: '1' }"
-                ></app-overlay>
-                <app-overlay class="overlay-cam2"
-                    ref="overlay-cam2"
-                    v-bind:options="{ cam: '2' }"
-                ></app-overlay>
-                <app-overlay class="overlay-cam3"
-                    ref="overlay-cam3"
-                    v-bind:options="{ cam: '3' }"
-                ></app-overlay>
-                <app-overlay class="overlay-cam4"
-                    ref="overlay-cam4"
-                    v-bind:options="{ cam: '4' }"
-                ></app-overlay>
-                <app-overlay class="overlay-cam5"
-                    ref="overlay-cam5"
-                    v-bind:options="{ cam: '5' }"
-                ></app-overlay>
+            <div class="overlay-container">
+                <div class="overlay-grid">
+                    <div class="overlay-box overlay-cam1">
+                        <div class="title">CAM1</div>
+                        <app-overlay
+                            ref="overlay-cam1"
+                            v-bind:options="{ cam: '1' }"
+                        ></app-overlay>
+                    </div>
+                    <div class="overlay-box overlay-cam2">
+                        <div class="title">CAM2</div>
+                        <app-overlay
+                            ref="overlay-cam2"
+                            v-bind:options="{ cam: '2' }"
+                        ></app-overlay>
+                    </div>
+                    <div class="overlay-box overlay-cam3">
+                        <div class="title">CAM3</div>
+                        <app-overlay
+                            ref="overlay-cam3"
+                            v-bind:options="{ cam: '3' }"
+                        ></app-overlay>
+                    </div>
+                    <div class="overlay-box overlay-cam4">
+                        <div class="title">CAM4</div>
+                        <app-overlay
+                            ref="overlay-cam4"
+                            v-bind:options="{ cam: '4' }"
+                        ></app-overlay>
+                    </div>
+                    <div class="overlay-box overlay-cam5">
+                        <div class="title">CAM5</div>
+                        <app-overlay
+                            ref="overlay-cam5"
+                            v-bind:options="{ cam: '5' }"
+                        ></app-overlay>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -61,7 +78,7 @@
     padding: 0
     display: flex
     flex-direction: column
-    justify-items: center
+    justify-content: center
     align-items: center
     .head
         background-color: var(--color-std-bg-3)
@@ -86,27 +103,51 @@
         width:  calc(100% - 2 * 10px)
         height: calc(100% - 2 * 10px)
         overflow: hidden
-        .overlay-grid
-            display: grid
-            grid-template-columns: 300px 300px 300px
-            grid-template-rows:    auto auto auto
-            grid-template-areas:   ".    cam5 .   " "cam1 cam2 cam4" ".    cam3 .   "
-            .app-overlay
-                width: 300px
-                height: auto
-                aspect-ratio: 16 / 9
-                border: 1px solid white
-                background-color: #444444
-            .overlay-cam1
-                grid-area: cam1
-            .overlay-cam2
-                grid-area: cam2
-            .overlay-cam3
-                grid-area: cam3
-            .overlay-cam4
-                grid-area: cam4
-            .overlay-cam5
-                grid-area: cam5
+        display: flex
+        flex-direction: row
+        justify-content: center
+        align-items: center
+        .overlay-container
+            flex-grow: 1
+            .overlay-grid
+                width: 100%
+                display: grid
+                grid-template-columns: 1fr 1fr 1fr
+                grid-template-rows:    auto auto auto
+                grid-template-areas:   ".    cam5 .   " "cam1 cam2 cam4" ".    cam3 .   "
+                gap: 10px
+                .overlay-box
+                    position: relative
+                    width: 100%
+                    height: auto
+                    aspect-ratio: 16 / 9
+                    background-color: var(--color-std-bg-3)
+                    .title
+                        position: absolute
+                        top: 0
+                        left: 0
+                        border-bottom-right-radius: 0.3rem
+                        padding: 0.10rem 0.40rem
+                        background-color: var(--color-std-bg-4)
+                        color: var(--color-std-fg-5)
+                        font-size: 1.3rem
+                        font-weight: bold
+                    .app-overlay
+                        position: absolute
+                        top: 0
+                        left: 0
+                        width: 100%
+                        height: 100%
+                .overlay-cam1
+                    grid-area: cam1
+                .overlay-cam2
+                    grid-area: cam2
+                .overlay-cam3
+                    grid-area: cam3
+                .overlay-cam4
+                    grid-area: cam4
+                .overlay-cam5
+                    grid-area: cam5
     .foot
         background-color: var(--color-std-bg-3)
         color: var(--color-std-fg-1)
@@ -118,7 +159,7 @@
         line-height: 14px
         display: flex
         flex-direction: row
-        justify-items: center
+        justify-content: center
         align-items: center
         .status
             flex-grow: 1

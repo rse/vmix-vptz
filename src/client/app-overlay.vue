@@ -22,8 +22,7 @@
                     top:    (canvas.h * ( state[options.cam][vptz].y                / camera.h)) + 'px',
                     width:  (canvas.w * ((state[options.cam][vptz].zoom * canvas.w) / camera.w)) + 'px',
                     height: (canvas.h * ((state[options.cam][vptz].zoom * canvas.h) / camera.h)) + 'px'
-                }"
-            >
+                }">
                 <div class="title">{{ vptz }}</div>
             </div>
         </div>
