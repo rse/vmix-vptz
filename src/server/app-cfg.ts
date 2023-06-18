@@ -5,9 +5,9 @@
 */
 
 export default class Config {
-    public idCAMs  = [ "1", "2", "3", "4", "5" ]
-    public idPTZs  = [ "A", "B", "C", "D", "E", "F", "G", "H" ]
-    public idVPTZs = [ "C-L", "C-C", "C-R", "F-L", "F-C", "F-R", "W-C" ]
+    public idCAMs  = [ "1", "2", "3", "4", "5" ] as const
+    public idPTZs  = [ "A", "B", "C", "D", "E", "F", "G", "H" ] as const
+    public idVPTZs = [ "C-L", "C-C", "C-R", "F-L", "F-C", "F-R", "W-C" ] as const
 
     /*  creation  */
     constructor () {}
