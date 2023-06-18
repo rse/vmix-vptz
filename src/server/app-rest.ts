@@ -106,9 +106,10 @@ export default class REST {
         /*  load current state  */
         this.server.route({
             method: "GET",
-            path: "/state",
+            path: "/state/{cam}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const state = this.vmix.getState()
+                const cam = req.params.ptz
+                const state = await this.vmix.getState(cam)
                 return h.response(state).code(200)
             }
         })

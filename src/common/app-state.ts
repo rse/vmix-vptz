@@ -10,19 +10,57 @@ import minimatch  from "minimatch"
 
 /*  complete state type (all fields required)  */
 export type StateType = {
-    preview: {
-        n:          string,
-        x:          number,
-        y:          number,
-        w:          number,
-        h:          number
-    },
-    program: {
-        n:          string,
-        x:          number,
-        y:          number,
-        w:          number,
-        h:          number
+    cam:                string,
+    vptz: {
+        "C-L": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "C-C": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "C-R": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "F-L": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "F-C": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "F-R": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "W-C": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        }
     }
 }
 
@@ -31,19 +69,57 @@ export type StateTypePartial = Partial<StateType>
 
 /*  complete state schema (all fields required)  */
 export const StateSchema = `{
-    preview: {
-        n:          string,
-        x:          number,
-        y:          number,
-        w:          number,
-        h:          number
-    },
-    program: {
-        n:          string,
-        x:          number,
-        y:          number,
-        w:          number,
-        h:          number
+    cam:                string,
+    vptz: {
+        "C-L": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "C-C": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "C-R": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "F-L": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "F-C": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "F-R": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        },
+        "W-C": {
+            program:    boolean,
+            preview:    boolean,
+            x:          number,
+            y:          number,
+            zoom:       number
+        }
     }
 }`
 
@@ -52,19 +128,57 @@ export const StateSchemaPartial = StateSchema.replace(/:/g, "?:")
 
 /*  complete state default (all fields with default values)  */
 export const StateDefault: StateType = {
-    preview: {
-        n:          "",
-        x:          0,
-        y:          0,
-        w:          192,
-        h:          108
-    },
-    program: {
-        n:          "",
-        x:          300,
-        y:          300,
-        w:          192,
-        h:          108
+    cam:                "",
+    vptz: {
+        "C-L": {
+            program:    false,
+            preview:    false,
+            x:          0,
+            y:          0,
+            zoom:       1.0
+        },
+        "C-C": {
+            program:    false,
+            preview:    false,
+            x:          0,
+            y:          0,
+            zoom:       1.0
+        },
+        "C-R": {
+            program:    false,
+            preview:    false,
+            x:          0,
+            y:          0,
+            zoom:       1.0
+        },
+        "F-L": {
+            program:    false,
+            preview:    false,
+            x:          0,
+            y:          0,
+            zoom:       1.0
+        },
+        "F-C": {
+            program:    false,
+            preview:    false,
+            x:          0,
+            y:          0,
+            zoom:       1.0
+        },
+        "F-R": {
+            program:    false,
+            preview:    false,
+            x:          0,
+            y:          0,
+            zoom:       1.0
+        },
+        "W-C": {
+            program:    false,
+            preview:    false,
+            x:          0,
+            y:          0,
+            zoom:       1.0
+        }
     }
 } satisfies StateType
 

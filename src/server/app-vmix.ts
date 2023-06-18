@@ -16,6 +16,7 @@ import Log          from "./app-log"
 import Cfg          from "./app-cfg"
 import State        from "./app-state"
 import type { PTZ, VPTZ, XYZ } from "./app-state"
+import { StateDefault } from "../common/app-state"
 
 /*  define our vMix input type  */
 type vMixInput = {
@@ -216,8 +217,32 @@ export default class VMix extends EventEmitter {
         }
     }
 
-    getState () {
-        return {} // FIXME: TODO
+    async getState (cam: string) {
+        /*  determine PTZ of camera  */
+        const ptz = this.cam2ptz.get(cam)!
+
+        /*  determine program and preview inputs  */
+        const program = this.active.program.B !== "" ? this.active.program.B : this.active.program.A
+        const preview = this.active.preview.B !== "" ? this.active.preview.B : this.active.preview.A
+
+        /*  determine camera and VPTZ of program and preview inputs  */
+        const programCam  = this.cfg.camOfInputName(program)
+        const previewCam  = this.cfg.camOfInputName(preview)
+        const programVPTZ = this.cfg.vptzOfInputName(program)
+        const previewVPTZ = this.cfg.vptzOfInputName(preview)
+
+        /*  generate state record  */
+        const state = StateDefault
+        state.cam = cam
+        for (const vptz of this.cfg.idVPTZs) {
+            const xyz = await this.state.getVPTZ(cam, ptz, vptz)
+            state.vptz[vptz].program = (programCam === cam && programVPTZ === vptz)
+            state.vptz[vptz].preview = (previewCam === cam && previewVPTZ === vptz)
+            state.vptz[vptz].x       = xyz.x
+            state.vptz[vptz].y       = xyz.y
+            state.vptz[vptz].zoom    = xyz.zoom
+        }
+        return state
     }
 
     /*  backup state from vMix  */
