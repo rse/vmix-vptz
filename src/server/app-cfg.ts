@@ -28,11 +28,17 @@ export default class Config {
     inputNameVPTZ (cam: string, vptz: string) {
         return `VPTZ - CAM${cam}-${vptz}`
     }
-    cameraOfInputName (inputName: string) {
-        let m
+    camOfInputName (inputName: string) {
+        let m: RegExpMatchArray | null
         if ((m = inputName.match(/^V?PTZ - CAM(\d+)-.+$/)) !== null)
             return m[1]
-        return undefined
+        return ""
+    }
+    vptzOfInputName (inputName: string) {
+        let m: RegExpMatchArray | null
+        if ((m = inputName.match(/^VPTZ - CAM\d+-(C-L|C-C|C-R|F-L|F-C|F-R|W-C)$/)) !== null)
+            return m[1]
+        return ""
     }
 }
 
