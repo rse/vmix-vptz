@@ -99,9 +99,9 @@
         flex-grow: 1
         background-color: var(--color-std-bg-2)
         color: var(--color-std-fg-5)
-        padding: 10px 10px
+        padding: 10px 10px 20px 10px
         width:  calc(100% - 2 * 10px)
-        height: calc(100% - 2 * 10px)
+        height: calc(100% - 10px - 20px)
         overflow: hidden
         display: flex
         flex-direction: row
@@ -109,25 +109,37 @@
         align-items: center
         .overlay-container
             flex-grow: 1
+            display: flex
+            flex-direction: column
+            justify-content: center
+            align-items: center
+            max-width: 100%
+            max-height: 100%
+            aspect-ratio: 16 / 9
             .overlay-grid
-                width: 100%
+                flex-grow: 1
+                max-width: 100%
+                max-height: 100%
+                box-sizing: border-box
+                aspect-ratio: 16 / 9
                 display: grid
                 grid-template-columns: 1fr 1fr 1fr
-                grid-template-rows:    auto auto auto
+                grid-template-rows:    1fr 1fr 1fr
                 grid-template-areas:   ".    cam5 .   " "cam1 cam2 cam4" ".    cam3 .   "
                 gap: 10px
                 .overlay-box
                     position: relative
-                    width: 100%
-                    height: auto
+                    max-width: 100%
+                    max-height: 100%
                     aspect-ratio: 16 / 9
                     background-color: var(--color-std-bg-3)
+                    box-sizing: border-box
                     .title
                         position: absolute
                         top: 0
                         left: 0
                         border-bottom-right-radius: 0.3rem
-                        padding: 0.10rem 0.40rem
+                        padding: 0.1rem 0.4rem
                         background-color: var(--color-std-bg-4)
                         color: var(--color-std-fg-5)
                         font-size: 1.3rem
