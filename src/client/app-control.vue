@@ -95,9 +95,9 @@
                         <div class="control-grid control-grid-vptz">
                             <div class="button ga-01" v-bind:class="{ active: vptzCam === '1' }" v-on:click="vptzCam = '1'">CAM1</div>
                             <div class="button ga-02" v-bind:class="{ active: vptzCam === '2' }" v-on:click="vptzCam = '2'">CAM2</div>
-                            <div class="button ga-03" v-bind:class="{ active: vptzCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
-                            <div class="button ga-04" v-bind:class="{ active: vptzCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
-                            <div class="button ga-05" v-bind:class="{ active: vptzCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
+                            <div class="button ga-03" v-bind:class="{ active: vptzCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
+                            <div class="button ga-04" v-bind:class="{ active: vptzCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
+                            <div class="button ga-05" v-bind:class="{ active: vptzCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
                             <div class="button ga-06" v-bind:class="{ active: vptzView === 'C-L' }" v-on:click="vptzView = 'C-L'">C-L</div>
                             <div class="button ga-07" v-bind:class="{ active: vptzView === 'C-C' }" v-on:click="vptzView = 'C-C'">C-C</div>
                             <div class="button ga-08" v-bind:class="{ active: vptzView === 'C-R' }" v-on:click="vptzView = 'C-R'">C-R</div>
@@ -363,13 +363,16 @@
                     .control-grid .ga-12
                         grid-area: ga-12
                     .control-grid-global
-                        grid-template-columns: 1fr 1fr
+                        grid-template-columns: calc(1fr + 1vw) 1fr
                         grid-template-rows:    1fr 1fr
                         grid-template-areas:   "ga-01 ga-03" "ga-02 ga-04"
                         .button
                             font-size: 1.5vw
+                            &.ga-01
+                            &.ga-02
+                                margin-right: 1vw
                     .control-grid-ptz
-                        grid-template-columns: 6fr 6fr 6fr 6fr 6fr 6fr 6fr
+                        grid-template-columns: calc(6fr + 0.5vw) 6fr 6fr 6fr 6fr 6fr 6fr
                         grid-template-rows:    8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr
                         grid-template-areas: \
                             "ga-01 ga-03 ga-04 ga-05 ga-06 ga-07 ga-08" \
@@ -390,20 +393,27 @@
                                 flex-direction: column
                                 justify-content: center
                                 align-items: center
+                                margin-right: 0.5vw
                                 .icon
                                     padding-right: 0
                     .control-grid-vptz
                         grid-template-columns: 5fr 5fr 5fr 5fr 5fr
-                        grid-template-rows:    4fr 4fr 4fr 4fr
+                        grid-template-rows:    calc(4fr + 0.5vw) 4fr 4fr 4fr
                         grid-template-areas:   "ga-01 ga-02 ga-03 ga-04 ga-05" \
                             ". ga-06 ga-07 ga-08 ." \
                             ". ga-09 ga-10 ga-11 ." \
                             ". . ga-12 . ."
                         .button
                             font-size: 1.3vw
+                            &.ga-01
+                            &.ga-02
+                            &.ga-03
+                            &.ga-04
+                            &.ga-05
+                                margin-bottom: 0.5vw
                     .control-grid-joystick
                         grid-template-columns: 3fr 3fr 3fr
-                        grid-template-rows:    4fr 4fr 4fr
+                        grid-template-rows:    4fr 4fr calc(4fr + 0.5vw)
                         grid-template-areas:   "ga-01 ga-02 ga-03" \
                             "ga-04 ga-05 ga-06" \
                             "ga-07 ga-08 ga-09" \
@@ -412,6 +422,10 @@
                             font-size: 1.5vw
                             .icon
                                 padding-right: 0
+                            &.ga-10
+                            &.ga-11
+                            &.ga-12
+                                margin-top: 0.5vw
                 .control-box-ptz
                     grid-area: ctrl1
                 .control-box-global
