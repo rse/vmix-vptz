@@ -101,11 +101,10 @@ export default defineComponent({
         }).then((response) => response.data).catch(() => null)
         if (state !== null) {
             const errors = [] as Array<string>
-            if (Ducky.validate(state, StateSchema, errors)) {
-                this.state = state as StateType
-            }
+            if (Ducky.validate(state, StateSchema, errors))
+                this.setState(state as StateType)
             else
-                this.log("ERROR", `invalid schema of loaded state: ${errors.join(", ")}`)
+                this.log("ERROR", `invalid schema of received state: ${errors.join(", ")}`)
         }
         else
             this.log("ERROR", "failed to state")
@@ -140,14 +139,10 @@ export default defineComponent({
             if (data.cmd === "STATE") {
                 const state = data.arg.state as StateType
                 const errors = [] as Array<string>
-                if (!Ducky.validate(state, StateSchema, errors)) {
-                    this.log("WARNING", `invalid schema of loaded state: ${errors.join(", ")}`)
-                    return
-                }
-                if (this.mode === "control")
-                    (this.$refs.control as typeof AppControl).setState(state)
-                else if (this.mode === "overlay")
-                    (this.$refs.overlay as typeof AppOverlay).setState(state)
+                if (Ducky.validate(state, StateSchema, errors))
+                    this.setState(state)
+                else
+                    this.log("WARNING", `invalid schema of received state: ${errors.join(", ")}`)
             }
         })
     },
@@ -158,6 +153,13 @@ export default defineComponent({
         },
         onLog (level: string, msg: string) {
             this.log(level, msg)
+        },
+        setState (state: StateType) {
+            this.state = state
+            if (this.mode === "control" && this.$refs.control)
+                (this.$refs.control as typeof AppControl).setState(this.state)
+            else if (this.mode === "overlay" && this.$refs.overlay)
+                (this.$refs.overlay as typeof AppOverlay).setState(this.state)
         }
     }
 })
