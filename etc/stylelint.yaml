@@ -11,7 +11,7 @@ extends:
 rules:
     stylus/indentation: 4
     shorthand-property-no-redundant-values: null
-    unit-allowed-list: [ "px", "pt", "%", "vh", "vw", "fr", "rem", "ms" ]
+    unit-allowed-list: [ "px", "pt", "%", "vh", "vw", "fr", "rem", "ms", "deg" ]
     rule-empty-line-before: null
     no-descending-specificity: null
     custom-property-empty-line-before: null
