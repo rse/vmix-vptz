@@ -258,13 +258,14 @@ export default class VMix extends EventEmitter {
         const state = StateDefault
         for (const cam of this.cfg.idCAMs) {
             const ptz = this.cam2ptz.get(cam)!
+            state[cam].ptz = ptz
             for (const vptz of this.cfg.idVPTZs) {
                 const xyz = await this.state.getVPTZ(cam, ptz, vptz)
-                state[cam][vptz].program = (programCam === cam && programVPTZ === vptz)
-                state[cam][vptz].preview = (previewCam === cam && previewVPTZ === vptz)
-                state[cam][vptz].x       = xyz.x
-                state[cam][vptz].y       = xyz.y
-                state[cam][vptz].zoom    = xyz.zoom
+                state[cam].vptz[vptz].program = (programCam === cam && programVPTZ === vptz)
+                state[cam].vptz[vptz].preview = (previewCam === cam && previewVPTZ === vptz)
+                state[cam].vptz[vptz].x       = xyz.x
+                state[cam].vptz[vptz].y       = xyz.y
+                state[cam].vptz[vptz].zoom    = xyz.zoom
             }
         }
         return state

@@ -9,19 +9,22 @@
 <template>
     <div class="app-overlay" ref="root">
         <div ref="canvas" class="canvas">
+            <div class="ptz">
+                {{ state[options.cam].ptz }}
+            </div>
             <div
                 v-for="vptz in [ 'C-L', 'C-C', 'C-R', 'F-L', 'F-C', 'F-R', 'W-C' ]"
                 v-bind:key="vptz"
-                class="overlay"
+                class="vptz"
                 v-bind:class="{
-                    program: state[options.cam][vptz].program,
-                    preview: state[options.cam][vptz].preview
+                    program: state[options.cam].vptz[vptz].program,
+                    preview: state[options.cam].vptz[vptz].preview
                 }"
                 v-bind:style="{
-                    left:   (canvas.w * ( state[options.cam][vptz].x                / camera.w)) + 'px',
-                    top:    (canvas.h * ( state[options.cam][vptz].y                / camera.h)) + 'px',
-                    width:  (canvas.w * ((state[options.cam][vptz].zoom * canvas.w) / camera.w)) + 'px',
-                    height: (canvas.h * ((state[options.cam][vptz].zoom * canvas.h) / camera.h)) + 'px'
+                    left:   (canvas.w * ( state[options.cam].vptz[vptz].x                / camera.w)) + 'px',
+                    top:    (canvas.h * ( state[options.cam].vptz[vptz].y                / camera.h)) + 'px',
+                    width:  (canvas.w * ((state[options.cam].vptz[vptz].zoom * canvas.w) / camera.w)) + 'px',
+                    height: (canvas.h * ((state[options.cam].vptz[vptz].zoom * canvas.h) / camera.h)) + 'px'
                 }">
                 <div class="title">{{ vptz }}</div>
             </div>
@@ -44,7 +47,16 @@
         border: 0
         outline: none
         background-color: transparent
-        .overlay
+        .ptz
+            position: absolute
+            top: 0
+            right: 0
+            border-bottom-left-radius: 8px
+            padding: 0 8px 0 8px
+            color: #ffffff
+            font-size: 1.3vw
+            font-weight: bold
+        .vptz
             position: absolute
             top: 0
             left: 0

@@ -11,12 +11,15 @@ import minimatch  from "minimatch"
 /*  complete state type (all fields required)  */
 export type StateType = {
     [ cam: string ]: {
-        [ vptz: string ]: {
-            program:    boolean,
-            preview:    boolean,
-            x:          number,
-            y:          number,
-            zoom:       number
+        ptz: string,
+        vptz: {
+                [ vptz: string ]: {
+                program:    boolean,
+                preview:    boolean,
+                x:          number,
+                y:          number,
+                zoom:       number
+            }
         }
     }
 }
@@ -27,12 +30,15 @@ export type StateTypePartial = Partial<StateType>
 /*  complete state schema (all fields required)  */
 export const StateSchema = `{
     @: {
-        @: {
-            program:    boolean,
-            preview:    boolean,
-            x:          number,
-            y:          number,
-            zoom:       number
+        ptz: string,
+        vptz: {
+            @: {
+                program:    boolean,
+                preview:    boolean,
+                x:          number,
+                y:          number,
+                zoom:       number
+            }
         }
     }
 }`
@@ -43,9 +49,9 @@ export const StateSchemaPartial = StateSchema.replace(/:/g, "?:")
 /*  complete state default (all fields with default values)  */
 export const StateDefault = {} as StateType
 for (const cam of [ "1", "2", "3", "4", "5" ]) {
-    StateDefault[cam] = {}
+    StateDefault[cam] = { ptz: "", vptz: {} }
     for (const vptz of [ "C-L", "C-C", "C-R", "F-L", "F-C", "F-R", "W-C" ]) {
-        StateDefault[cam][vptz] = {
+        StateDefault[cam].vptz[vptz] = {
             program:    false,
             preview:    false,
             x:          0,
