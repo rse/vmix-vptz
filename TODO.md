@@ -1,1 +1,4 @@
-- State visualization in client
+- Control: reflect preview/program in VPTZ Select, SendtoPreview
+- Control: Memory store/recall (MS,MR) for VPTZ set
+- Control: PTZ Control beside VPTZ control
+- Overlay: State visualization in client
