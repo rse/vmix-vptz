@@ -341,7 +341,7 @@ export default class VMix extends EventEmitter {
     async setPTZAll (ptz: string) {
         this.log.log(2, `vMix: activating physical PTZ "${ptz}" of all cameras`)
         for (const cam of this.cfg.idCAMs)
-            this.setPTZCam(cam, ptz)
+            this.setPTZCam(ptz, cam)
     }
 
     /*  activate single physical PTZ of a camera  */
@@ -385,7 +385,7 @@ export default class VMix extends EventEmitter {
     async storePTZAll (ptz: string) {
         this.log.log(2, `vMix: storing physical PTZ "${ptz}" of all cameras`)
         for (const cam of this.cfg.idCAMs)
-            this.storePTZCam(cam, ptz)
+            this.storePTZCam(ptz, cam)
     }
 
     /*  store single physical PTZ of a camera  */
