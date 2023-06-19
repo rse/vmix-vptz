@@ -260,6 +260,33 @@ export default class REST {
             }
         })
 
+        /*  store PTZ of all cameras  */
+        this.server.route({
+            method: "PUT",
+            path: "/ptz/{ptz}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const ptz = req.params.ptz
+                queue = queue.then(() => {
+                    return this.vmix.storePTZAll(ptz)
+                })
+                return h.response().code(204)
+            }
+        })
+
+        /*  store PTZ of single camera  */
+        this.server.route({
+            method: "PUT",
+            path: "/ptz/{ptz}/{cam}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const ptz = req.params.ptz
+                const cam = req.params.cam
+                queue = queue.then(() => {
+                    return this.vmix.storePTZCam(ptz, cam)
+                })
+                return h.response().code(204)
+            }
+        })
+
         /*  ==== Endpoint: VPTZ Adjustment ====  */
 
         /*  change VPTZ  */

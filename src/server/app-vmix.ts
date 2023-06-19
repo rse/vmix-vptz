@@ -381,6 +381,29 @@ export default class VMix extends EventEmitter {
         this.notifyState()
     }
 
+    /*  store all physical PTZ of a camera  */
+    async storePTZAll (ptz: string) {
+        this.log.log(2, `vMix: storing physical PTZ "${ptz}" of all cameras`)
+        for (const cam of this.cfg.idCAMs)
+            this.storePTZCam(cam, ptz)
+    }
+
+    /*  store single physical PTZ of a camera  */
+    async storePTZCam (ptz: string, cam: string) {
+        /*  sanity check arguments  */
+        if (!this.cfg.idPTZs.find((id) => id === ptz))
+            throw new Error(`invalid PTZ id "${ptz}"`)
+        if (!this.cfg.idCAMs.find((id) => id === cam))
+            throw new Error(`invalid CAM id "${cam}"`)
+
+        /*  set PTZ setting and update vMix PTZ inputs  */
+        this.log.log(2, `vMix: storing physical PTZ "${ptz}" of camera "${cam}"`)
+        const input = this.cfg.inputNameCAM(cam)
+        this.vmixCommand(this.vmix1, [
+            { Function: "PTZUpdateVirtualInput", Input: input }
+        ])
+    }
+
     /*  send command to vMix  */
     async vmixCommand (vmix: vMixAPI.ConnectionTCP | null, cmds: string | Array<string> | vMixCommand | Array<vMixCommand>) {
         if (vmix !== null && vmix.connected())
