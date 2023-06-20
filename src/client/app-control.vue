@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div class="control-box control-box-ptz">
-                        <div class="title">PTZ LOAD/SAVE</div>
+                        <div class="title">CAM+PTZ ACTIVATE / STORE</div>
                         <div class="control-grid control-grid-ptz">
                             <div class="button ga-01"
                                 v-bind:class="{ active: ptzMode === 'load' }"
@@ -91,70 +91,85 @@
                         </div>
                     </div>
                     <div class="control-box control-box-vptz">
-                        <div class="title">VPTZ SELECT</div>
+                        <div class="title">CAM+VPTZ ACTIVATE</div>
                         <div class="control-grid control-grid-vptz">
-                            <div class="button ga-01" v-bind:class="{ active: vptzCam === '1' }" v-on:click="vptzCam = '1'">CAM1</div>
-                            <div class="button ga-02" v-bind:class="{ active: vptzCam === '2' }" v-on:click="vptzCam = '2'">CAM2</div>
-                            <div class="button ga-03" v-bind:class="{ active: vptzCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
-                            <div class="button ga-04" v-bind:class="{ active: vptzCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
-                            <div class="button ga-05" v-bind:class="{ active: vptzCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
-                            <div class="button ga-06" v-bind:class="{ active: vptzView === 'C-L' }" v-on:click="vptzView = 'C-L'">C-L</div>
-                            <div class="button ga-07" v-bind:class="{ active: vptzView === 'C-C' }" v-on:click="vptzView = 'C-C'">C-C</div>
-                            <div class="button ga-08" v-bind:class="{ active: vptzView === 'C-R' }" v-on:click="vptzView = 'C-R'">C-R</div>
-                            <div class="button ga-09" v-bind:class="{ active: vptzView === 'F-L' }" v-on:click="vptzView = 'F-L'">F-L</div>
-                            <div class="button ga-10" v-bind:class="{ active: vptzView === 'F-C' }" v-on:click="vptzView = 'F-C'">F-C</div>
-                            <div class="button ga-11" v-bind:class="{ active: vptzView === 'F-R' }" v-on:click="vptzView = 'F-R'">F-R</div>
-                            <div class="button ga-12" v-bind:class="{ active: vptzView === 'W-C' }" v-on:click="vptzView = 'W-C'">W-C</div>
+                            <div class="button ga-01" v-bind:class="{ active: vptzCam === '1', preview: previewCam === '1', program: programCam === '1' }" v-on:click="vptzCam = '1'">CAM1</div>
+                            <div class="button ga-02" v-bind:class="{ active: vptzCam === '2', preview: previewCam === '2', program: programCam === '2' }" v-on:click="vptzCam = '2'">CAM2</div>
+                            <div class="button ga-03" v-bind:class="{ active: vptzCam === '5', preview: previewCam === '5', program: programCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
+                            <div class="button ga-04" v-bind:class="{ active: vptzCam === '3', preview: previewCam === '3', program: programCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
+                            <div class="button ga-05" v-bind:class="{ active: vptzCam === '4', preview: previewCam === '4', program: programCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
+                            <div class="button ga-06" v-bind:class="{ preview: previewView === 'C-L', program: programView === 'C-L' }" v-on:click="vptz('C-L')">C-L</div>
+                            <div class="button ga-07" v-bind:class="{ preview: previewView === 'C-C', program: programView === 'C-C' }" v-on:click="vptz('C-C')">C-C</div>
+                            <div class="button ga-08" v-bind:class="{ preview: previewView === 'C-R', program: programView === 'C-R' }" v-on:click="vptz('C-R')">C-R</div>
+                            <div class="button ga-09" v-bind:class="{ preview: previewView === 'F-L', program: programView === 'F-L' }" v-on:click="vptz('F-L')">F-L</div>
+                            <div class="button ga-10" v-bind:class="{ preview: previewView === 'F-C', program: programView === 'F-C' }" v-on:click="vptz('F-C')">F-C</div>
+                            <div class="button ga-11" v-bind:class="{ preview: previewView === 'F-R', program: programView === 'F-R' }" v-on:click="vptz('F-R')">F-R</div>
+                            <div class="button ga-12" v-bind:class="{ preview: previewView === 'W-C', program: programView === 'W-C' }" v-on:click="vptz('W-C')">W-C</div>
                         </div>
                     </div>
                     <div class="control-box control-box-joystick">
-                        <div class="title">VPTZ ADJUST</div>
+                        <div v-if="adjustMode === 'ptz'" class="title">
+                            PTZ ADJUST: <b>CAM{{ previewCam }} / {{ previewCam != '' ? state[previewCam].ptz + previewCam : '' }}</b>
+                        </div>
+                        <div v-if="adjustMode === 'vptz'" class="title">
+                            VPTZ ADJUST: <b>CAM{{ previewCam }} / {{ previewCam != '' ? state[previewCam].ptz + previewCam : '' }} / {{ previewView }}</b>
+                        </div>
                         <div class="control-grid control-grid-joystick">
                             <div class="button ga-01"
+                                v-bind:class="{ active: adjustMode === 'ptz' }"
+                                v-on:click="adjustMode = 'ptz'">
+                                PTZ
+                            </div>
+                            <div class="button ga-02"
+                                v-bind:class="{ active: adjustMode === 'vptz' }"
+                                v-on:click="adjustMode = 'vptz'">
+                                VPTZ
+                            </div>
+                            <div class="button ga-03"
                                 v-on:click="joystick('pan', 'up-left')">
                                 <span class="icon"><i class="fa-solid fa-circle-left fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i></span>
                             </div>
-                            <div class="button ga-02"
+                            <div class="button ga-04"
                                 v-on:click="joystick('pan', 'up')">
                                 <span class="icon"><i class="fa-solid fa-circle-up"></i></span>
                             </div>
-                            <div class="button ga-03"
+                            <div class="button ga-05"
                                 v-on:click="joystick('pan', 'up-right')">
                                 <span class="icon"><i class="fa-solid fa-circle-right fa-rotate-by" style="--fa-rotate-angle: -45deg;"></i></span>
                             </div>
-                            <div class="button ga-04"
+                            <div class="button ga-06"
                                 v-on:click="joystick('pan', 'left')">
                                 <span class="icon"><i class="fa-solid fa-circle-left"></i></span>
                             </div>
-                            <div class="button ga-05 destructive"
+                            <div class="button ga-07 destructive"
                                 v-on:click="joystick('pan', 'reset')">
                                 <span class="icon"><i class="fa-solid fa-circle-xmark"></i></span>
                             </div>
-                            <div class="button ga-06"
+                            <div class="button ga-08"
                                 v-on:click="joystick('pan', 'right')">
                                 <span class="icon"><i class="fa-solid fa-circle-right"></i></span>
                             </div>
-                            <div class="button ga-07"
+                            <div class="button ga-09"
                                 v-on:click="joystick('pan', 'down-left')">
                                 <span class="icon"><i class="fa-solid fa-circle-left fa-rotate-by" style="--fa-rotate-angle: -45deg;"></i></span>
                             </div>
-                            <div class="button ga-08"
+                            <div class="button ga-10"
                                 v-on:click="joystick('pan', 'down')">
                                 <span class="icon"><i class="fa-solid fa-circle-down"></i></span>
                             </div>
-                            <div class="button ga-09"
+                            <div class="button ga-11"
                                 v-on:click="joystick('pan', 'down-right')">
                                 <span class="icon"><i class="fa-solid fa-circle-right fa-rotate-by" style="--fa-rotate-angle: 45deg;"></i></span>
                             </div>
-                            <div class="button ga-10"
+                            <div class="button ga-12"
                                 v-on:click="joystick('zoom', 'decrease')">
                                 <span class="icon"><i class="fa-solid fa-circle-minus"></i></span>
                             </div>
-                            <div class="button ga-11 destructive"
+                            <div class="button ga-13 destructive"
                                 v-on:click="joystick('zoom', 'reset')">
                                 <span class="icon"><i class="fa-solid fa-circle-xmark"></i></span>
                             </div>
-                            <div class="button ga-12"
+                            <div class="button ga-14"
                                 v-on:click="joystick('zoom', 'increase')">
                                 <span class="icon"><i class="fa-solid fa-circle-plus"></i></span>
                             </div>
@@ -368,7 +383,7 @@
                         grid-template-areas:   "ga-01 ga-03" "ga-02 ga-04"
                         .button
                             font-size: 1.5vw
-                            &.ga-01
+                            &.ga-01,
                             &.ga-02
                                 margin-right: 1vw
                     .control-grid-ptz
@@ -405,27 +420,38 @@
                             ". . ga-12 . ."
                         .button
                             font-size: 1.3vw
-                            &.ga-01
-                            &.ga-02
-                            &.ga-03
-                            &.ga-04
+                            &.ga-01,
+                            &.ga-02,
+                            &.ga-03,
+                            &.ga-04,
                             &.ga-05
                                 margin-bottom: 0.5vw
+                            &.program
+                                background-color: var(--color-prg-bg-2)
+                                color: var(--color-prg-fg-2)
+                            &.preview
+                                background-color: var(--color-prv-bg-2)
+                                color: var(--color-prv-fg-2)
                     .control-grid-joystick
-                        grid-template-columns: 3fr 3fr 3fr
-                        grid-template-rows:    4fr 4fr calc(4fr + 0.5vw)
-                        grid-template-areas:   "ga-01 ga-02 ga-03" \
-                            "ga-04 ga-05 ga-06" \
-                            "ga-07 ga-08 ga-09" \
-                            "ga-10 ga-11 ga-12"
+                        grid-template-columns: 4fr 4fr 4fr 4fr
+                        grid-template-rows:    4fr 4fr 4fr 4fr
+                        grid-template-areas:   "ga-01 ga-03 ga-04 ga-05" \
+                            "ga-01 ga-06 ga-07 ga-08" \
+                            "ga-02 ga-09 ga-10 ga-11" \
+                            "ga-02 ga-12 ga-13 ga-14"
                         .button
                             font-size: 1.5vw
                             .icon
                                 padding-right: 0
-                            &.ga-10
-                            &.ga-11
-                            &.ga-12
-                                margin-top: 0.5vw
+                            &.ga-01,
+                            &.ga-02
+                                display: flex
+                                flex-direction: column
+                                justify-content: center
+                                align-items: center
+                                margin-right: 0.5vw
+                                .icon
+                                    padding-right: 0
                 .control-box-ptz
                     grid-area: ctrl1
                 .control-box-global
@@ -473,15 +499,35 @@ export default defineComponent({
     data: () => ({
         state: StateDefault as StateType,
         pkg,
-        ptzMode: "load",
-        vptzCam: "1",
-        vptzView: "C-L"
+        ptzMode:     "load",
+        vptzCam:     "",
+        programCam:  "",
+        programView: "",
+        previewCam:  "",
+        previewView: "",
+        adjustMode:  "ptz"
     }),
     async created () {
     },
     methods: {
         setState (state: StateType) {
             this.state = state
+            this.programCam  = ""
+            this.programView = ""
+            this.previewCam  = ""
+            this.previewView = ""
+            for (const cam of Object.keys(this.state)) {
+                for (const view of Object.keys(this.state[cam].vptz)) {
+                    if (this.state[cam].vptz[view].program) {
+                        this.programCam  = cam
+                        this.programView = view
+                    }
+                    if (this.state[cam].vptz[view].preview) {
+                        this.previewCam  = cam
+                        this.previewView = view
+                    }
+                }
+            }
         },
         log (level: string, msg: string) {
             this.$emit("log", level, msg)
@@ -497,10 +543,18 @@ export default defineComponent({
             else
                 await this.api(`/ptz/${ptz}`, method)
         },
+        async vptz (vptz: string) {
+            const cam = this.vptzCam
+            await this.api(`/vptz/${cam}/${vptz}/select`)
+        },
         async joystick (op: string, arg: string) {
-            const cam  = this.vptzCam
-            const vptz = this.vptzView
-            await this.api(`/vptz/${cam}/${vptz}/${op}/${arg}`)
+            const cam  = this.previewCam
+            const ptz  = this.state[cam].ptz
+            const vptz = this.previewView
+            if (this.adjustMode === "ptz")
+                await this.api(`/ptz/${cam}/${ptz}/${op}/${arg}`)
+            else if (this.adjustMode === "vptz")
+                await this.api(`/vptz/${cam}/${vptz}/${op}/${arg}`)
         }
     }
 })

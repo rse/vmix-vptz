@@ -287,6 +287,22 @@ export default class REST {
             }
         })
 
+        /*  change PTZ  */
+        this.server.route({
+            method: "GET",
+            path: "/ptz/{ptz}/{cam}/{op}/{arg}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const cam   = req.params.cam
+                const ptz   = req.params.ptz
+                const op    = req.params.op
+                const arg   = req.params.arg
+                queue = queue.then(() => {
+                    return this.vmix.changePTZ(cam, ptz, op, arg)
+                })
+                return h.response().code(204)
+            }
+        })
+
         /*  ==== Endpoint: VPTZ Adjustment ====  */
 
         /*  change VPTZ  */
@@ -300,6 +316,20 @@ export default class REST {
                 const arg   = req.params.arg
                 queue = queue.then(() => {
                     return this.vmix.changeVPTZ(cam, vptz, op, arg)
+                })
+                return h.response().code(204)
+            }
+        })
+
+        /*  select VPTZ into preview  */
+        this.server.route({
+            method: "GET",
+            path: "/vptz/{cam}/{vptz}/select",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const cam   = req.params.cam
+                const vptz  = req.params.vptz
+                queue = queue.then(() => {
+                    return this.vmix.selectVPTZ(cam, vptz)
                 })
                 return h.response().code(204)
             }

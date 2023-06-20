@@ -34,7 +34,7 @@ type vMixCommand = {
 }
 
 /*  define vMix command and XYZ modification operation  */
-type CMD = { f: string, v: string }
+type CMD = { f: string, v?: string }
 type MOD = (xyz: XYZ) => void
 
 /*  asynchronous delay  */
@@ -268,6 +268,8 @@ export default class VMix extends EventEmitter {
                 state[cam].vptz[vptz].zoom    = xyz.zoom
             }
         }
+        state["2"].vptz["C-C"].preview = true
+        state["2"].vptz["W-C"].program = true
         return state
     }
 
@@ -412,6 +414,114 @@ export default class VMix extends EventEmitter {
             this.log.log(1, "vMix: failed to send command(s) -- (still) not connected")
     }
 
+    /*  change physical PTZ  */
+    async changePTZ (cam: string, ptz: string, op: string, arg: string) {
+        /*  sanity check arguments  */
+        if (!this.cfg.idCAMs.find((id) => id === cam))
+            throw new Error(`invalid CAM id "${cam}"`)
+        if (!this.cfg.idPTZs.find((id) => id === ptz))
+            throw new Error(`invalid PTZ id "${ptz}"`)
+        if (op !== "pan" && op !== "zoom")
+            throw new Error("invalid operation")
+
+        /*  constants  */
+        const moveSpeed  = 0.5
+        const moveTime   = 0.5
+        const zoomSpeed  = 0.5
+        const zoomTime   = 0.5
+
+        /*  variables  */
+        let cmd1: CMD | null = null
+        let cmd2: CMD | null = null
+        let time = 0
+
+        /*  dispatch according to operation  */
+        if (op === "pan") {
+            if (arg === "reset")
+                cmd1 = { f: "PTZHome" }
+            else if (arg === "up-left") {
+                cmd1 = { f: "PTZMoveUpLeft", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else if (arg === "up") {
+                cmd1 = { f: "PTZMoveUp", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else if (arg === "up-right") {
+                cmd1 = { f: "PTZMoveUpRight", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else if (arg === "left") {
+                cmd1 = { f: "PTZMoveLeft", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else if (arg === "right") {
+                cmd1 = { f: "PTZMoveRight", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else if (arg === "down-left") {
+                cmd1 = { f: "PTZMoveDownLeft", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else if (arg === "down") {
+                cmd1 = { f: "PTZMoveDown", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else if (arg === "down-right") {
+                cmd1 = { f: "PTZMoveDownRight", v: moveSpeed.toString() }
+                cmd2 = { f: "PTZMoveStop" }
+                time = moveTime
+            }
+            else
+                throw new Error("invalid argument")
+        }
+        else if (op === "zoom") {
+            if (arg === "reset") {
+                cmd1 = { f: "PTZZoomOut", v: "1.0" }
+                cmd2 = { f: "PTZZoomStop" }
+                time = 2.0
+            }
+            else if (arg === "decrease") {
+                cmd1 = { f: "PTZZoomOut", v: zoomSpeed.toString() }
+                cmd2 = { f: "PTZZoomStop" }
+                time = zoomTime
+            }
+            else if (arg === "increase") {
+                cmd1 = { f: "PTZZoomIn", v: zoomSpeed.toString() }
+                cmd2 = { f: "PTZZoomStop" }
+                time = zoomTime
+            }
+            else
+                throw new Error("invalid argument")
+        }
+
+        /*  determine and execute first vMix command  */
+        const input = this.cfg.inputNamePTZ(cam, ptz)
+        const vmixCmd1 = { Function: cmd1!.f, Input: input } as vMixCommand
+        if (cmd1!.v !== undefined && cmd1!.v !== "")
+            vmixCmd1.Value = cmd1!.v
+        await this.vmixCommand(this.vmix1, vmixCmd1)
+
+        /*  determine and execute optional delay  */
+        if (time > 0)
+            await AsyncDelay(time)
+
+        /*  determine and execute optional second vMix command  */
+        if (cmd2 !== null) {
+            const vmixCmd2 = { Function: cmd2!.f, Input: input } as vMixCommand
+            if (cmd2!.v !== undefined && cmd2!.v !== "")
+                vmixCmd2.Value = cmd2!.v
+            await this.vmixCommand(this.vmix1, vmixCmd2)
+        }
+    }
+
     /*  change virtual PTZ  */
     async changeVPTZ (cam: string, vptz: string, op: string, arg: string) {
         /*  sanity check arguments  */
@@ -430,10 +540,10 @@ export default class VMix extends EventEmitter {
         const deltaZoom  = 0.10
 
         /*  variables  */
-        let   cmd1: CMD | null = null
-        let   cmd2: CMD | null = null
-        let   mod1: MOD | null = null
-        let   mod2: MOD | null = null
+        let cmd1: CMD | null = null
+        let cmd2: CMD | null = null
+        let mod1: MOD | null = null
+        let mod2: MOD | null = null
 
         /*  dispatch according to operation  */
         if (op === "pan") {
@@ -532,6 +642,19 @@ export default class VMix extends EventEmitter {
         }, (cancelled) => {
             this.state.setVPTZ(cam, ptz, vptz, xyz!)
         }, { duration, fps })
+    }
+
+    /*  select virtual PTZ for preview  */
+    async selectVPTZ (cam: string, vptz: string) {
+        /*  sanity check arguments  */
+        if (!this.cfg.idCAMs.find((id) => id === cam))
+            throw new Error(`invalid CAM id "${cam}"`)
+        if (!this.cfg.idVPTZs.find((id) => id === vptz))
+            throw new Error(`invalid VPTZ id "${vptz}"`)
+
+        /*  send input to preview  */
+        const input = this.cfg.inputNameVPTZ(cam, vptz)
+        await this.vmixCommand(this.vmix2, { Function: "PreviewInput", Input: input })
     }
 
     /*  drive preview into program  */
@@ -654,7 +777,7 @@ export default class VMix extends EventEmitter {
             await AsyncDelay(100)
 
             /*  cut preview into program  */
-            this.vmixCommand(this.vmix1, { Function: "Cut" })
+            this.vmixCommand(this.vmix2, { Function: "Cut" })
             await AsyncDelay(50)
 
             /*  determine drive path from program (which was the preview) to original preview  */

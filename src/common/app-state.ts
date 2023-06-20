@@ -13,7 +13,7 @@ export type StateType = {
     [ cam: string ]: {
         ptz: string,
         vptz: {
-                [ vptz: string ]: {
+            [ vptz: string ]: {
                 program:    boolean,
                 preview:    boolean,
                 x:          number,
