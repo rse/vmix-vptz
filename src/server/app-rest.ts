@@ -338,10 +338,15 @@ export default class REST {
         /*  drive preview into program  */
         this.server.route({
             method: "GET",
-            path: "/drive/{mode}",
+            path: "/mixer/{op}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const mode = req.params.mode
-                await this.vmix.drive(mode)
+                const op = req.params.op
+                if (op === "cut")
+                    await this.vmix.cut()
+                else if (op === "drive" || op === "apply")
+                    await this.vmix.drive(op)
+                else
+                    return Boom.badRequest("invalid mixer operation")
                 return h.response().code(204)
             }
         })

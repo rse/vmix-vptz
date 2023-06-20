@@ -269,7 +269,7 @@ export default class VMix extends EventEmitter {
             }
         }
         state["2"].vptz["C-C"].preview = true
-        state["2"].vptz["W-C"].program = true
+        state["3"].vptz["W-C"].program = true
         return state
     }
 
@@ -655,6 +655,11 @@ export default class VMix extends EventEmitter {
         /*  send input to preview  */
         const input = this.cfg.inputNameVPTZ(cam, vptz)
         await this.vmixCommand(this.vmix2, { Function: "PreviewInput", Input: input })
+    }
+
+    /*  cut preview into program  */
+    async cut () {
+        await this.vmixCommand(this.vmix2, { Function: "Cut" })
     }
 
     /*  drive preview into program  */
