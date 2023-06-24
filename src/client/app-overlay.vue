@@ -8,7 +8,8 @@
 
 <template>
     <div class="app-overlay" ref="root" v-bind:style="{ opacity: options.opacity ?? 1.0 }">
-        <div ref="canvas" class="canvas">
+        <div v-if="options.cam" ref="canvas" class="canvas">
+            {{  options.cam  }}
             <div class="ptz">
                 {{ state[options.cam]?.ptz ?? "?" }}
             </div>
@@ -103,6 +104,10 @@ export default defineComponent({
         canvas: { w: 0, h: 0 },
         camera: { w: 3840, h: 2160 }
     }),
+    async created () {
+        if (this.options.cam === undefined)
+            throw new Error("missing mandatory option \"cam\"")
+    },
     async mounted () {
         const updateCanvasSize = () => {
             const root = this.$refs.root as HTMLElement

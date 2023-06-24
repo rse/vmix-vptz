@@ -50,7 +50,7 @@ export default defineComponent({
     },
     data: () => ({
         mode:       "control",
-        options:    new Map<string, string | boolean>(),
+        options:    {} as { [ key: string ]: string | boolean },
         svURL:      "",
         wsURL:      "",
         state:      StateDefault as StateType,
@@ -68,9 +68,9 @@ export default defineComponent({
                 for (const opt of opts) {
                     let m2
                     if ((m2 = opt.match(/^(.+)=(.+)$/)) !== null)
-                        this.options.set(m2[1], m2[2])
+                        this.options[m2[1]] = m2[2]
                     else
-                        this.options.set(opt, true)
+                        this.options[opt] = true
                 }
             }
         }
