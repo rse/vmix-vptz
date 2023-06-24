@@ -117,7 +117,6 @@ export default defineComponent({
     methods: {
         setState (state: StateType) {
             this.state = state
-            console.log(state)
         },
         log (level: string, msg: string) {
             this.$emit("log", level, msg)
