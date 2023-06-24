@@ -7,10 +7,10 @@
 -->
 
 <template>
-    <div class="app-overlay" ref="root">
+    <div class="app-overlay" ref="root" v-bind:style="{ opacity: options.opacity ?? 1.0 }">
         <div ref="canvas" class="canvas">
             <div class="ptz">
-                {{ state[options.cam].ptz }}
+                {{ state[options.cam]?.ptz ?? "?" }}
             </div>
             <div
                 v-for="vptz in [ 'C-L', 'C-C', 'C-R', 'F-L', 'F-C', 'F-R', 'W-C' ]"
@@ -32,12 +32,12 @@
     </div>
 </template>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .app-overlay
     width: 100%
     height: auto
     aspect-ratio: 16 / 9
-    border: 1px solid red
+    background-color: transparent
     .canvas
         position: relative
         width: 100%
@@ -49,12 +49,13 @@
         background-color: transparent
         .ptz
             position: absolute
-            top: 0
-            right: 0
-            border-bottom-left-radius: 8px
-            padding: 0 8px 0 8px
-            color: #ffffff
-            font-size: 1.3vw
+            top: 0.5vw
+            right: 0.5vw
+            border-radius: 0.5vw
+            padding: 0 1vw 0 1vw
+            background-color: var(--color-std-bg-4)
+            color: var(--color-std-fg-4)
+            font-size: 2vw
             font-weight: bold
         .vptz
             position: absolute
@@ -63,23 +64,26 @@
             box-sizing: border-box
             .title
                 position: absolute
-                bottom: -4px
-                left: -4px
-                border-top-right-radius: 8px
-                padding: 0 8px 0 8px
-                color: #ffffff
-                font-size: 1.3vw
+                top: 0
+                left: 0
+                padding: 0.1vw 0.5vw 0.1vw 0.1vw
+                border: 0
+                border-bottom-right-radius: 0.5vw
+                background-color: var(--color-std-bg-5)
+                color: var(--color-std-fg-5)
+                font-size: 1.0vw
+                line-height: 1.0vw
                 font-weight: bold
             &.preview
-                border: 4px solid #009900
-                background-color: #00990020
+                border: 0.2vw solid var(--color-prv-bg-5)
+                background-color: var(--color-prv-bg-5-20p)
                 .title
-                    background-color: #009900
+                    background-color: var(--color-prv-bg-5)
             &.program
-                border: 4px solid #cc0000
-                background-color: #cc000020
+                border: 0.2vw solid var(--color-prg-bg-5)
+                background-color: var(--color-prg-bg-5-20p)
                 .title
-                    background-color: #cc0000
+                    background-color: var(--color-prg-bg-5)
 </style>
 
 <script setup lang="ts">
@@ -92,7 +96,7 @@ export default defineComponent({
     name: "app-overlay",
     components: {},
     props: {
-        options: { type: Object, default: new Map<string, string | boolean>() }
+        options: { type: Object, default: {} as { [ key: string ]: string | boolean } }
     },
     data: () => ({
         state: StateDefault as StateType,
@@ -100,19 +104,20 @@ export default defineComponent({
         camera: { w: 3840, h: 2160 }
     }),
     async mounted () {
-        const fetchCanvasSize = () => {
+        const updateCanvasSize = () => {
             const root = this.$refs.root as HTMLElement
             this.canvas.w = root.clientWidth
             this.canvas.h = root.clientHeight
         }
         window.addEventListener("resize", () => {
-            fetchCanvasSize()
+            updateCanvasSize()
         })
-        fetchCanvasSize()
+        updateCanvasSize()
     },
     methods: {
         setState (state: StateType) {
             this.state = state
+            console.log(state)
         },
         log (level: string, msg: string) {
             this.$emit("log", level, msg)

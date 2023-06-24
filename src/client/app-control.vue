@@ -229,7 +229,7 @@
     </div>
 </template>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .app-control
     width:  100vw
     height: 100vh
@@ -299,14 +299,16 @@
                     box-sizing: border-box
                     .title
                         position: absolute
-                        top: 0
-                        left: 0
-                        border-bottom-right-radius: 0.3rem
-                        padding: 0.1rem 0.4rem
-                        background-color: var(--color-std-bg-4)
-                        color: var(--color-std-fg-5)
-                        font-size: 1.3rem
+                        top: calc(50% - 3vw)
+                        left: calc(50% - 5vw)
+                        height: 3vw
+                        width: 10vw
+                        padding: 0.1vw 0.6vw
+                        color: var(--color-std-fg-1)
+                        font-size: 2.5vw
+                        line-height: 3vw
                         font-weight: bold
+                        text-align: center
                     .app-overlay
                         position: absolute
                         top: 0
@@ -535,6 +537,9 @@ export default defineComponent({
     },
     methods: {
         setState (state: StateType) {
+            for (const cam of Object.keys(this.state))
+                if (this.$refs[`overlay-cam${cam}`])
+                    (this.$refs[`overlay-cam${cam}`] as typeof AppOverlay).setState(state)
             this.state = state
             this.programCam  = ""
             this.programView = ""

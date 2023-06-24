@@ -158,7 +158,7 @@ export default defineComponent({
             this.state = state
             if (this.mode === "control" && this.$refs.control)
                 (this.$refs.control as typeof AppControl).setState(this.state)
-            else if (this.mode === "overlay" && this.$refs.overlay)
+            if (this.mode === "overlay" && this.$refs.overlay)
                 (this.$refs.overlay as typeof AppOverlay).setState(this.state)
         }
     }
