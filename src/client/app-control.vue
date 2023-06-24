@@ -347,6 +347,7 @@
                             font-size: 1vw
                             border-radius: 0.4vw
                             text-align: center
+                            cursor: pointer
                             &.active
                                 background-color: var(--color-acc-bg-2)
                                 color: var(--color-acc-fg-2)
