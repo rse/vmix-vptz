@@ -71,8 +71,8 @@
                 border-bottom-right-radius: 0.5vw
                 background-color: var(--color-std-bg-5)
                 color: var(--color-std-fg-5)
-                font-size: 1.0vw
-                line-height: 1.0vw
+                font-size: 1vw
+                line-height: 1vw
                 font-weight: bold
             &.preview
                 border: 0.2vw solid var(--color-prv-bg-5)

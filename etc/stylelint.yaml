@@ -19,6 +19,7 @@ rules:
     stylus/media-feature-colon: null
     stylus/single-line-comment: null
     stylus/selector-list-comma: "always"
+    stylus/number-no-trailing-zeros: null
     color-hex-length: null
     declaration-block-no-redundant-longhand-properties: null
 
