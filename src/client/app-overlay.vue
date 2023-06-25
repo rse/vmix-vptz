@@ -14,7 +14,7 @@
                 {{ state[options.cam]?.ptz ?? "?" }}
             </div>
             <div
-                v-for="vptz in [ 'C-L', 'C-C', 'C-R', 'F-L', 'F-C', 'F-R', 'W-C' ]"
+                v-for="vptz in [ 'W-C', 'F-L', 'F-C', 'F-R', 'C-L', 'C-C', 'C-R' ]"
                 v-bind:key="vptz"
                 class="vptz"
                 v-bind:class="{
@@ -22,10 +22,10 @@
                     preview: state[options.cam].vptz[vptz].preview
                 }"
                 v-bind:style="{
-                    left:   (canvas.w * ( state[options.cam].vptz[vptz].x                / camera.w)) + 'px',
-                    top:    (canvas.h * ( state[options.cam].vptz[vptz].y                / camera.h)) + 'px',
-                    width:  (canvas.w * ((state[options.cam].vptz[vptz].zoom * canvas.w) / camera.w)) + 'px',
-                    height: (canvas.h * ((state[options.cam].vptz[vptz].zoom * canvas.h) / camera.h)) + 'px'
+                    left:   (canvas.w * ((state[options.cam].vptz[vptz].x    * camera.w) / camera.w)) + 'px',
+                    top:    (canvas.h * ((state[options.cam].vptz[vptz].y    * camera.h) / camera.h)) + 'px',
+                    width:  (canvas.w * ((state[options.cam].vptz[vptz].zoom * camera.w) / camera.w)) + 'px',
+                    height: (canvas.h * ((state[options.cam].vptz[vptz].zoom * camera.h) / camera.h)) + 'px'
                 }">
                 <div class="title">{{ vptz }}</div>
             </div>
@@ -63,6 +63,9 @@
             top: 0
             left: 0
             box-sizing: border-box
+            border: 0.25vw solid var(--color-reg-bg-tr)
+            border-radius: 0.5vw
+            box-shadow: 0 0 0.8vw var(--color-std-bg-1)
             .title
                 position: absolute
                 top: 0
@@ -70,21 +73,23 @@
                 padding: 0.1vw 0.5vw 0.1vw 0.1vw
                 border: 0
                 border-bottom-right-radius: 0.5vw
-                background-color: var(--color-std-bg-5)
-                color: var(--color-std-fg-5)
+                background-color: var(--color-reg-bg-tr)
+                color: var(--color-reg-fg)
                 font-size: 1vw
                 line-height: 1vw
                 font-weight: bold
             &.preview
-                border: 0.2vw solid var(--color-prv-bg-5)
-                background-color: var(--color-prv-bg-5-20p)
+                border: 0.25vw solid var(--color-prv-bg-tr)
+                z-index: 100
                 .title
-                    background-color: var(--color-prv-bg-5)
+                    background-color: var(--color-prv-bg-tr)
+                    color: var(--color-prv-fg)
             &.program
-                border: 0.2vw solid var(--color-prg-bg-5)
-                background-color: var(--color-prg-bg-5-20p)
+                border: 0.25vw solid var(--color-prg-bg-tr)
+                z-index: 110
                 .title
-                    background-color: var(--color-prg-bg-5)
+                    background-color: var(--color-prg-bg-tr)
+                    color: var(--color-prg-fg)
 </style>
 
 <script setup lang="ts">
@@ -113,6 +118,7 @@ export default defineComponent({
             const root = this.$refs.root as HTMLElement
             this.canvas.w = root.clientWidth
             this.canvas.h = root.clientHeight
+            console.log(this.canvas)
         }
         window.addEventListener("resize", () => {
             updateCanvasSize()

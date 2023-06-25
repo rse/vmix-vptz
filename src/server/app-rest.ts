@@ -233,55 +233,44 @@ export default class REST {
 
         let queue = Promise.resolve()
 
-        /*  select PTZ of all cameras  */
+        /*  PTZ action on all cameras  */
         this.server.route({
             method: "GET",
-            path: "/ptz/{ptz}",
+            path: "/ptz/{ptz}/{mode}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const ptz = req.params.ptz
+                const ptz  = req.params.ptz
+                const mode = req.params.mode
                 queue = queue.then(() => {
-                    return this.vmix.setPTZAll(ptz)
+                    if (mode === "load")
+                        return this.vmix.setPTZAll(ptz)
+                    else if (mode === "save")
+                        return this.vmix.storePTZAll(ptz)
+                    else if (mode === "reset")
+                        return this.vmix.resetPTZAll(ptz)
+                    else if (mode === "clear")
+                        return this.vmix.clearPTZAll(ptz)
                 })
                 return h.response().code(204)
             }
         })
 
-        /*  select PTZ of single camera  */
+        /*  PTZ action on single camera  */
         this.server.route({
             method: "GET",
-            path: "/ptz/{ptz}/{cam}",
+            path: "/ptz/{ptz}/{cam}/{mode}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const ptz = req.params.ptz
-                const cam = req.params.cam
+                const ptz  = req.params.ptz
+                const cam  = req.params.cam
+                const mode = req.params.mode
                 queue = queue.then(() => {
-                    return this.vmix.setPTZCam(ptz, cam)
-                })
-                return h.response().code(204)
-            }
-        })
-
-        /*  store PTZ of all cameras  */
-        this.server.route({
-            method: "PUT",
-            path: "/ptz/{ptz}",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const ptz = req.params.ptz
-                queue = queue.then(() => {
-                    return this.vmix.storePTZAll(ptz)
-                })
-                return h.response().code(204)
-            }
-        })
-
-        /*  store PTZ of single camera  */
-        this.server.route({
-            method: "PUT",
-            path: "/ptz/{ptz}/{cam}",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const ptz = req.params.ptz
-                const cam = req.params.cam
-                queue = queue.then(() => {
-                    return this.vmix.storePTZCam(ptz, cam)
+                    if (mode === "load")
+                        return this.vmix.setPTZCam(ptz, cam)
+                    else if (mode === "save")
+                        return this.vmix.storePTZCam(ptz, cam)
+                    else if (mode === "reset")
+                        return this.vmix.resetPTZCam(ptz, cam)
+                    else if (mode === "clear")
+                        return this.vmix.clearPTZCam(ptz, cam)
                 })
                 return h.response().code(204)
             }

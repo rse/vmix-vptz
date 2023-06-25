@@ -406,6 +406,64 @@ export default class VMix extends EventEmitter {
         ])
     }
 
+    /*  reset all physical PTZ of a camera  */
+    async resetPTZAll (ptz: string) {
+        this.log.log(2, `vMix: resetting physical PTZ "${ptz}" of all cameras`)
+        for (const cam of this.cfg.idCAMs)
+            this.resetPTZCam(ptz, cam)
+    }
+
+    /*  reset single physical PTZ of a camera  */
+    async resetPTZCam (ptz: string, cam: string) {
+        /*  sanity check arguments  */
+        if (!this.cfg.idPTZs.find((id) => id === ptz))
+            throw new Error(`invalid PTZ id "${ptz}"`)
+        if (!this.cfg.idCAMs.find((id) => id === cam))
+            throw new Error(`invalid CAM id "${cam}"`)
+
+        /*  reset VPTZ settings  */
+        await this.state.transaction(async () => {
+            for (const vptz of this.cfg.idVPTZs) {
+                this.log.log(2, `vMix: resetting virtual PTZ "${vptz}" of camera "${cam}"`)
+                let xyz = { x: 0.0, y: 0.0, zoom: 1.0 } as XYZ
+                if      (vptz === "C-L") xyz = { x: 0.070, y: 0.150, zoom: 0.35 }
+                else if (vptz === "C-C") xyz = { x: 0.325, y: 0.150, zoom: 0.35 }
+                else if (vptz === "C-R") xyz = { x: 0.580, y: 0.150, zoom: 0.35 }
+                else if (vptz === "F-L") xyz = { x: 0.000, y: 0.150, zoom: 0.50 }
+                else if (vptz === "F-C") xyz = { x: 0.250, y: 0.150, zoom: 0.50 }
+                else if (vptz === "F-R") xyz = { x: 0.500, y: 0.150, zoom: 0.50 }
+                else if (vptz === "W-C") xyz = { x: 0.000, y: 0.000, zoom: 1.00 }
+                await this.state.setVPTZ(cam, ptz, vptz, xyz)
+                this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+            }
+        })
+        this.notifyState()
+    }
+
+    /*  clear all physical PTZ of a camera  */
+    async clearPTZAll (ptz: string) {
+        this.log.log(2, `vMix: clearing all physical PTZ "${ptz}" of all cameras`)
+        for (const cam of this.cfg.idCAMs)
+            await this.state.delPTZ(cam)
+    }
+
+    /*  clear single physical PTZ of a camera  */
+    async clearPTZCam (ptz: string, cam: string) {
+        /*  sanity check arguments  */
+        if (!this.cfg.idPTZs.find((id) => id === ptz))
+            throw new Error(`invalid PTZ id "${ptz}"`)
+        if (!this.cfg.idCAMs.find((id) => id === cam))
+            throw new Error(`invalid CAM id "${cam}"`)
+
+        /*  reset VPTZ settings  */
+        this.state.transaction(async () => {
+            for (const vptz of this.cfg.idVPTZs) {
+                this.log.log(2, `vMix: clearing virtual PTZ "${vptz}" of camera "${cam}"`)
+                await this.state.delVPTZ(cam, ptz, vptz)
+            }
+        })
+    }
+
     /*  send command to vMix  */
     async vmixCommand (vmix: vMixAPI.ConnectionTCP | null, cmds: string | Array<string> | vMixCommand | Array<vMixCommand>) {
         if (vmix !== null && vmix.connected())
