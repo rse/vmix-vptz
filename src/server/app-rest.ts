@@ -351,7 +351,7 @@ export default class REST {
     async start () {
         /*  start service  */
         await this.server!.start()
-        this.log.log(2, `started HTTP  network service: http://${this.argv.httpAddr}:${this.argv.httpPort}`)
+        this.log.log(2, `started HTTP network service: http://${this.argv.httpAddr}:${this.argv.httpPort}`)
     }
 
     async shutdown () {
