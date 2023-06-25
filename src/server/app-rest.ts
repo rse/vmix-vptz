@@ -26,12 +26,14 @@ import { StateType }  from "../common/app-state"
 
 export default class REST {
     public server: Server | null = null
+
     constructor (
         private pkg:    Pkg,
         private argv:   Argv,
         private log:    Log,
         private vmix:   VMix
     ) {}
+
     async init () {
         /*  establish network service  */
         this.server = new Server({
@@ -345,11 +347,13 @@ export default class REST {
             }
         })
     }
+
     async start () {
         /*  start service  */
         await this.server!.start()
         this.log.log(2, `started HTTP  network service: http://${this.argv.httpAddr}:${this.argv.httpPort}`)
     }
+
     async shutdown () {
         if (this.server !== null) {
             this.log.log(2, "stopping HTTP network service")

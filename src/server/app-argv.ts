@@ -19,9 +19,11 @@ export default class Argv {
     public vsetInputRegex = ""
     public vmix1Addr      = ""
     public vmix2Addr      = ""
+
     constructor (
         private pkg: Pkg
     ) {}
+
     async init () {
         /*  command-line option parsing  */
         // @ts-ignore
@@ -83,6 +85,7 @@ export default class Argv {
             process.exit(0)
         }
     }
+
     async shutdown () {
     }
 }

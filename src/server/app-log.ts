@@ -20,20 +20,24 @@ const levels = [
 
 export default class Log {
     private stream: fs.WriteStream | null = null
+
     constructor (
         private pkg:  Pkg,
         private argv: Argv
     ) {}
+
     async init () {
-        /*  log messages  */
         if (this.argv.logLevel >= levels.length)
             throw new Error("invalid maximum verbose level")
         if (this.argv.logFile !== "-")
             this.stream = fs.createWriteStream(this.argv.logFile, { flags: "a", encoding: "utf8" })
         this.log(2, `starting ${this.pkg.name} ${this.pkg.version} (${this.pkg.date}) <${this.pkg.homepage}>`)
     }
+
     async shutdown () {
+        this.log(2, "shutdown application!")
     }
+
     log (level: number, msg: string) {
         if (level <= this.argv.logLevel) {
             const timestamp = moment().format("YYYY-MM-DD hh:mm:ss.SSS")

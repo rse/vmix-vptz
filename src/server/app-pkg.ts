@@ -16,6 +16,7 @@ export default class Pkg {
     public description: string
     public authorName:  string
     public authorUrl:   string
+
     constructor () {
         this.name         = pkg.name
         this.version      = pkg.version
@@ -26,9 +27,9 @@ export default class Pkg {
         this.authorName   = pkg.author.name
         this.authorUrl    = pkg.author.url
     }
-    async init () {
-    }
-    async shutdown () {
-    }
+
+    async init () {}
+
+    async shutdown () {}
 }
 

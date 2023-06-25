@@ -5,6 +5,7 @@
 */
 
 export default class Config {
+    /*  identifiers of the setup  */
     public idCAMs  = [ "1", "2", "3", "4", "5" ] as const
     public idPTZs  = [ "A", "B", "C", "D", "E", "F", "G", "H" ] as const
     public idVPTZs = [ "C-L", "C-C", "C-R", "F-L", "F-C", "F-R", "W-C" ] as const
@@ -28,6 +29,8 @@ export default class Config {
     inputNameVPTZ (cam: string, vptz: string) {
         return `VPTZ - CAM${cam}-${vptz}`
     }
+
+    /*  vMix input name parsing  */
     camOfInputName (inputName: string) {
         let m: RegExpMatchArray | null
         if ((m = inputName.match(/^V?PTZ - CAM(\d+)-.+$/)) !== null)

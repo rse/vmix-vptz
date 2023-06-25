@@ -12,16 +12,8 @@ import Knex                    from "knex"
 import type { Knex as KnexNS } from "knex"
 import URI                     from "urijs"
 
-enum DB_LogLevels {
-    ERROR,
-    WARNING,
-    INFO,
-    DEBUG
-}
-
-type DB_Options = {
-    debug?: boolean
-}
+enum DB_LogLevels { ERROR, WARNING, INFO, DEBUG }
+type DB_Options = { debug?: boolean }
 
 export default class DB extends EventEmitter {
     /*  public properties  */
