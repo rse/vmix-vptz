@@ -444,7 +444,7 @@ export default class VMix extends EventEmitter {
     async clearPTZAll (ptz: string) {
         this.log.log(2, `vMix: clearing all physical PTZ "${ptz}" of all cameras`)
         for (const cam of this.cfg.idCAMs)
-            await this.state.delPTZ(cam)
+            await this.clearPTZCam(ptz, cam)
     }
 
     /*  clear single physical PTZ of a camera  */
@@ -459,9 +459,12 @@ export default class VMix extends EventEmitter {
         this.state.transaction(async () => {
             for (const vptz of this.cfg.idVPTZs) {
                 this.log.log(2, `vMix: clearing virtual PTZ "${vptz}" of camera "${cam}"`)
-                await this.state.delVPTZ(cam, ptz, vptz)
+                const xyz = { x: 0.0, y: 0.0, zoom: 1.0 } as XYZ
+                await this.state.setVPTZ(cam, ptz, vptz, xyz)
+                this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
             }
         })
+        this.notifyState()
     }
 
     /*  send command to vMix  */
