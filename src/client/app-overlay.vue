@@ -9,7 +9,6 @@
 <template>
     <div class="app-overlay" ref="root" v-bind:style="{ opacity: options.opacity ?? 1.0 }">
         <div v-if="options.cam" ref="canvas" class="canvas">
-            {{  options.cam  }}
             <div class="ptz">
                 {{ state[options.cam]?.ptz ?? "?" }}
             </div>
