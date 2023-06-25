@@ -165,7 +165,7 @@ export default class REST {
                     }
                 }
             },
-            handler: (request: HAPI.Request, h: HAPI.ResponseToolkit) => {
+            handler: async (request: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 /*  on WebSocket message transfer  */
                 const { ctx, ws } = request.websocket()
                 if (typeof request.payload !== "object" || request.payload === null)
@@ -173,8 +173,13 @@ export default class REST {
                 if (!ducky.validate(request.payload, "{ cmd: string, arg?: string }"))
                     return Boom.badRequest("invalid request")
                 const { cmd, arg } = request.payload as any satisfies { cmd: string, arg: any }
-                return Boom.badRequest("not implemented") // FIXME: TODO
-                return h.response().code(204)
+                if (cmd === "STATE") {
+                    const data = await this.vmix.getState(false)
+                    const json = JSON.stringify({ cmd: "STATE", arg: { state: data } })
+                    return h.response(json).code(200)
+                }
+                else
+                    return Boom.badRequest("not implemented")
             }
         })
 
