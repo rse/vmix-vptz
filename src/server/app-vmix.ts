@@ -97,11 +97,10 @@ export default class VMix extends EventEmitter {
 
     /*  initialize instance  */
     async init () {
-        /*  initialize state  */
+        /*  initialize internal state  */
         for (const cam of this.cfg.idCAMs) {
             const ptz = await this.state.getPTZ(cam)
             this.cam2ptz.set(cam, ptz)
-            await this.setPTZCam(ptz, cam)
         }
 
         /*  establish connection to vMix instance(s)  */
@@ -230,6 +229,12 @@ export default class VMix extends EventEmitter {
                 this.log.log(2, "vMix: connection closed to vMix #2")
             })
         }
+
+        /*  initialize vMix  */
+        for (const cam of this.cfg.idCAMs) {
+            const ptz = this.cam2ptz.get(cam)!
+            await this.setPTZCam(ptz, cam)
+        }
     }
 
     async shutdown () {
@@ -259,17 +264,17 @@ export default class VMix extends EventEmitter {
         for (const cam of this.cfg.idCAMs) {
             const ptz = this.cam2ptz.get(cam)!
             state[cam].ptz = ptz
-            for (const vptz of this.cfg.idVPTZs) {
-                const xyz = await this.state.getVPTZ(cam, ptz, vptz)
-                state[cam].vptz[vptz].program = (programCam === cam && programVPTZ === vptz)
-                state[cam].vptz[vptz].preview = (previewCam === cam && previewVPTZ === vptz)
-                state[cam].vptz[vptz].x       = xyz.x
-                state[cam].vptz[vptz].y       = xyz.y
-                state[cam].vptz[vptz].zoom    = xyz.zoom
+            const recs = await this.state.getVPTZAll(cam, ptz)
+            for (const rec of recs) {
+                state[cam].vptz[rec.vptz].program = (programCam === cam && programVPTZ === rec.vptz)
+                state[cam].vptz[rec.vptz].preview = (previewCam === cam && previewVPTZ === rec.vptz)
+                state[cam].vptz[rec.vptz].x       = rec.xyz.x
+                state[cam].vptz[rec.vptz].y       = rec.xyz.y
+                state[cam].vptz[rec.vptz].zoom    = rec.xyz.zoom
             }
         }
-        state["2"].vptz["C-C"].preview = true
-        state["3"].vptz["W-C"].program = true
+        state["2"].vptz["C-C"].preview = true // FIXME: Temporary Hack
+        state["3"].vptz["W-C"].program = true // FIXME: Temporary Hack
         return state
     }
 

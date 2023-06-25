@@ -125,6 +125,16 @@ export default class State extends DB {
     }
 
     /*  data access object (DAO) methods for "VPTZ"  */
+    async getVPTZAll (cam: string, ptz: string) {
+        if (this.knex === null)
+            throw new Error("database not opened")
+        return this.atomic(async (knex) => {
+            const recs = await knex("vptz").select([ "vptz", "x", "y", "zoom" ]).where({ cam, ptz })
+            return recs.map((rec) => {
+                return { vptz: rec.vptz, xyz: { x: rec.x, y: rec.y, zoom: rec.zoom } as XYZ }
+            })
+        }
+    }
     async getVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)
             throw new Error("database not opened")
