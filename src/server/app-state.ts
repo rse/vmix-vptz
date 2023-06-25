@@ -133,7 +133,7 @@ export default class State extends DB {
             return recs.map((rec) => {
                 return { vptz: rec.vptz, xyz: { x: rec.x, y: rec.y, zoom: rec.zoom } as XYZ }
             })
-        }
+        })
     }
     async getVPTZ (cam: string, ptz: string, vptz: string) {
         if (this.knex === null)

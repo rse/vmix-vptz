@@ -190,8 +190,8 @@ export default class REST {
         /*  forward state changes to clients  */
         let notifyTimer: ReturnType<typeof setTimeout> | null = null
         let notifyData:  StateType | null = null
-        this.vmix!.on("state-change", async () => {
-            notifyData = await this.vmix.getState()
+        this.vmix!.on("state-change", async (cached = false) => {
+            notifyData = await this.vmix.getState(cached)
             if (notifyTimer === null) {
                 notifyTimer = setTimeout(() => {
                     notifyTimer = null

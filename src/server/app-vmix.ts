@@ -248,7 +248,7 @@ export default class VMix extends EventEmitter {
         }
     }
 
-    async getState () {
+    async getState (cached = false) {
         /*  determine program and preview inputs  */
         const program = this.active.program.B !== "" ? this.active.program.B : this.active.program.A
         const preview = this.active.preview.B !== "" ? this.active.preview.B : this.active.preview.A
@@ -264,13 +264,25 @@ export default class VMix extends EventEmitter {
         for (const cam of this.cfg.idCAMs) {
             const ptz = this.cam2ptz.get(cam)!
             state[cam].ptz = ptz
-            const recs = await this.state.getVPTZAll(cam, ptz)
-            for (const rec of recs) {
-                state[cam].vptz[rec.vptz].program = (programCam === cam && programVPTZ === rec.vptz)
-                state[cam].vptz[rec.vptz].preview = (previewCam === cam && previewVPTZ === rec.vptz)
-                state[cam].vptz[rec.vptz].x       = rec.xyz.x
-                state[cam].vptz[rec.vptz].y       = rec.xyz.y
-                state[cam].vptz[rec.vptz].zoom    = rec.xyz.zoom
+            if (cached) {
+                for (const vptz of this.cfg.idVPTZs) {
+                    const xyz = this.vptz2xyz.get(`${cam}:${vptz}`)
+                    state[cam].vptz[vptz].program = (programCam === cam && programVPTZ === vptz)
+                    state[cam].vptz[vptz].preview = (previewCam === cam && previewVPTZ === vptz)
+                    state[cam].vptz[vptz].x       = xyz?.x    ?? 0
+                    state[cam].vptz[vptz].y       = xyz?.y    ?? 0
+                    state[cam].vptz[vptz].zoom    = xyz?.zoom ?? 1.0
+                }
+            }
+            else {
+                const recs = await this.state.getVPTZAll(cam, ptz)
+                for (const rec of recs) {
+                    state[cam].vptz[rec.vptz].program = (programCam === cam && programVPTZ === rec.vptz)
+                    state[cam].vptz[rec.vptz].preview = (previewCam === cam && previewVPTZ === rec.vptz)
+                    state[cam].vptz[rec.vptz].x       = rec.xyz.x
+                    state[cam].vptz[rec.vptz].y       = rec.xyz.y
+                    state[cam].vptz[rec.vptz].zoom    = rec.xyz.zoom
+                }
             }
         }
         state["2"].vptz["C-C"].preview = true // FIXME: Temporary Hack
@@ -278,8 +290,8 @@ export default class VMix extends EventEmitter {
         return state
     }
 
-    notifyState () {
-        this.emit("state-change")
+    notifyState (cached = false) {
+        this.emit("state-change", cached)
     }
 
     /*  backup state from vMix  */
@@ -704,10 +716,10 @@ export default class VMix extends EventEmitter {
             mod1!(xyz!)
             if (mod2 !== null)
                 mod2!(xyz!)
-            this.notifyState()
+            this.notifyState(true)
         }, (cancelled) => {
             this.state.setVPTZ(cam, ptz, vptz, xyz!)
-            this.notifyState()
+            this.notifyState(false)
         }, { duration, fps })
     }
 
@@ -872,7 +884,7 @@ export default class VMix extends EventEmitter {
                 const cam  = this.cfg.camOfInputName(input)
                 const vptz = this.cfg.vptzOfInputName(input)
                 this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
-                this.notifyState()
+                this.notifyState(true)
 
                 /*  change vMix  */
                 const cmds = [] as Array<vMixCommand>
@@ -883,6 +895,7 @@ export default class VMix extends EventEmitter {
             }
         }, (cancelled) => {
             this.state.setVPTZ(cam, ptz, vptz, path[path.length - 1])
+            this.notifyState(false)
         }, { duration, fps })
     }
 }
