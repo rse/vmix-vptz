@@ -191,6 +191,7 @@ export default class REST {
         let notifyData:  StateType | null = null
         this.vmix!.on("state-change", async () => {
             notifyData = await this.vmix.getState()
+            this.log.log(2, "STATE")
             if (notifyTimer === null) {
                 notifyTimer = setTimeout(() => {
                     notifyTimer = null
@@ -199,7 +200,7 @@ export default class REST {
                         notifyData = null
                         notifyState(data)
                     }
-                }, 50)
+                }, 33)
             }
         })
 

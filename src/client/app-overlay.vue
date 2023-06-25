@@ -21,10 +21,10 @@
                     preview: state[options.cam].vptz[vptz].preview
                 }"
                 v-bind:style="{
-                    left:   (canvas.w * ((state[options.cam].vptz[vptz].x    * camera.w) / camera.w)) + 'px',
-                    top:    (canvas.h * ((state[options.cam].vptz[vptz].y    * camera.h) / camera.h)) + 'px',
-                    width:  (canvas.w * ((state[options.cam].vptz[vptz].zoom * camera.w) / camera.w)) + 'px',
-                    height: (canvas.h * ((state[options.cam].vptz[vptz].zoom * camera.h) / camera.h)) + 'px'
+                    left:   ( (canvas.w * ((state[options.cam].vptz[vptz].x    * camera.w) / camera.w))) + 'px',
+                    top:    (-(canvas.h * ((state[options.cam].vptz[vptz].y    * camera.h) / camera.h))) + 'px',
+                    width:  ( (canvas.w * ((state[options.cam].vptz[vptz].zoom * camera.w) / camera.w))) + 'px',
+                    height: ( (canvas.h * ((state[options.cam].vptz[vptz].zoom * camera.h) / camera.h))) + 'px'
                 }">
                 <div class="title">{{ vptz }}</div>
             </div>

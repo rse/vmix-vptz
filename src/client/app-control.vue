@@ -55,12 +55,12 @@
                             <div class="button ga-03 destructive"
                                 v-bind:class="{ active: ptzMode === 'reset' }"
                                 v-on:click="ptzMode = 'reset'">
-                                <span class="icon"><i class="fa-solid fa-paint-roller"></i></span>
+                                <span class="icon"><i class="fa-solid fa-palette"></i></span>
                             </div>
                             <div class="button ga-04 destructive"
                                 v-bind:class="{ active: ptzMode === 'clear' }"
                                 v-on:click="ptzMode = 'clear'">
-                                <span class="icon"><i class="fa-solid fa-trash-can"></i></span>
+                                <span class="icon"><i class="fa-solid fa-maximize"></i></span>
                             </div>
                             <div class="button ga-05" v-bind:class="{ active: state['1'].ptz === 'A', preview: state['1'].ptz === 'A' && previewCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('A', '1')">A1</div>
                             <div class="button ga-06" v-bind:class="{ active: state['2'].ptz === 'A', preview: state['2'].ptz === 'A' && previewCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('A', '2')">A2</div>
