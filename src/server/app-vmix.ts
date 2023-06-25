@@ -285,8 +285,10 @@ export default class VMix extends EventEmitter {
                 }
             }
         }
+        /*
         state["2"].vptz["C-C"].preview = true // FIXME: Temporary Hack
         state["3"].vptz["W-C"].program = true // FIXME: Temporary Hack
+        */
         return state
     }
 
