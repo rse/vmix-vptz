@@ -180,6 +180,7 @@ export default class REST {
 
         /*  notify clients about state  */
         const notifyState = (state: StateType) => {
+            this.log.log(2, "notify client about new state")
             const msg = JSON.stringify({ cmd: "STATE", arg: { state } })
             for (const info of wsPeers.values())
                 if (info.ws.readyState === WebSocket.OPEN)
@@ -191,7 +192,6 @@ export default class REST {
         let notifyData:  StateType | null = null
         this.vmix!.on("state-change", async () => {
             notifyData = await this.vmix.getState()
-            this.log.log(2, "STATE")
             if (notifyTimer === null) {
                 notifyTimer = setTimeout(() => {
                     notifyTimer = null
