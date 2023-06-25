@@ -5,17 +5,17 @@
 */
 
 /*  load external requirements  */
-import chalk          from "chalk"
-import * as awilix    from "awilix"
+import chalk       from "chalk"
+import * as awilix from "awilix"
 
 /*  load internal requirements  */
-import Pkg            from "./app-pkg"
-import Cfg            from "./app-cfg"
-import Argv           from "./app-argv"
-import Log            from "./app-log"
-import REST           from "./app-rest"
-import VMix           from "./app-vmix"
-import State          from "./app-state"
+import Pkg         from "./app-pkg"
+import Cfg         from "./app-cfg"
+import Argv        from "./app-argv"
+import Log         from "./app-log"
+import REST        from "./app-rest"
+import VMix        from "./app-vmix"
+import State       from "./app-state"
 
 /*  establish environment  */
 class Main {
@@ -33,13 +33,13 @@ class Main {
             const ctx = {}
             this.container.register({
                 ctx:        awilix.asValue(ctx),
-                pkg:        awilix.asClass(Pkg        ).setLifetime(awilix.Lifetime.SINGLETON),
-                cfg:        awilix.asClass(Cfg        ).setLifetime(awilix.Lifetime.SINGLETON),
-                argv:       awilix.asClass(Argv       ).setLifetime(awilix.Lifetime.SINGLETON),
-                log:        awilix.asClass(Log        ).setLifetime(awilix.Lifetime.SINGLETON),
-                state:      awilix.asClass(State      ).setLifetime(awilix.Lifetime.SINGLETON),
-                rest:       awilix.asClass(REST       ).setLifetime(awilix.Lifetime.SINGLETON),
-                vmix:       awilix.asClass(VMix       ).setLifetime(awilix.Lifetime.SINGLETON)
+                pkg:        awilix.asClass(Pkg  ).setLifetime(awilix.Lifetime.SINGLETON),
+                cfg:        awilix.asClass(Cfg  ).setLifetime(awilix.Lifetime.SINGLETON),
+                argv:       awilix.asClass(Argv ).setLifetime(awilix.Lifetime.SINGLETON),
+                log:        awilix.asClass(Log  ).setLifetime(awilix.Lifetime.SINGLETON),
+                state:      awilix.asClass(State).setLifetime(awilix.Lifetime.SINGLETON),
+                rest:       awilix.asClass(REST ).setLifetime(awilix.Lifetime.SINGLETON),
+                vmix:       awilix.asClass(VMix ).setLifetime(awilix.Lifetime.SINGLETON)
             })
 
             /*  initialize classes  */
