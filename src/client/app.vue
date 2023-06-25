@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { defineComponent, toHandlerKey, toHandlers } from "vue"
 import URI                 from "urijs"
 import RecWebSocket        from "reconnecting-websocket"
@@ -37,8 +36,11 @@ import axios               from "axios"
 
 import AppControl          from "./app-control.vue"
 import AppOverlay          from "./app-overlay.vue"
-import { StateType, StateSchema, StateDefault } from "../common/app-state"
-
+import {
+    StateType,
+    StateSchema,
+    StateDefault
+}                          from "../common/app-state"
 </script>
 
 <script lang="ts">
