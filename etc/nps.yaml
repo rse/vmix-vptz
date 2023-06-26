@@ -44,8 +44,8 @@ scripts:
                             cross-env NODE_OPTIONS="-r source-map-support/register"
                             nodemon --exec "npm start server" --watch dst/server --ext js --delay 1.0
     server: >
-                            node dst/server/index.js -v 3 -a 0.0.0.0 -p 12345
-                            -A 10.1.0.15:8099 -B 10.1.0.15:8099
+                            node dst/server/index.js -v 3 -a 0.0.0.0 -p 12346
+                            -A 10.0.0.21:8099 -B 10.0.0.22:8099
 
     #  cleanup filesystem
     clean:                  rimraf dst
