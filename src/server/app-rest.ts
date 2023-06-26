@@ -212,10 +212,10 @@ export default class REST {
 
         /*  ==== Endpoint: State Backup/Restore ====  */
 
-        /*  manually backup the state of vMix  */
+        /*  manually backup/receive the state from vMix  */
         this.server.route({
             method: "GET",
-            path: "/state/backup",
+            path: "/state/recv",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 queue = queue.then(() => {
                     return this.vmix.backupState()
@@ -224,10 +224,10 @@ export default class REST {
             }
         })
 
-        /*  manually restore the state of vMix  */
+        /*  manually restore/send the state to vMix  */
         this.server.route({
             method: "GET",
-            path: "/state/restore",
+            path: "/state/send",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 queue = queue.then(() => {
                     return this.vmix.restoreState()

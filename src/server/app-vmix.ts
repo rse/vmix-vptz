@@ -311,7 +311,7 @@ export default class VMix extends EventEmitter {
                 const ptz = this.cam2ptz.get(cam)
                 if (ptz === undefined)
                     continue
-                this.log.log(2, `vMix: backup vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
+                this.log.log(2, `vMix: backup/receive vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
 
                 /*  iterate over all corresponding virtual PTZ...  */
                 for (const vptz of this.cfg.idVPTZs) {
@@ -338,7 +338,7 @@ export default class VMix extends EventEmitter {
                 const ptz = this.cam2ptz.get(cam)
                 if (ptz === undefined)
                     continue
-                this.log.log(2, `vMix: restore vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
+                this.log.log(2, `vMix: restore/send vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
 
                 /*  iterate over all corresponding virtual PTZ...  */
                 const cmds = [] as Array<vMixCommand>

@@ -24,8 +24,8 @@
                             <div class="button ga-01" v-on:click="mixer('cut')"><span class="icon"><i class="fa-solid fa-cut"></i></span> CUT</div>
                             <div class="button ga-02" v-on:click="mixer('drive')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> CUT+DRIVE</div>
                             <div class="button ga-03" v-on:click="mixer('apply')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE</div>
-                            <div class="button ga-04 destructive"><span class="icon"><i class="fa-solid fa-download"></i></span> RECV</div>
-                            <div class="button ga-05 destructive"><span class="icon"><i class="fa-solid fa-upload"></i></span> SENT</div>
+                            <div class="button ga-04 destructive" v-on:click="vmixState('recv')"><span class="icon"><i class="fa-solid fa-download"></i></span> RECV</div>
+                            <div class="button ga-05 destructive" v-on:click="vmixState('send')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SEND</div>
                         </div>
                     </div>
                     <div class="control-box control-box-ptz">
@@ -606,6 +606,9 @@ export default defineComponent({
         },
         async mixer (op: string) {
             await this.api(`/mixer/${op}`)
+        },
+        async vmixState (op: string) {
+            await this.api(`/state/${op}`)
         }
     }
 })
