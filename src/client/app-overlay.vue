@@ -64,13 +64,13 @@
             left: 0
             box-sizing: border-box
             border: calc(0.25vw * var(--scale)) solid var(--color-reg-bg-tr)
-            border-radius: 0.5vw
-            box-shadow: 0 0 0.8vw var(--color-std-bg-1)
+            border-radius: calc(0.5vw * var(--scale))
+            box-shadow: 0 0 calc(0.8vw * var(--scale)) var(--color-std-bg-1)
             .title
                 position: absolute
                 top: 0
                 left: 0
-                padding: 0.1vw calc(0.5vw * var(--scale)) 0.1vw 0.1vw
+                padding: calc(0.1vw * var(--scale)) calc(0.5vw * var(--scale)) calc(0.1vw * var(--scale)) calc(0.1vw * var(--scale))
                 border: 0
                 border-bottom-right-radius: calc(0.5vw * var(--scale))
                 background-color: var(--color-reg-bg-tr)
@@ -79,7 +79,7 @@
                 line-height: calc(1vw * var(--scale))
                 font-weight: bold
             &.preview
-                border: calc(0.4vw * var(--scale))  solid var(--color-prv-bg-tr)
+                border: calc(0.4vw * var(--scale)) solid var(--color-prv-bg-tr)
                 z-index: 100
                 .title
                     background-color: var(--color-prv-bg-tr)
