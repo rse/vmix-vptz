@@ -9,6 +9,7 @@ import * as vMixAPI from "node-vmix"
 import vMixUtils    from "vmix-js-utils"
 import * as XPath   from "xpath-ts2"
 import EventEmitter from "eventemitter2"
+import clone        from "clone"
 
 /*  internal requirements  */
 import Argv         from "./app-argv"
@@ -56,7 +57,7 @@ const AsyncLoop = (step: () => void, finish: (cancelled: boolean) => void, _opti
             /* eslint no-unmodified-loop-condition: off */
             while (timeSteps > 0 && !cancelled) {
                 timeSteps = timeSteps - 1
-                step()
+                await step()
                 await AsyncDelay(timeSlice)
             }
             resolve(!cancelled)
@@ -485,7 +486,7 @@ export default class VMix extends EventEmitter {
     /*  send command to vMix  */
     async vmixCommand (vmix: vMixAPI.ConnectionTCP | null, cmds: string | Array<string> | vMixCommand | Array<vMixCommand>) {
         if (vmix !== null && vmix.connected())
-            await vmix.send(cmds)
+            await vmix.send(clone(cmds))
         else {
             const remote = (vmix?.socket().remoteAddress ?? "unknown") + ":" + (vmix?.socket().remotePort ?? "unknown")
             this.log.log(1, `vMix: failed to send command(s) to ${remote} -- (still) not connected`)
@@ -711,7 +712,7 @@ export default class VMix extends EventEmitter {
         const ptz = this.cam2ptz.get(cam) ?? this.cfg.idPTZs[0]
 
         /*  finally perform VPTZ adjustment operation  */
-        await AsyncLoop(() => {
+        await AsyncLoop(async () => {
             this.vmixCommand(this.vmix1, cmds)
             mod1!(xyz!)
             if (mod2 !== null)
