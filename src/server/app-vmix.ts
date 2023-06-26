@@ -634,44 +634,44 @@ export default class VMix extends EventEmitter {
                 mod2 = (xyz: XYZ) => { xyz.x = 0 }
             }
             else if (arg === "up-left") {
-                cmd1 = { f: "SetPanY", v: `+=${delta}` }
-                cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
-                mod2 = (xyz: XYZ) => { xyz.x -= delta }
-            }
-            else if (arg === "up") {
-                cmd1 = { f: "SetPanY", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
-            }
-            else if (arg === "up-right") {
-                cmd1 = { f: "SetPanY", v: `+=${delta}` }
+                cmd1 = { f: "SetPanY", v: `-=${delta}` }
                 cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
                 mod2 = (xyz: XYZ) => { xyz.x += delta }
             }
-            else if (arg === "left") {
-                cmd1 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.x -= delta }
+            else if (arg === "up") {
+                cmd1 = { f: "SetPanY", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
             }
-            else if (arg === "right") {
+            else if (arg === "up-right") {
+                cmd1 = { f: "SetPanY", v: `-=${delta}` }
+                cmd2 = { f: "SetPanX", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                mod2 = (xyz: XYZ) => { xyz.x -= delta }
+            }
+            else if (arg === "left") {
                 cmd1 = { f: "SetPanX", v: `+=${delta}` }
                 mod1 = (xyz: XYZ) => { xyz.x += delta }
             }
+            else if (arg === "right") {
+                cmd1 = { f: "SetPanX", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.x -= delta }
+            }
             else if (arg === "down-left") {
-                cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
-                mod2 = (xyz: XYZ) => { xyz.x -= delta }
+                cmd1 = { f: "SetPanY", v: `+=${delta}` }
+                cmd2 = { f: "SetPanX", v: `+=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod2 = (xyz: XYZ) => { xyz.x += delta }
             }
             else if (arg === "down") {
-                cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                cmd1 = { f: "SetPanY", v: `+=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
             }
             else if (arg === "down-right") {
-                cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
-                mod2 = (xyz: XYZ) => { xyz.x += delta }
+                cmd1 = { f: "SetPanY", v: `+=${delta}` }
+                cmd2 = { f: "SetPanX", v: `-=${delta}` }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod2 = (xyz: XYZ) => { xyz.x -= delta }
             }
             else
                 throw new Error("invalid argument")
