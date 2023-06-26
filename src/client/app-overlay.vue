@@ -50,42 +50,42 @@
         background-color: transparent
         .ptz
             position: absolute
-            top: calc(0.5vw * var(--borderscale))
-            right: calc(0.5vw * var(--borderscale))
-            border-radius: calc(0.5vw * var(--borderscale))
-            padding: 0 calc(1vw * var(--borderscale)) 0 calc(1vw * var(--borderscale))
+            top: calc(0.5vw * var(--scale))
+            right: calc(0.5vw * var(--scale))
+            border-radius: calc(0.5vw * var(--scale))
+            padding: 0 calc(1vw * var(--scale)) 0 calc(1vw * var(--scale))
             background-color: var(--color-std-bg-4)
             color: var(--color-std-fg-4)
-            font-size: calc(1.5vw * var(--borderscale))
+            font-size: calc(1.5vw * var(--scale))
             font-weight: bold
         .vptz
             position: absolute
             top: 0
             left: 0
             box-sizing: border-box
-            border: calc(0.25vw * var(--borderscale)) solid var(--color-reg-bg-tr)
+            border: calc(0.25vw * var(--scale)) solid var(--color-reg-bg-tr)
             border-radius: 0.5vw
             box-shadow: 0 0 0.8vw var(--color-std-bg-1)
             .title
                 position: absolute
                 top: 0
                 left: 0
-                padding: 0.1vw calc(0.5vw * var(--borderscale)) 0.1vw 0.1vw
+                padding: 0.1vw calc(0.5vw * var(--scale)) 0.1vw 0.1vw
                 border: 0
-                border-bottom-right-radius: calc(0.5vw * var(--borderscale))
+                border-bottom-right-radius: calc(0.5vw * var(--scale))
                 background-color: var(--color-reg-bg-tr)
                 color: var(--color-reg-fg)
-                font-size: calc(1vw * var(--borderscale))
-                line-height: calc(1vw * var(--borderscale))
+                font-size: calc(1vw * var(--scale))
+                line-height: calc(1vw * var(--scale))
                 font-weight: bold
             &.preview
-                border: calc(0.4vw * var(--borderscale))  solid var(--color-prv-bg-tr)
+                border: calc(0.4vw * var(--scale))  solid var(--color-prv-bg-tr)
                 z-index: 100
                 .title
                     background-color: var(--color-prv-bg-tr)
                     color: var(--color-prv-fg)
             &.program
-                border: calc(0.4vw * var(--borderscale)) solid var(--color-prg-bg-tr)
+                border: calc(0.4vw * var(--scale)) solid var(--color-prg-bg-tr)
                 z-index: 110
                 .title
                     background-color: var(--color-prg-bg-tr)
