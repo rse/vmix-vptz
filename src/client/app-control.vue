@@ -201,35 +201,35 @@
                         <div class="title">CAM1</div>
                         <app-overlay
                             ref="overlay-cam1"
-                            v-bind:options="{ cam: '1', opacity: 1.00 }"
+                            v-bind:options="{ cam: '1', borderscale: 1.0, opacity: 1.00 }"
                         ></app-overlay>
                     </div>
                     <div class="overlay-box overlay-cam2">
                         <div class="title">CAM2</div>
                         <app-overlay
                             ref="overlay-cam2"
-                            v-bind:options="{ cam: '2', opacity: 1.00 }"
+                            v-bind:options="{ cam: '2', borderscale: 1.0, opacity: 1.00 }"
                         ></app-overlay>
                     </div>
                     <div class="overlay-box overlay-cam3">
                         <div class="title">CAM3</div>
                         <app-overlay
                             ref="overlay-cam3"
-                            v-bind:options="{ cam: '3', opacity: 1.00 }"
+                            v-bind:options="{ cam: '3', borderscale: 1.0, opacity: 1.00 }"
                         ></app-overlay>
                     </div>
                     <div class="overlay-box overlay-cam4">
                         <div class="title">CAM4</div>
                         <app-overlay
                             ref="overlay-cam4"
-                            v-bind:options="{ cam: '4', opacity: 1.00 }"
+                            v-bind:options="{ cam: '4', borderscale: 1.0, opacity: 1.00 }"
                         ></app-overlay>
                     </div>
                     <div class="overlay-box overlay-cam5">
                         <div class="title">CAM5</div>
                         <app-overlay
                             ref="overlay-cam5"
-                            v-bind:options="{ cam: '5', opacity: 1.00 }"
+                            v-bind:options="{ cam: '5', borderscale: 1.0, opacity: 1.00 }"
                         ></app-overlay>
                     </div>
                 </div>

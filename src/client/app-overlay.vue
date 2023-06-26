@@ -7,7 +7,7 @@
 -->
 
 <template>
-    <div class="app-overlay" ref="root" v-bind:style="{ opacity: options.opacity ?? 1.0 }">
+    <div class="app-overlay" ref="root" v-bind:style="style">
         <div v-if="options.cam" ref="canvas" class="canvas">
             <div class="ptz">
                 {{ state[options.cam]?.ptz ?? "?" }}
@@ -38,6 +38,7 @@
     height: auto
     aspect-ratio: 16 / 9
     background-color: transparent
+    opacity: var(--opacity)
     .canvas
         position: relative
         width: 100%
@@ -49,42 +50,42 @@
         background-color: transparent
         .ptz
             position: absolute
-            top: 0.5vw
-            right: 0.5vw
-            border-radius: 0.5vw
-            padding: 0 1vw 0 1vw
+            top: calc(0.5vw * var(--borderscale))
+            right: calc(0.5vw * var(--borderscale))
+            border-radius: calc(0.5vw * var(--borderscale))
+            padding: 0 calc(1vw * var(--borderscale)) 0 calc(1vw * var(--borderscale))
             background-color: var(--color-std-bg-4)
             color: var(--color-std-fg-4)
-            font-size: 2vw
+            font-size: calc(1.5vw * var(--borderscale))
             font-weight: bold
         .vptz
             position: absolute
             top: 0
             left: 0
             box-sizing: border-box
-            border: 0.25vw solid var(--color-reg-bg-tr)
+            border: calc(0.25vw * var(--borderscale)) solid var(--color-reg-bg-tr)
             border-radius: 0.5vw
             box-shadow: 0 0 0.8vw var(--color-std-bg-1)
             .title
                 position: absolute
                 top: 0
                 left: 0
-                padding: 0.1vw 0.5vw 0.1vw 0.1vw
+                padding: 0.1vw calc(0.5vw * var(--borderscale)) 0.1vw 0.1vw
                 border: 0
-                border-bottom-right-radius: 0.5vw
+                border-bottom-right-radius: calc(0.5vw * var(--borderscale))
                 background-color: var(--color-reg-bg-tr)
                 color: var(--color-reg-fg)
-                font-size: 1vw
-                line-height: 1vw
+                font-size: calc(1vw * var(--borderscale))
+                line-height: calc(1vw * var(--borderscale))
                 font-weight: bold
             &.preview
-                border: 0.25vw solid var(--color-prv-bg-tr)
+                border: calc(0.4vw * var(--borderscale))  solid var(--color-prv-bg-tr)
                 z-index: 100
                 .title
                     background-color: var(--color-prv-bg-tr)
                     color: var(--color-prv-fg)
             &.program
-                border: 0.25vw solid var(--color-prg-bg-tr)
+                border: calc(0.4vw * var(--borderscale)) solid var(--color-prg-bg-tr)
                 z-index: 110
                 .title
                     background-color: var(--color-prg-bg-tr)
@@ -108,6 +109,15 @@ export default defineComponent({
         canvas: { w: 0, h: 0 },
         camera: { w: 3840, h: 2160 }
     }),
+    computed: {
+        style: function () {
+            console.log("FUCK", (this as any).options)
+            const css = {} as { [ key: string ]: string }
+            for (const key of Object.keys((this as any).options))
+                css[`--${key}`] = (this as any).options[key]
+            return css
+        }
+    },
     async created () {
         if (this.options.cam === undefined)
             throw new Error("missing mandatory option \"cam\"")

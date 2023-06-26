@@ -7,7 +7,7 @@
 /*  external requirements  */
 import * as vMixAPI from "node-vmix"
 import vMixUtils    from "vmix-js-utils"
-import XPath        from "xpath-ts2"
+import * as XPath   from "xpath-ts2"
 import EventEmitter from "eventemitter2"
 
 /*  internal requirements  */
@@ -105,12 +105,12 @@ export default class VMix extends EventEmitter {
 
         /*  establish connection to vMix instance(s)  */
         const [ hostA, portA ] = this.argv.vmix1Addr.split(":")
-        const [ hostB, portB ] = this.argv.vmix1Addr.split(":")
+        const [ hostB, portB ] = this.argv.vmix2Addr.split(":")
         this.log.log(2, `vMix: establish connection to vMix #1 at "${this.argv.vmix1Addr}"`)
         this.vmix1 = new vMixAPI.ConnectionTCP(hostA,
             { port: parseInt(portA), debug: false, autoReconnect: true })
         if (hostA !== hostB || portA !== portB) {
-            this.log.log(2, `vMix: establish connection to vMix #2 at "${this.argv.vmix1Addr}"`)
+            this.log.log(2, `vMix: establish connection to vMix #2 at "${this.argv.vmix2Addr}"`)
             this.vmix2 = new vMixAPI.ConnectionTCP(hostB,
                 { port: parseInt(portB), debug: false, autoReconnect: true })
         }
@@ -134,15 +134,17 @@ export default class VMix extends EventEmitter {
                 this.restoreState()
             }
         }
-        this.vmix1.on("connect", () => {
+        this.vmix1.on("connect", async () => {
             this.log.log(2, "vMix: connection established to vMix #1")
+            await AsyncDelay(100)
             this.vmixCommand(this.vmix1, "XML")
             this.vmixCommand(this.vmix1, "SUBSCRIBE TALLY")
             onConnect()
         })
         if (this.vmix2 !== null) {
-            this.vmix2.on("connect", () => {
+            this.vmix2.on("connect", async () => {
                 this.log.log(2, "vMix: connection established to vMix #2")
+                await AsyncDelay(100)
                 this.vmixCommand(this.vmix2, "XML")
                 this.vmixCommand(this.vmix2, "SUBSCRIBE TALLY")
                 onConnect()
@@ -202,9 +204,9 @@ export default class VMix extends EventEmitter {
             }
 
             /*  determine inputs currently in program and preview  */
-            let n = XPath.select1("/vmix/active", doc).toString()
+            let n = XPath.select1("/vmix/active/text()", doc).toString()
             this.active.program[instance] = this.inputs.get(`${instance}:${n}`)?.name ?? ""
-            n = XPath.select1("/vmix/preview", doc).toString()
+            n = XPath.select1("/vmix/preview/text()", doc).toString()
             this.active.preview[instance] = this.inputs.get(`${instance}:${n}`)?.name ?? ""
 
             this.notifyState()
@@ -214,7 +216,7 @@ export default class VMix extends EventEmitter {
             onXmlStatus("A", xml)
         })
         if (this.vmix2 !== null) {
-            this.vmix2.on("tally", (xml: string) => {
+            this.vmix2.on("xml", (xml: string) => {
                 this.log.log(2, "vMix: received XML status on vMix #2")
                 onXmlStatus("B", xml)
             })
@@ -228,12 +230,6 @@ export default class VMix extends EventEmitter {
             this.vmix2.on("close", () => {
                 this.log.log(2, "vMix: connection closed to vMix #2")
             })
-        }
-
-        /*  initialize vMix  */
-        for (const cam of this.cfg.idCAMs) {
-            const ptz = this.cam2ptz.get(cam)!
-            await this.setPTZCam(ptz, cam)
         }
     }
 
@@ -490,8 +486,10 @@ export default class VMix extends EventEmitter {
     async vmixCommand (vmix: vMixAPI.ConnectionTCP | null, cmds: string | Array<string> | vMixCommand | Array<vMixCommand>) {
         if (vmix !== null && vmix.connected())
             await vmix.send(cmds)
-        else
-            this.log.log(1, "vMix: failed to send command(s) -- (still) not connected")
+        else {
+            const remote = (vmix?.socket().remoteAddress ?? "unknown") + ":" + (vmix?.socket().remotePort ?? "unknown")
+            this.log.log(1, `vMix: failed to send command(s) to ${remote} -- (still) not connected`)
+        }
     }
 
     /*  change physical PTZ  */
