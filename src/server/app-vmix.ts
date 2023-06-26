@@ -415,7 +415,7 @@ export default class VMix extends EventEmitter {
 
         /*  set PTZ setting and update vMix PTZ inputs  */
         this.log.log(2, `vMix: storing physical PTZ "${ptz}" of camera "${cam}"`)
-        const input = this.cfg.inputNameCAM(cam)
+        const input = this.cfg.inputNamePTZ(cam, ptz)
         this.vmixCommand(this.vmix1, [
             { Function: "PTZUpdateVirtualInput", Input: input }
         ])
