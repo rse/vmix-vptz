@@ -749,6 +749,16 @@ export default class VMix extends EventEmitter {
 
         /*  persist new information  */
         this.state.setVPTZ(cam, ptz, vptz, xyz)
+
+        /*  update vMix  */
+        const input = this.cfg.inputNameVPTZ(cam, vptz)
+        const cmds = [] as Array<vMixCommand>
+        cmds.push({ Function: "SetPanX", Input: input, Value: xyz.x.toString() })
+        cmds.push({ Function: "SetPanY", Input: input, Value: xyz.y.toString() })
+        cmds.push({ Function: "SetZoom", Input: input, Value: xyz.zoom.toString() })
+        this.vmixCommand(this.vmix1, cmds)
+
+        /*  notify clients  */
         this.notifyState(false)
     }
 
