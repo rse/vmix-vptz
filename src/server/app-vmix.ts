@@ -724,6 +724,34 @@ export default class VMix extends EventEmitter {
         }, { duration, fps })
     }
 
+    /*  change virtual PTZ x/y/zoom  */
+    async xyzVPTZ (cam: string, vptz: string, x: number, y: number, zoom: number) {
+        /*  sanity check arguments  */
+        if (!this.cfg.idCAMs.find((id) => id === cam))
+            throw new Error(`invalid CAM id "${cam}"`)
+        if (!this.cfg.idVPTZs.find((id) => id === vptz))
+            throw new Error(`invalid VPTZ id "${vptz}"`)
+
+        /*  determine physical PTZ of camera  */
+        const ptz = this.cam2ptz.get(cam) ?? this.cfg.idPTZs[0]
+
+        /*  determine XYZ object  */
+        let xyz = this.vptz2xyz.get(`${cam}:${vptz}`)
+        if (xyz === undefined) {
+            xyz = { x: 0, y: 0, zoom: 1.0 }
+            this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+        }
+
+        /*  update XYZ object  */
+        xyz.x    = x
+        xyz.y    = y
+        xyz.zoom = zoom
+
+        /*  persist new information  */
+        this.state.setVPTZ(cam, ptz, vptz, xyz)
+        this.notifyState(false)
+    }
+
     /*  select virtual PTZ for preview  */
     async selectVPTZ (cam: string, vptz: string) {
         /*  sanity check arguments  */

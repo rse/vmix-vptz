@@ -317,6 +317,23 @@ export default class REST {
             }
         })
 
+        /*  set VPTZ x/y/zoom  */
+        this.server.route({
+            method: "GET",
+            path: "/vptz/{cam}/{vptz}/xyz/{x}/{y}/{zoom}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const cam   = req.params.cam
+                const vptz  = req.params.vptz
+                const x     = parseFloat(req.params.x)
+                const y     = parseFloat(req.params.y)
+                const zoom  = parseFloat(req.params.zoom)
+                queue = queue.then(() => {
+                    return this.vmix.xyzVPTZ(cam, vptz, x, y, zoom)
+                })
+                return h.response().code(204)
+            }
+        })
+
         /*  select VPTZ into preview  */
         this.server.route({
             method: "GET",
