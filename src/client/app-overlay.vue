@@ -22,10 +22,10 @@
                 }"
                 v-bind:style="{
                     left:   ((canvas.w / 2) +
-                            (canvas.w * (1 / state[options.cam].vptz[vptz].zoom) * -state[options.cam].vptz[vptz].x) -
+                            (canvas.w * (1 / state[options.cam].vptz[vptz].zoom) * (-state[options.cam].vptz[vptz].x / 2)) -
                             ((canvas.w * (1 / state[options.cam].vptz[vptz].zoom)) / 2)) + 'px',
                     top:    ((canvas.h / 2) -
-                            (canvas.h * (1 / state[options.cam].vptz[vptz].zoom) * -state[options.cam].vptz[vptz].y) -
+                            (canvas.h * (1 / state[options.cam].vptz[vptz].zoom) * (-state[options.cam].vptz[vptz].y / 2)) -
                             ((canvas.h * (1 / state[options.cam].vptz[vptz].zoom)) / 2)) + 'px',
                     width:  (canvas.w * (1 / state[options.cam].vptz[vptz].zoom)) + 'px',
                     height: (canvas.h * (1 / state[options.cam].vptz[vptz].zoom)) + 'px'
@@ -84,13 +84,13 @@
                 font-weight: bold
             &.preview
                 border: calc(0.4vw * var(--scale)) solid var(--color-prv-bg-tr)
-                z-index: 100
+                z-index: 110
                 .title
                     background-color: var(--color-prv-bg-tr)
                     color: var(--color-prv-fg)
             &.program
                 border: calc(0.4vw * var(--scale)) solid var(--color-prg-bg-tr)
-                z-index: 110
+                z-index: 100
                 .title
                     background-color: var(--color-prg-bg-tr)
                     color: var(--color-prg-fg)

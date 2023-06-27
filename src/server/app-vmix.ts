@@ -344,9 +344,9 @@ export default class VMix extends EventEmitter {
                     const xyz = await this.state.getVPTZ(cam, ptz, vptz)
                     this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
                     const input = this.cfg.inputNameVPTZ(cam, vptz)
-                    cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
-                    cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
-                    cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
+                    cmds.push({ Function: "SetPanX", Input: input, Value: xyz.x.toString() })
+                    cmds.push({ Function: "SetPanY", Input: input, Value: xyz.y.toString() })
+                    cmds.push({ Function: "SetZoom", Input: input, Value: xyz.zoom.toString() })
                 }
                 this.vmixCommand(this.vmix1, cmds)
             }
@@ -389,9 +389,9 @@ export default class VMix extends EventEmitter {
                 const xyz = await this.state.getVPTZ(cam, ptz, vptz)
                 this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
                 const input = this.cfg.inputNameVPTZ(cam, vptz)
-                cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
-                cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
-                cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
+                cmds.push({ Function: "SetPanX", Input: input, Value: xyz.x.toString() })
+                cmds.push({ Function: "SetPanY", Input: input, Value: xyz.y.toString() })
+                cmds.push({ Function: "SetZoom", Input: input, Value: xyz.zoom.toString() })
             }
             this.vmixCommand(this.vmix1, cmds)
         })
@@ -442,13 +442,13 @@ export default class VMix extends EventEmitter {
             for (const vptz of this.cfg.idVPTZs) {
                 this.log.log(2, `vMix: resetting virtual PTZ "${vptz}" of camera "${cam}"`)
                 let xyz = { x: 0.0, y: 0.0, zoom: 1.0 } as XYZ
-                if      (vptz === "C-L") xyz = { x: -0.25 + 0.070, y:  0.150, zoom: 0.35 }
-                else if (vptz === "C-C") xyz = { x: -0.500, y: 0.500, zoom: 2.00 }
-                else if (vptz === "C-R") xyz = { x: -0.25 + 0.580, y:  0.150, zoom: 0.35 }
-                else if (vptz === "F-L") xyz = { x: -0.25 + 0.000, y:  0.150, zoom: 0.50 }
-                else if (vptz === "F-C") xyz = { x: 0.500, y: -0.500, zoom: 2.00 }
-                else if (vptz === "F-R") xyz = { x: 0.000, y: 0.200, zoom: 0.50 }
-                else if (vptz === "W-C") xyz = { x: 0.000, y: 0.000, zoom: 1.00 }
+                if      (vptz === "C-L") xyz = { x:  2.000, y: -1.200, zoom: 3.00 }
+                else if (vptz === "C-C") xyz = { x:  0.000, y: -1.200, zoom: 3.00 }
+                else if (vptz === "C-R") xyz = { x: -2.000, y: -1.200, zoom: 3.00 }
+                else if (vptz === "F-L") xyz = { x:  1.000, y: -0.450, zoom: 2.00 }
+                else if (vptz === "F-C") xyz = { x:  0.000, y: -0.450, zoom: 2.00 }
+                else if (vptz === "F-R") xyz = { x: -1.000, y: -0.450, zoom: 2.00 }
+                else if (vptz === "W-C") xyz = { x:  0.000, y:  0.000, zoom: 1.00 }
                 await this.state.setVPTZ(cam, ptz, vptz, xyz)
                 this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
             }
@@ -636,42 +636,42 @@ export default class VMix extends EventEmitter {
             else if (arg === "up-left") {
                 cmd1 = { f: "SetPanY", v: `-=${delta}` }
                 cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= (delta / 2) }
-                mod2 = (xyz: XYZ) => { xyz.x += (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                mod2 = (xyz: XYZ) => { xyz.x += delta }
             }
             else if (arg === "up") {
                 cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
             }
             else if (arg === "up-right") {
                 cmd1 = { f: "SetPanY", v: `-=${delta}` }
                 cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= (delta / 2) }
-                mod2 = (xyz: XYZ) => { xyz.x -= (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                mod2 = (xyz: XYZ) => { xyz.x -= delta }
             }
             else if (arg === "left") {
                 cmd1 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.x += (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.x += delta }
             }
             else if (arg === "right") {
                 cmd1 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.x -= (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.x -= delta }
             }
             else if (arg === "down-left") {
                 cmd1 = { f: "SetPanY", v: `+=${delta}` }
                 cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += (delta / 2) }
-                mod2 = (xyz: XYZ) => { xyz.x += (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod2 = (xyz: XYZ) => { xyz.x += delta }
             }
             else if (arg === "down") {
                 cmd1 = { f: "SetPanY", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
             }
             else if (arg === "down-right") {
                 cmd1 = { f: "SetPanY", v: `+=${delta}` }
                 cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += (delta / 2) }
-                mod2 = (xyz: XYZ) => { xyz.x -= (delta / 2) }
+                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod2 = (xyz: XYZ) => { xyz.x -= delta }
             }
             else
                 throw new Error("invalid argument")
@@ -855,9 +855,9 @@ export default class VMix extends EventEmitter {
             previewXYZ.y    = programXYZ.y
             previewXYZ.zoom = programXYZ.zoom
             const cmds = [] as Array<vMixCommand>
-            cmds.push({ Function: "SetPanX", Input: preview, Value: (previewXYZ.x * 2).toString() })
-            cmds.push({ Function: "SetPanY", Input: preview, Value: (previewXYZ.y * 2).toString() })
-            cmds.push({ Function: "SetZoom", Input: preview, Value: (previewXYZ.zoom ).toString() })
+            cmds.push({ Function: "SetPanX", Input: preview, Value: previewXYZ.x.toString() })
+            cmds.push({ Function: "SetPanY", Input: preview, Value: previewXYZ.y.toString() })
+            cmds.push({ Function: "SetZoom", Input: preview, Value: previewXYZ.zoom.toString() })
             this.vmixCommand(this.vmix1, cmds)
             await AsyncDelay(100)
 
@@ -889,9 +889,9 @@ export default class VMix extends EventEmitter {
 
                 /*  change vMix  */
                 const cmds = [] as Array<vMixCommand>
-                cmds.push({ Function: "SetPanX", Input: input, Value: (xyz.x * 2).toString() })
-                cmds.push({ Function: "SetPanY", Input: input, Value: (xyz.y * 2).toString() })
-                cmds.push({ Function: "SetZoom", Input: input, Value: (xyz.zoom ).toString() })
+                cmds.push({ Function: "SetPanX", Input: input, Value: xyz.x.toString() })
+                cmds.push({ Function: "SetPanY", Input: input, Value: xyz.y.toString() })
+                cmds.push({ Function: "SetZoom", Input: input, Value: xyz.zoom.toString() })
                 this.vmixCommand(this.vmix1, cmds)
             }
         }, (cancelled) => {
