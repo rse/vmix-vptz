@@ -67,8 +67,8 @@
             top: 0
             left: 0
             box-sizing: border-box
-            border: calc(0.25vw * var(--scale)) solid var(--color-reg-bg-tr)
-            border-radius: calc(0.5vw * var(--scale))
+            border: calc(0.2vw * var(--scale)) solid var(--color-reg-bg-tr)
+            border-radius: calc(0.4vw * var(--scale))
             box-shadow: 0 0 calc(0.8vw * var(--scale)) var(--color-std-bg-1)
             .title
                 position: absolute
