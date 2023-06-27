@@ -111,7 +111,6 @@ export default defineComponent({
     }),
     computed: {
         style: function () {
-            console.log("FUCK", (this as any).options)
             const css = {} as { [ key: string ]: string }
             for (const key of Object.keys((this as any).options))
                 css[`--${key}`] = (this as any).options[key]
@@ -127,7 +126,6 @@ export default defineComponent({
             const root = this.$refs.root as HTMLElement
             this.canvas.w = root.clientWidth
             this.canvas.h = root.clientHeight
-            console.log(this.canvas)
         }
         window.addEventListener("resize", () => {
             updateCanvasSize()
