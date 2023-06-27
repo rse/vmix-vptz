@@ -22,13 +22,13 @@
                 }"
                 v-bind:style="{
                     left:   ((canvas.w / 2) +
-                            (canvas.w * state[options.cam].vptz[vptz].x) -
-                            ((canvas.w * state[options.cam].vptz[vptz].zoom) / 2)) + 'px',
+                            (canvas.w * (1 / state[options.cam].vptz[vptz].zoom) * -state[options.cam].vptz[vptz].x) -
+                            ((canvas.w * (1 / state[options.cam].vptz[vptz].zoom)) / 2)) + 'px',
                     top:    ((canvas.h / 2) -
-                            (canvas.h * state[options.cam].vptz[vptz].y) -
-                            ((canvas.h * state[options.cam].vptz[vptz].zoom) / 2)) + 'px',
-                    width:  (canvas.w * state[options.cam].vptz[vptz].zoom) + 'px',
-                    height: (canvas.h * state[options.cam].vptz[vptz].zoom) + 'px'
+                            (canvas.h * (1 / state[options.cam].vptz[vptz].zoom) * -state[options.cam].vptz[vptz].y) -
+                            ((canvas.h * (1 / state[options.cam].vptz[vptz].zoom)) / 2)) + 'px',
+                    width:  (canvas.w * (1 / state[options.cam].vptz[vptz].zoom)) + 'px',
+                    height: (canvas.h * (1 / state[options.cam].vptz[vptz].zoom)) + 'px'
                 }">
                 <div class="title">{{ vptz }}</div>
             </div>

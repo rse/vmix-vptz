@@ -443,12 +443,12 @@ export default class VMix extends EventEmitter {
                 this.log.log(2, `vMix: resetting virtual PTZ "${vptz}" of camera "${cam}"`)
                 let xyz = { x: 0.0, y: 0.0, zoom: 1.0 } as XYZ
                 if      (vptz === "C-L") xyz = { x: -0.25 + 0.070, y:  0.150, zoom: 0.35 }
-                else if (vptz === "C-C") xyz = { x: -0.25 + 0.325, y:  0.150, zoom: 0.35 }
+                else if (vptz === "C-C") xyz = { x: -0.500, y: 0.500, zoom: 2.00 }
                 else if (vptz === "C-R") xyz = { x: -0.25 + 0.580, y:  0.150, zoom: 0.35 }
                 else if (vptz === "F-L") xyz = { x: -0.25 + 0.000, y:  0.150, zoom: 0.50 }
-                else if (vptz === "F-C") xyz = { x: -0.25 + 0.250, y:  0.150, zoom: 0.50 }
-                else if (vptz === "F-R") xyz = { x: -0.25 + 0.500, y:  0.150, zoom: 0.50 }
-                else if (vptz === "W-C") xyz = { x:         0.000, y:  0.000, zoom: 1.00 }
+                else if (vptz === "F-C") xyz = { x: 0.500, y: -0.500, zoom: 2.00 }
+                else if (vptz === "F-R") xyz = { x: 0.000, y: 0.200, zoom: 0.50 }
+                else if (vptz === "W-C") xyz = { x: 0.000, y: 0.000, zoom: 1.00 }
                 await this.state.setVPTZ(cam, ptz, vptz, xyz)
                 this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
             }
@@ -636,42 +636,42 @@ export default class VMix extends EventEmitter {
             else if (arg === "up-left") {
                 cmd1 = { f: "SetPanY", v: `-=${delta}` }
                 cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
-                mod2 = (xyz: XYZ) => { xyz.x += delta }
+                mod1 = (xyz: XYZ) => { xyz.y -= (delta / 2) }
+                mod2 = (xyz: XYZ) => { xyz.x += (delta / 2) }
             }
             else if (arg === "up") {
                 cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                mod1 = (xyz: XYZ) => { xyz.y -= (delta / 2) }
             }
             else if (arg === "up-right") {
                 cmd1 = { f: "SetPanY", v: `-=${delta}` }
                 cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
-                mod2 = (xyz: XYZ) => { xyz.x -= delta }
+                mod1 = (xyz: XYZ) => { xyz.y -= (delta / 2) }
+                mod2 = (xyz: XYZ) => { xyz.x -= (delta / 2) }
             }
             else if (arg === "left") {
                 cmd1 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.x += delta }
+                mod1 = (xyz: XYZ) => { xyz.x += (delta / 2) }
             }
             else if (arg === "right") {
                 cmd1 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.x -= delta }
+                mod1 = (xyz: XYZ) => { xyz.x -= (delta / 2) }
             }
             else if (arg === "down-left") {
                 cmd1 = { f: "SetPanY", v: `+=${delta}` }
                 cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
-                mod2 = (xyz: XYZ) => { xyz.x += delta }
+                mod1 = (xyz: XYZ) => { xyz.y += (delta / 2) }
+                mod2 = (xyz: XYZ) => { xyz.x += (delta / 2) }
             }
             else if (arg === "down") {
                 cmd1 = { f: "SetPanY", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                mod1 = (xyz: XYZ) => { xyz.y += (delta / 2) }
             }
             else if (arg === "down-right") {
                 cmd1 = { f: "SetPanY", v: `+=${delta}` }
                 cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
-                mod2 = (xyz: XYZ) => { xyz.x -= delta }
+                mod1 = (xyz: XYZ) => { xyz.y += (delta / 2) }
+                mod2 = (xyz: XYZ) => { xyz.x -= (delta / 2) }
             }
             else
                 throw new Error("invalid argument")
