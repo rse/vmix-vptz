@@ -439,6 +439,7 @@ export default class VMix extends EventEmitter {
 
         /*  reset VPTZ settings  */
         await this.state.transaction(async () => {
+            const cmds = [] as Array<vMixCommand>
             for (const vptz of this.cfg.idVPTZs) {
                 this.log.log(2, `vMix: resetting virtual PTZ "${vptz}" of camera "${cam}"`)
                 let xyz = { x: 0.0, y: 0.0, zoom: 1.0 } as XYZ
@@ -451,7 +452,12 @@ export default class VMix extends EventEmitter {
                 else if (vptz === "W-C") xyz = { x:  0.000, y:  0.000, zoom: 1.00 }
                 await this.state.setVPTZ(cam, ptz, vptz, xyz)
                 this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+                const input = this.cfg.inputNameVPTZ(cam, vptz)
+                cmds.push({ Function: "SetPanX", Input: input, Value: xyz.x.toString() })
+                cmds.push({ Function: "SetPanY", Input: input, Value: xyz.y.toString() })
+                cmds.push({ Function: "SetZoom", Input: input, Value: xyz.zoom.toString() })
             }
+            this.vmixCommand(this.vmix1, cmds)
         })
         this.notifyState()
     }
@@ -473,12 +479,18 @@ export default class VMix extends EventEmitter {
 
         /*  reset VPTZ settings  */
         this.state.transaction(async () => {
+            const cmds = [] as Array<vMixCommand>
             for (const vptz of this.cfg.idVPTZs) {
                 this.log.log(2, `vMix: clearing virtual PTZ "${vptz}" of camera "${cam}"`)
                 const xyz = { x: 0.0, y: 0.0, zoom: 1.0 } as XYZ
                 await this.state.setVPTZ(cam, ptz, vptz, xyz)
                 this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+                const input = this.cfg.inputNameVPTZ(cam, vptz)
+                cmds.push({ Function: "SetPanX", Input: input, Value: xyz.x.toString() })
+                cmds.push({ Function: "SetPanY", Input: input, Value: xyz.y.toString() })
+                cmds.push({ Function: "SetZoom", Input: input, Value: xyz.zoom.toString() })
             }
+            this.vmixCommand(this.vmix1, cmds)
         })
         this.notifyState()
     }

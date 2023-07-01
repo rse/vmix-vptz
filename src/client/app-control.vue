@@ -50,17 +50,17 @@
                             <div class="button ga-02 destructive"
                                 v-bind:class="{ active: ptzMode === 'save' }"
                                 v-on:click="ptzMode = 'save'">
-                                <span class="icon"><i class="fa-solid fa-gear"></i></span>
+                                <span class="icon"><i class="fa-solid fa-floppy-disk"></i></span>
                             </div>
                             <div class="button ga-03 destructive"
                                 v-bind:class="{ active: ptzMode === 'reset' }"
                                 v-on:click="ptzMode = 'reset'">
-                                <span class="icon"><i class="fa-solid fa-palette"></i></span>
+                                <span class="icon"><i class="fa-solid fa-table-cells-large"></i></span>
                             </div>
                             <div class="button ga-04 destructive"
                                 v-bind:class="{ active: ptzMode === 'clear' }"
                                 v-on:click="ptzMode = 'clear'">
-                                <span class="icon"><i class="fa-solid fa-maximize"></i></span>
+                                <span class="icon"><i class="fa-regular fa-square"></i></span>
                             </div>
                             <div class="button ga-05 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'A', preview: state['1'].ptz === 'A' && previewCam === '1', program: state['1'].ptz === 'A' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A', '1')">1A</div>
                             <div class="button ga-06 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'A', preview: state['2'].ptz === 'A' && previewCam === '2', program: state['2'].ptz === 'A' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A', '2')">2A</div>
