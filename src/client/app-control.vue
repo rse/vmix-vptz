@@ -301,9 +301,9 @@
         flex-grow: 1
         background-color: var(--color-std-bg-2)
         color: var(--color-std-fg-5)
-        padding: 10px 10px 20px 10px
+        padding: 10px 10px 10px 10px
         width:  calc(100% - 2 * 10px)
-        height: calc(100% - 10px - 20px)
+        height: calc(100% - 10px - 10px)
         overflow: hidden
         display: flex
         flex-direction: row
@@ -328,7 +328,7 @@
                 grid-template-columns: 1fr 1fr 1fr
                 grid-template-rows:    1fr 1fr 1fr
                 grid-template-areas:   "ctrl1 cam5 ctrl2" "cam1 cam2 cam4" "ctrl3 cam3 ctrl4"
-                gap: 10px
+                gap: 0.3vw
                 .overlay-box
                     position: relative
                     max-width: 100%
@@ -383,7 +383,7 @@
                         .button
                             background: var(--color-std-bg-4)
                             color: var(--color-std-fg-4)
-                            padding: 0.5vw 1vw 0.5vw 1vw
+                            padding: 0.3vw 0.8vw 0.3vw 0.8vw
                             font-size: 1vw
                             border-radius: 0.4vw
                             text-align: center
@@ -472,7 +472,7 @@
                             "ga-04 ga-41 ga-42 ga-43 ga-44 ga-45 ga-46" \
                             "ga-04 ga-47 ga-48 ga-49 ga-50 ga-51 ga-52"
                         .button
-                            font-size: 1vw
+                            font-size: 1.1vw
                             line-height: 1vw
                             padding: 0.2vw 1vw 0.2vw 1vw
                             &.ga-01,
@@ -521,7 +521,7 @@
                             &.ga-03,
                             &.ga-04,
                             &.ga-05
-                                margin-bottom: 0.5vw
+                                margin-bottom: 0.8vw
                             &.preview
                                 background: var(--color-prv-bg)
                                 color: var(--color-prv-fg)
@@ -558,14 +558,15 @@
                                 justify-content: center
                                 align-items: center
                                 margin-right: 0.5vw
-                                font-size: 1.0vw
+                                font-size: 1.5vw
                                 .icon
                                     padding-right: 0
                             &.ga-15,
                             &.ga-16,
                             &.ga-17,
                             &.ga-18
-                                font-size: 1.0vw
+                                font-size: 1.2vw
+                                margin-left: 0.5vw
                 .control-box-ptz
                     grid-area: ctrl1
                 .control-box-global
