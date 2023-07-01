@@ -516,10 +516,10 @@ export default class VMix extends EventEmitter {
             throw new Error("invalid operation")
 
         /*  constants  */
-        const moveSpeed  = (speed === "fast" ? 1.0 : (speed === "med" ? 0.5 : 0.25))
-        const moveTime   = 0.5
-        const zoomSpeed  = (speed === "fast" ? 1.0 : (speed === "med" ? 0.5 : 0.25))
-        const zoomTime   = 0.5
+        const moveSpeed  = (speed === "fast" ? 0.5 : (speed === "med" ? 0.25 : 0.10))
+        const moveTime   = 100
+        const zoomSpeed  = (speed === "fast" ? 1.0 : (speed === "med" ? 0.5 : 0.15))
+        const zoomTime   = 100
 
         /*  variables  */
         let cmd1: CMD | null = null
@@ -577,7 +577,7 @@ export default class VMix extends EventEmitter {
             if (arg === "reset") {
                 cmd1 = { f: "PTZZoomOut", v: "1.0" }
                 cmd2 = { f: "PTZZoomStop" }
-                time = 2.0
+                time = 2 * 1000
             }
             else if (arg === "decrease") {
                 cmd1 = { f: "PTZZoomOut", v: zoomSpeed.toString() }
@@ -594,8 +594,8 @@ export default class VMix extends EventEmitter {
         }
 
         /*  determine and execute first vMix command  */
-        const input = this.cfg.inputNamePTZ(cam, ptz)
-        const vmixCmd1 = { Function: cmd1!.f, Input: input } as vMixCommand
+        const inputCAM = this.cfg.inputNamePTZ(cam, ptz)
+        const vmixCmd1 = { Function: cmd1!.f, Input: inputCAM } as vMixCommand
         if (cmd1!.v !== undefined && cmd1!.v !== "")
             vmixCmd1.Value = cmd1!.v
         await this.vmixCommand(this.vmix1, vmixCmd1)
@@ -606,11 +606,17 @@ export default class VMix extends EventEmitter {
 
         /*  determine and execute optional second vMix command  */
         if (cmd2 !== null) {
-            const vmixCmd2 = { Function: cmd2!.f, Input: input } as vMixCommand
+            const vmixCmd2 = { Function: cmd2!.f, Input: inputCAM } as vMixCommand
             if (cmd2!.v !== undefined && cmd2!.v !== "")
                 vmixCmd2.Value = cmd2!.v
             await this.vmixCommand(this.vmix1, vmixCmd2)
         }
+
+        /*  finally persist PTZ information in vMix  */
+        const inputPTZ = this.cfg.inputNamePTZ(cam, ptz)
+        this.vmixCommand(this.vmix1, [
+            { Function: "PTZUpdateVirtualInput", Input: inputPTZ }
+        ])
     }
 
     /*  change virtual PTZ  */
