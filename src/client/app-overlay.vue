@@ -61,8 +61,8 @@
             right: calc(0.5vw * var(--scale))
             border-radius: calc(0.5vw * var(--scale))
             padding: 0 calc(1vw * var(--scale)) 0 calc(1vw * var(--scale))
-            background-color: var(--color-std-bg-4)
-            color: var(--color-std-fg-4)
+            background-color: var(--color-reg-bg-tr)
+            color: var(--color-reg-fg)
             font-size: calc(1.5vw * var(--scale))
             font-weight: bold
         .vptz
