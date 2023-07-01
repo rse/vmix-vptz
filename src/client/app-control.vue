@@ -62,54 +62,54 @@
                                 v-on:click="ptzMode = 'clear'">
                                 <span class="icon"><i class="fa-solid fa-maximize"></i></span>
                             </div>
-                            <div class="button ga-05" v-bind:class="{ active: state['1'].ptz === 'A', preview: state['1'].ptz === 'A' && previewCam === '1', program: state['1'].ptz === 'A' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('A', '1')">1A</div>
-                            <div class="button ga-06" v-bind:class="{ active: state['2'].ptz === 'A', preview: state['2'].ptz === 'A' && previewCam === '2', program: state['2'].ptz === 'A' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('A', '2')">2A</div>
-                            <div class="button ga-07" v-bind:class="{ active: state['3'].ptz === 'A', preview: state['3'].ptz === 'A' && previewCam === '3', program: state['3'].ptz === 'A' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('A', '3')">3A</div>
-                            <div class="button ga-08" v-bind:class="{ active: state['4'].ptz === 'A', preview: state['4'].ptz === 'A' && previewCam === '4', program: state['4'].ptz === 'A' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('A', '4')">4A</div>
-                            <div class="button ga-09" v-bind:class="{ active: state['5'].ptz === 'A', preview: state['5'].ptz === 'A' && previewCam === '5', program: state['5'].ptz === 'A' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('A', '5')">5A</div>
-                            <div class="button ga-10" v-bind:class="{ active: state['1'].ptz === 'A' && state['2'].ptz === 'A' && state['3'].ptz === 'A' && state['4'].ptz === 'A' && state['5'].ptz === 'A', destructive: ptzMode !== 'load' }" v-on:click="ptz('A')">A</div>
-                            <div class="button ga-11" v-bind:class="{ active: state['1'].ptz === 'B', preview: state['1'].ptz === 'B' && previewCam === '1', program: state['1'].ptz === 'B' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('B', '1')">1B</div>
-                            <div class="button ga-12" v-bind:class="{ active: state['2'].ptz === 'B', preview: state['2'].ptz === 'B' && previewCam === '2', program: state['2'].ptz === 'B' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('B', '2')">2B</div>
-                            <div class="button ga-13" v-bind:class="{ active: state['3'].ptz === 'B', preview: state['3'].ptz === 'B' && previewCam === '3', program: state['3'].ptz === 'B' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('B', '3')">3B</div>
-                            <div class="button ga-14" v-bind:class="{ active: state['4'].ptz === 'B', preview: state['4'].ptz === 'B' && previewCam === '4', program: state['4'].ptz === 'B' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('B', '4')">4B</div>
-                            <div class="button ga-15" v-bind:class="{ active: state['5'].ptz === 'B', preview: state['5'].ptz === 'B' && previewCam === '5', program: state['5'].ptz === 'B' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('B', '5')">5B</div>
-                            <div class="button ga-16" v-bind:class="{ active: state['1'].ptz === 'B' && state['2'].ptz === 'B' && state['3'].ptz === 'B' && state['4'].ptz === 'B' && state['5'].ptz === 'B', destructive: ptzMode !== 'load' }" v-on:click="ptz('B')">B</div>
-                            <div class="button ga-17" v-bind:class="{ active: state['1'].ptz === 'C', preview: state['1'].ptz === 'C' && previewCam === '1', program: state['1'].ptz === 'C' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('C', '1')">1C</div>
-                            <div class="button ga-18" v-bind:class="{ active: state['2'].ptz === 'C', preview: state['2'].ptz === 'C' && previewCam === '2', program: state['2'].ptz === 'C' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('C', '2')">2C</div>
-                            <div class="button ga-19" v-bind:class="{ active: state['3'].ptz === 'C', preview: state['3'].ptz === 'C' && previewCam === '3', program: state['3'].ptz === 'C' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('C', '3')">3C</div>
-                            <div class="button ga-20" v-bind:class="{ active: state['4'].ptz === 'C', preview: state['4'].ptz === 'C' && previewCam === '4', program: state['4'].ptz === 'C' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('C', '4')">4C</div>
-                            <div class="button ga-21" v-bind:class="{ active: state['5'].ptz === 'C', preview: state['5'].ptz === 'C' && previewCam === '5', program: state['5'].ptz === 'C' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('C', '5')">5C</div>
-                            <div class="button ga-22" v-bind:class="{ active: state['1'].ptz === 'C' && state['2'].ptz === 'C' && state['3'].ptz === 'C' && state['4'].ptz === 'C' && state['5'].ptz === 'C', destructive: ptzMode !== 'load' }" v-on:click="ptz('C')">C</div>
-                            <div class="button ga-23" v-bind:class="{ active: state['1'].ptz === 'D', preview: state['1'].ptz === 'D' && previewCam === '1', program: state['1'].ptz === 'D' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('D', '1')">1D</div>
-                            <div class="button ga-24" v-bind:class="{ active: state['2'].ptz === 'D', preview: state['2'].ptz === 'D' && previewCam === '2', program: state['2'].ptz === 'D' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('D', '2')">2D</div>
-                            <div class="button ga-25" v-bind:class="{ active: state['3'].ptz === 'D', preview: state['3'].ptz === 'D' && previewCam === '3', program: state['3'].ptz === 'D' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('D', '3')">3D</div>
-                            <div class="button ga-26" v-bind:class="{ active: state['4'].ptz === 'D', preview: state['4'].ptz === 'D' && previewCam === '4', program: state['4'].ptz === 'D' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('D', '4')">4D</div>
-                            <div class="button ga-27" v-bind:class="{ active: state['5'].ptz === 'D', preview: state['5'].ptz === 'D' && previewCam === '5', program: state['5'].ptz === 'D' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('D', '5')">5D</div>
-                            <div class="button ga-28" v-bind:class="{ active: state['1'].ptz === 'D' && state['2'].ptz === 'D' && state['3'].ptz === 'D' && state['4'].ptz === 'D' && state['5'].ptz === 'D', destructive: ptzMode !== 'load' }" v-on:click="ptz('D')">D</div>
-                            <div class="button ga-29" v-bind:class="{ active: state['1'].ptz === 'E', preview: state['1'].ptz === 'E' && previewCam === '1', program: state['1'].ptz === 'E' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('E', '1')">1E</div>
-                            <div class="button ga-30" v-bind:class="{ active: state['2'].ptz === 'E', preview: state['2'].ptz === 'E' && previewCam === '2', program: state['2'].ptz === 'E' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('E', '2')">2E</div>
-                            <div class="button ga-31" v-bind:class="{ active: state['3'].ptz === 'E', preview: state['3'].ptz === 'E' && previewCam === '3', program: state['3'].ptz === 'E' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('E', '3')">3E</div>
-                            <div class="button ga-32" v-bind:class="{ active: state['4'].ptz === 'E', preview: state['4'].ptz === 'E' && previewCam === '4', program: state['4'].ptz === 'E' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('E', '4')">4E</div>
-                            <div class="button ga-33" v-bind:class="{ active: state['5'].ptz === 'E', preview: state['5'].ptz === 'E' && previewCam === '5', program: state['5'].ptz === 'E' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('E', '5')">5E</div>
-                            <div class="button ga-34" v-bind:class="{ active: state['1'].ptz === 'E' && state['2'].ptz === 'E' && state['3'].ptz === 'E' && state['4'].ptz === 'E' && state['5'].ptz === 'E', destructive: ptzMode !== 'load' }" v-on:click="ptz('E')">E</div>
-                            <div class="button ga-35" v-bind:class="{ active: state['1'].ptz === 'F', preview: state['1'].ptz === 'F' && previewCam === '1', program: state['1'].ptz === 'F' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('F', '1')">1F</div>
-                            <div class="button ga-36" v-bind:class="{ active: state['2'].ptz === 'F', preview: state['2'].ptz === 'F' && previewCam === '2', program: state['2'].ptz === 'F' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('F', '2')">2F</div>
-                            <div class="button ga-37" v-bind:class="{ active: state['3'].ptz === 'F', preview: state['3'].ptz === 'F' && previewCam === '3', program: state['3'].ptz === 'F' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('F', '3')">3F</div>
-                            <div class="button ga-38" v-bind:class="{ active: state['4'].ptz === 'F', preview: state['4'].ptz === 'F' && previewCam === '4', program: state['4'].ptz === 'F' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('F', '4')">4F</div>
-                            <div class="button ga-39" v-bind:class="{ active: state['5'].ptz === 'F', preview: state['5'].ptz === 'F' && previewCam === '5', program: state['5'].ptz === 'F' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('F', '5')">5F</div>
-                            <div class="button ga-40" v-bind:class="{ active: state['1'].ptz === 'F' && state['2'].ptz === 'F' && state['3'].ptz === 'F' && state['4'].ptz === 'F' && state['5'].ptz === 'F', destructive: ptzMode !== 'load' }" v-on:click="ptz('F')">F</div>
-                            <div class="button ga-41" v-bind:class="{ active: state['1'].ptz === 'G', preview: state['1'].ptz === 'G' && previewCam === '1', program: state['1'].ptz === 'G' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('G', '1')">1G</div>
-                            <div class="button ga-42" v-bind:class="{ active: state['2'].ptz === 'G', preview: state['2'].ptz === 'G' && previewCam === '2', program: state['2'].ptz === 'G' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('G', '2')">2G</div>
-                            <div class="button ga-43" v-bind:class="{ active: state['3'].ptz === 'G', preview: state['3'].ptz === 'G' && previewCam === '3', program: state['3'].ptz === 'G' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('G', '3')">3G</div>
-                            <div class="button ga-44" v-bind:class="{ active: state['4'].ptz === 'G', preview: state['4'].ptz === 'G' && previewCam === '4', program: state['4'].ptz === 'G' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('G', '4')">4G</div>
-                            <div class="button ga-45" v-bind:class="{ active: state['5'].ptz === 'G', preview: state['5'].ptz === 'G' && previewCam === '5', program: state['5'].ptz === 'G' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('G', '5')">5G</div>
-                            <div class="button ga-46" v-bind:class="{ active: state['1'].ptz === 'G' && state['2'].ptz === 'G' && state['3'].ptz === 'G' && state['4'].ptz === 'G' && state['5'].ptz === 'G', destructive: ptzMode !== 'load' }" v-on:click="ptz('G')">G</div>
-                            <div class="button ga-47" v-bind:class="{ active: state['1'].ptz === 'H', preview: state['1'].ptz === 'H' && previewCam === '1', program: state['1'].ptz === 'H' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="ptz('H', '1')">1H</div>
-                            <div class="button ga-48" v-bind:class="{ active: state['2'].ptz === 'H', preview: state['2'].ptz === 'H' && previewCam === '2', program: state['2'].ptz === 'H' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="ptz('H', '2')">2H</div>
-                            <div class="button ga-49" v-bind:class="{ active: state['3'].ptz === 'H', preview: state['3'].ptz === 'H' && previewCam === '3', program: state['3'].ptz === 'H' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="ptz('H', '3')">3H</div>
-                            <div class="button ga-50" v-bind:class="{ active: state['4'].ptz === 'H', preview: state['4'].ptz === 'H' && previewCam === '4', program: state['4'].ptz === 'H' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="ptz('H', '4')">4H</div>
-                            <div class="button ga-51" v-bind:class="{ active: state['5'].ptz === 'H', preview: state['5'].ptz === 'H' && previewCam === '5', program: state['5'].ptz === 'H' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="ptz('H', '5')">5H</div>
-                            <div class="button ga-52" v-bind:class="{ active: state['1'].ptz === 'H' && state['2'].ptz === 'H' && state['3'].ptz === 'H' && state['4'].ptz === 'H' && state['5'].ptz === 'H', destructive: ptzMode !== 'load' }" v-on:click="ptz('H')">H</div>
+                            <div class="button ga-05" v-bind:class="{ active: state['1'].ptz === 'A', preview: state['1'].ptz === 'A' && previewCam === '1', program: state['1'].ptz === 'A' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A', '1')">1A</div>
+                            <div class="button ga-06" v-bind:class="{ active: state['2'].ptz === 'A', preview: state['2'].ptz === 'A' && previewCam === '2', program: state['2'].ptz === 'A' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A', '2')">2A</div>
+                            <div class="button ga-07" v-bind:class="{ active: state['3'].ptz === 'A', preview: state['3'].ptz === 'A' && previewCam === '3', program: state['3'].ptz === 'A' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A', '3')">3A</div>
+                            <div class="button ga-08" v-bind:class="{ active: state['4'].ptz === 'A', preview: state['4'].ptz === 'A' && previewCam === '4', program: state['4'].ptz === 'A' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A', '4')">4A</div>
+                            <div class="button ga-09" v-bind:class="{ active: state['5'].ptz === 'A', preview: state['5'].ptz === 'A' && previewCam === '5', program: state['5'].ptz === 'A' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A', '5')">5A</div>
+                            <div class="button ga-10" v-bind:class="{ active: state['1'].ptz === 'A' && state['2'].ptz === 'A' && state['3'].ptz === 'A' && state['4'].ptz === 'A' && state['5'].ptz === 'A', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'A')">A</div>
+                            <div class="button ga-11" v-bind:class="{ active: state['1'].ptz === 'B', preview: state['1'].ptz === 'B' && previewCam === '1', program: state['1'].ptz === 'B' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'B', '1')">1B</div>
+                            <div class="button ga-12" v-bind:class="{ active: state['2'].ptz === 'B', preview: state['2'].ptz === 'B' && previewCam === '2', program: state['2'].ptz === 'B' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'B', '2')">2B</div>
+                            <div class="button ga-13" v-bind:class="{ active: state['3'].ptz === 'B', preview: state['3'].ptz === 'B' && previewCam === '3', program: state['3'].ptz === 'B' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'B', '3')">3B</div>
+                            <div class="button ga-14" v-bind:class="{ active: state['4'].ptz === 'B', preview: state['4'].ptz === 'B' && previewCam === '4', program: state['4'].ptz === 'B' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'B', '4')">4B</div>
+                            <div class="button ga-15" v-bind:class="{ active: state['5'].ptz === 'B', preview: state['5'].ptz === 'B' && previewCam === '5', program: state['5'].ptz === 'B' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'B', '5')">5B</div>
+                            <div class="button ga-16" v-bind:class="{ active: state['1'].ptz === 'B' && state['2'].ptz === 'B' && state['3'].ptz === 'B' && state['4'].ptz === 'B' && state['5'].ptz === 'B', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'B')">B</div>
+                            <div class="button ga-17" v-bind:class="{ active: state['1'].ptz === 'C', preview: state['1'].ptz === 'C' && previewCam === '1', program: state['1'].ptz === 'C' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'C', '1')">1C</div>
+                            <div class="button ga-18" v-bind:class="{ active: state['2'].ptz === 'C', preview: state['2'].ptz === 'C' && previewCam === '2', program: state['2'].ptz === 'C' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'C', '2')">2C</div>
+                            <div class="button ga-19" v-bind:class="{ active: state['3'].ptz === 'C', preview: state['3'].ptz === 'C' && previewCam === '3', program: state['3'].ptz === 'C' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'C', '3')">3C</div>
+                            <div class="button ga-20" v-bind:class="{ active: state['4'].ptz === 'C', preview: state['4'].ptz === 'C' && previewCam === '4', program: state['4'].ptz === 'C' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'C', '4')">4C</div>
+                            <div class="button ga-21" v-bind:class="{ active: state['5'].ptz === 'C', preview: state['5'].ptz === 'C' && previewCam === '5', program: state['5'].ptz === 'C' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'C', '5')">5C</div>
+                            <div class="button ga-22" v-bind:class="{ active: state['1'].ptz === 'C' && state['2'].ptz === 'C' && state['3'].ptz === 'C' && state['4'].ptz === 'C' && state['5'].ptz === 'C', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'C')">C</div>
+                            <div class="button ga-23" v-bind:class="{ active: state['1'].ptz === 'D', preview: state['1'].ptz === 'D' && previewCam === '1', program: state['1'].ptz === 'D' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'D', '1')">1D</div>
+                            <div class="button ga-24" v-bind:class="{ active: state['2'].ptz === 'D', preview: state['2'].ptz === 'D' && previewCam === '2', program: state['2'].ptz === 'D' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'D', '2')">2D</div>
+                            <div class="button ga-25" v-bind:class="{ active: state['3'].ptz === 'D', preview: state['3'].ptz === 'D' && previewCam === '3', program: state['3'].ptz === 'D' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'D', '3')">3D</div>
+                            <div class="button ga-26" v-bind:class="{ active: state['4'].ptz === 'D', preview: state['4'].ptz === 'D' && previewCam === '4', program: state['4'].ptz === 'D' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'D', '4')">4D</div>
+                            <div class="button ga-27" v-bind:class="{ active: state['5'].ptz === 'D', preview: state['5'].ptz === 'D' && previewCam === '5', program: state['5'].ptz === 'D' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'D', '5')">5D</div>
+                            <div class="button ga-28" v-bind:class="{ active: state['1'].ptz === 'D' && state['2'].ptz === 'D' && state['3'].ptz === 'D' && state['4'].ptz === 'D' && state['5'].ptz === 'D', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'D')">D</div>
+                            <div class="button ga-29" v-bind:class="{ active: state['1'].ptz === 'E', preview: state['1'].ptz === 'E' && previewCam === '1', program: state['1'].ptz === 'E' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'E', '1')">1E</div>
+                            <div class="button ga-30" v-bind:class="{ active: state['2'].ptz === 'E', preview: state['2'].ptz === 'E' && previewCam === '2', program: state['2'].ptz === 'E' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'E', '2')">2E</div>
+                            <div class="button ga-31" v-bind:class="{ active: state['3'].ptz === 'E', preview: state['3'].ptz === 'E' && previewCam === '3', program: state['3'].ptz === 'E' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'E', '3')">3E</div>
+                            <div class="button ga-32" v-bind:class="{ active: state['4'].ptz === 'E', preview: state['4'].ptz === 'E' && previewCam === '4', program: state['4'].ptz === 'E' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'E', '4')">4E</div>
+                            <div class="button ga-33" v-bind:class="{ active: state['5'].ptz === 'E', preview: state['5'].ptz === 'E' && previewCam === '5', program: state['5'].ptz === 'E' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'E', '5')">5E</div>
+                            <div class="button ga-34" v-bind:class="{ active: state['1'].ptz === 'E' && state['2'].ptz === 'E' && state['3'].ptz === 'E' && state['4'].ptz === 'E' && state['5'].ptz === 'E', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'E')">E</div>
+                            <div class="button ga-35" v-bind:class="{ active: state['1'].ptz === 'F', preview: state['1'].ptz === 'F' && previewCam === '1', program: state['1'].ptz === 'F' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'F', '1')">1F</div>
+                            <div class="button ga-36" v-bind:class="{ active: state['2'].ptz === 'F', preview: state['2'].ptz === 'F' && previewCam === '2', program: state['2'].ptz === 'F' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'F', '2')">2F</div>
+                            <div class="button ga-37" v-bind:class="{ active: state['3'].ptz === 'F', preview: state['3'].ptz === 'F' && previewCam === '3', program: state['3'].ptz === 'F' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'F', '3')">3F</div>
+                            <div class="button ga-38" v-bind:class="{ active: state['4'].ptz === 'F', preview: state['4'].ptz === 'F' && previewCam === '4', program: state['4'].ptz === 'F' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'F', '4')">4F</div>
+                            <div class="button ga-39" v-bind:class="{ active: state['5'].ptz === 'F', preview: state['5'].ptz === 'F' && previewCam === '5', program: state['5'].ptz === 'F' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'F', '5')">5F</div>
+                            <div class="button ga-40" v-bind:class="{ active: state['1'].ptz === 'F' && state['2'].ptz === 'F' && state['3'].ptz === 'F' && state['4'].ptz === 'F' && state['5'].ptz === 'F', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'F')">F</div>
+                            <div class="button ga-41" v-bind:class="{ active: state['1'].ptz === 'G', preview: state['1'].ptz === 'G' && previewCam === '1', program: state['1'].ptz === 'G' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'G', '1')">1G</div>
+                            <div class="button ga-42" v-bind:class="{ active: state['2'].ptz === 'G', preview: state['2'].ptz === 'G' && previewCam === '2', program: state['2'].ptz === 'G' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'G', '2')">2G</div>
+                            <div class="button ga-43" v-bind:class="{ active: state['3'].ptz === 'G', preview: state['3'].ptz === 'G' && previewCam === '3', program: state['3'].ptz === 'G' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'G', '3')">3G</div>
+                            <div class="button ga-44" v-bind:class="{ active: state['4'].ptz === 'G', preview: state['4'].ptz === 'G' && previewCam === '4', program: state['4'].ptz === 'G' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'G', '4')">4G</div>
+                            <div class="button ga-45" v-bind:class="{ active: state['5'].ptz === 'G', preview: state['5'].ptz === 'G' && previewCam === '5', program: state['5'].ptz === 'G' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'G', '5')">5G</div>
+                            <div class="button ga-46" v-bind:class="{ active: state['1'].ptz === 'G' && state['2'].ptz === 'G' && state['3'].ptz === 'G' && state['4'].ptz === 'G' && state['5'].ptz === 'G', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'G')">G</div>
+                            <div class="button ga-47" v-bind:class="{ active: state['1'].ptz === 'H', preview: state['1'].ptz === 'H' && previewCam === '1', program: state['1'].ptz === 'H' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'H', '1')">1H</div>
+                            <div class="button ga-48" v-bind:class="{ active: state['2'].ptz === 'H', preview: state['2'].ptz === 'H' && previewCam === '2', program: state['2'].ptz === 'H' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'H', '2')">2H</div>
+                            <div class="button ga-49" v-bind:class="{ active: state['3'].ptz === 'H', preview: state['3'].ptz === 'H' && previewCam === '3', program: state['3'].ptz === 'H' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'H', '3')">3H</div>
+                            <div class="button ga-50" v-bind:class="{ active: state['4'].ptz === 'H', preview: state['4'].ptz === 'H' && previewCam === '4', program: state['4'].ptz === 'H' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'H', '4')">4H</div>
+                            <div class="button ga-51" v-bind:class="{ active: state['5'].ptz === 'H', preview: state['5'].ptz === 'H' && previewCam === '5', program: state['5'].ptz === 'H' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'H', '5')">5H</div>
+                            <div class="button ga-52" v-bind:class="{ active: state['1'].ptz === 'H' && state['2'].ptz === 'H' && state['3'].ptz === 'H' && state['4'].ptz === 'H' && state['5'].ptz === 'H', destructive: ptzMode !== 'load' }" v-on:click="(el) => ptz(el, 'H')">H</div>
                         </div>
                     </div>
                     <div class="control-box control-box-vptz">
@@ -370,6 +370,7 @@
                             border-radius: 0.4vw
                             text-align: center
                             cursor: pointer
+                            border: 1px solid transparent
                             &.disabled
                                 background: var(--color-std-bg-3)
                                 color: var(--color-std-fg-1)
@@ -391,6 +392,8 @@
                                 color: var(--color-sig-fg-5) !important
                             .icon
                                 padding-right: 0.5vw
+                            &.animate
+                                animation: 1s linear flash
                     .control-grid .ga-01
                         grid-area: ga-01
                     .control-grid .ga-02
@@ -551,6 +554,16 @@
         align-items: center
         .status
             flex-grow: 1
+
+@keyframes flash
+    0%
+        border: 1px solid var(--color-std-fg-5)
+    33%
+        border: 1px solid transparent
+    66%
+        border: 1px solid var(--color-std-fg-5)
+    100%
+        border: 1px solid transparent
 </style>
 
 <script setup lang="ts">
@@ -585,7 +598,19 @@ export default defineComponent({
     }),
     async created () {
     },
+    async mounted () {
+        /*  remove "animate" CSS class at end of animations  */
+        this.$el.addEventListener("animationend", (ev: AnimationEvent) => {
+            const el = (ev.target) as HTMLDivElement
+            el.classList.remove("animate")
+        })
+    },
     methods: {
+        animate (el: HTMLElement) {
+            if (el.classList.contains("animate"))
+                el.classList.remove("animate")
+            el.classList.add("animate")
+        },
         setState (state: StateType) {
             for (const cam of Object.keys(this.state))
                 if (this.$refs[`overlay-cam${cam}`])
@@ -615,11 +640,15 @@ export default defineComponent({
             await axios({ method, url: `${this.svUrl}${path}` })
                 .then((response) => response.data).catch(() => null)
         },
-        async ptz (ptz: string, cam = "") {
+        async ptz (el: MouseEvent, ptz: string, cam = "") {
             if (cam !== "")
                 await this.api(`/ptz/${ptz}/${cam}/${this.ptzMode}`)
             else
                 await this.api(`/ptz/${ptz}/${this.ptzMode}`)
+            if (this.ptzMode !== "load") {
+                const div = (el.target) as HTMLDivElement
+                this.animate(div)
+            }
         },
         async vptz (vptz: string) {
             const cam = this.vptzCam
