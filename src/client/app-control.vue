@@ -120,13 +120,13 @@
                             <div class="button ga-03" v-bind:class="{ active: vptzCam === '5', preview: previewCam === '5', program: programCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
                             <div class="button ga-04" v-bind:class="{ active: vptzCam === '3', preview: previewCam === '3', program: programCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
                             <div class="button ga-05" v-bind:class="{ active: vptzCam === '4', preview: previewCam === '4', program: programCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
-                            <div class="button ga-06" v-bind:class="{ preview: previewView === 'C-L', program: programView === 'C-L' }" v-on:click="vptz('C-L')">C-L</div>
-                            <div class="button ga-07" v-bind:class="{ preview: previewView === 'C-C', program: programView === 'C-C' }" v-on:click="vptz('C-C')">C-C</div>
-                            <div class="button ga-08" v-bind:class="{ preview: previewView === 'C-R', program: programView === 'C-R' }" v-on:click="vptz('C-R')">C-R</div>
-                            <div class="button ga-09" v-bind:class="{ preview: previewView === 'F-L', program: programView === 'F-L' }" v-on:click="vptz('F-L')">F-L</div>
-                            <div class="button ga-10" v-bind:class="{ preview: previewView === 'F-C', program: programView === 'F-C' }" v-on:click="vptz('F-C')">F-C</div>
-                            <div class="button ga-11" v-bind:class="{ preview: previewView === 'F-R', program: programView === 'F-R' }" v-on:click="vptz('F-R')">F-R</div>
-                            <div class="button ga-12" v-bind:class="{ preview: previewView === 'W-C', program: programView === 'W-C' }" v-on:click="vptz('W-C')">W-C</div>
+                            <div class="button ga-06" v-bind:class="{ preview: previewView === 'C-L', program: programView === 'C-L', disabled: vptzCam === '' }" v-on:click="vptz('C-L')">C-L</div>
+                            <div class="button ga-07" v-bind:class="{ preview: previewView === 'C-C', program: programView === 'C-C', disabled: vptzCam === '' }" v-on:click="vptz('C-C')">C-C</div>
+                            <div class="button ga-08" v-bind:class="{ preview: previewView === 'C-R', program: programView === 'C-R', disabled: vptzCam === '' }" v-on:click="vptz('C-R')">C-R</div>
+                            <div class="button ga-09" v-bind:class="{ preview: previewView === 'F-L', program: programView === 'F-L', disabled: vptzCam === '' }" v-on:click="vptz('F-L')">F-L</div>
+                            <div class="button ga-10" v-bind:class="{ preview: previewView === 'F-C', program: programView === 'F-C', disabled: vptzCam === '' }" v-on:click="vptz('F-C')">F-C</div>
+                            <div class="button ga-11" v-bind:class="{ preview: previewView === 'F-R', program: programView === 'F-R', disabled: vptzCam === '' }" v-on:click="vptz('F-R')">F-R</div>
+                            <div class="button ga-12" v-bind:class="{ preview: previewView === 'W-C', program: programView === 'W-C', disabled: vptzCam === '' }" v-on:click="vptz('W-C')">W-C</div>
                         </div>
                     </div>
                     <div class="control-box control-box-joystick">
@@ -370,24 +370,25 @@
                             border-radius: 0.4vw
                             text-align: center
                             cursor: pointer
+                            &.disabled
+                                background: var(--color-std-bg-3)
+                                color: var(--color-std-fg-1)
+                                cursor: not-allowed
+                            &.disabled:hover
+                                background: var(--color-std-bg-3)
+                                color: var(--color-std-fg-1)
                             &.active
                                 background: var(--color-acc-bg-2)
                                 color: var(--color-acc-fg-2)
                             &.destructive.active
                                 background: var(--color-sig-bg-2)
                                 color: var(--color-sig-fg-2)
-                            &:hover
+                            &:hover:not(.disabled)
                                 background: var(--color-acc-bg-5) !important
-                                color: var(--color-acc-fg-5)
-                            &.destructive:hover
+                                color: var(--color-acc-fg-5) !important
+                            &.destructive:hover:not(.disabled)
                                 background: var(--color-sig-bg-5) !important
-                                color: var(--color-sig-fg-5)
-                            &.disabled
-                                background: var(--color-std-bg-3)
-                                color: var(--color-std-fg-1)
-                            &.disabled:hover
-                                background: var(--color-std-bg-3)
-                                color: var(--color-std-fg-1)
+                                color: var(--color-sig-fg-5) !important
                             .icon
                                 padding-right: 0.5vw
                     .control-grid .ga-01
@@ -459,8 +460,17 @@
                                 background: var(--color-prv-bg)
                                 color: var(--color-prv-fg)
                             &.program.preview
-                                background: var(--color-pnp-bg)
-                                color: var(--color-pnp-fg)
+                                background: var(--color-cb1-bg)
+                                color: var(--color-cb1-fg)
+                            &.active.preview
+                                background: var(--color-cb2-bg)
+                                color: var(--color-cb2-fg)
+                            &.active.program
+                                background: var(--color-cb3-bg)
+                                color: var(--color-cb3-fg)
+                            &.active.preview.program
+                                background: var(--color-cb4-bg)
+                                color: var(--color-cb4-fg)
                     .control-grid-vptz
                         grid-template-columns: 5fr 5fr 5fr 5fr 5fr
                         grid-template-rows:    calc(4fr + 0.5vw) 4fr 4fr 4fr
@@ -483,8 +493,17 @@
                                 background: var(--color-prg-bg)
                                 color: var(--color-prg-fg)
                             &.program.preview
-                                background: var(--color-pnp-bg)
-                                color: var(--color-pnp-fg)
+                                background: var(--color-cb1-bg)
+                                color: var(--color-cb1-fg)
+                            &.active.preview
+                                background: var(--color-cb2-bg)
+                                color: var(--color-cb2-fg)
+                            &.active.program
+                                background: var(--color-cb3-bg)
+                                color: var(--color-cb3-fg)
+                            &.active.preview.program
+                                background: var(--color-cb4-bg)
+                                color: var(--color-cb4-fg)
                     .control-grid-joystick
                         grid-template-columns: 4fr 4fr 4fr 4fr
                         grid-template-rows:    4fr 4fr 4fr 4fr
@@ -557,7 +576,7 @@ export default defineComponent({
         state: StateDefault as StateType,
         pkg,
         ptzMode:     "load",
-        vptzCam:     "",
+        vptzCam:     "1",
         programCam:  "",
         programView: "",
         previewCam:  "",
