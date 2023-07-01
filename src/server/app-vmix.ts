@@ -132,7 +132,7 @@ export default class VMix extends EventEmitter {
             initialized++
             if ((!this.vmix2 && initialized === 1) || (this.vmix2 && initialized === 2)) {
                 initialized = 0
-                this.restoreState()
+                /* this.restoreState() */
             }
         }
         this.vmix1.on("connect", async () => {
