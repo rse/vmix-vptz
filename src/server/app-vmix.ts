@@ -293,7 +293,7 @@ export default class VMix extends EventEmitter {
         this.emit("state-change", cached)
     }
 
-    /*  backup state from vMix  */
+    /*  backup state from vMix (FIXME: NOW UNUSED)  */
     async backupState () {
         /*  index all inputs by name  */
         const index = new Map<string, vMixInput>()
@@ -335,7 +335,7 @@ export default class VMix extends EventEmitter {
                 const ptz = this.cam2ptz.get(cam)
                 if (ptz === undefined)
                     continue
-                this.log.log(2, `vMix: restore/send vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
+                this.log.log(2, `vMix: restore vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
 
                 /*  iterate over all corresponding virtual PTZ...  */
                 const cmds = [] as Array<vMixCommand>

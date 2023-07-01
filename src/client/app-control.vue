@@ -24,8 +24,7 @@
                             <div class="button ga-01" v-on:click="mixer('cut')"><span class="icon"><i class="fa-solid fa-cut"></i></span> CUT</div>
                             <div class="button ga-02" v-on:click="mixer('drive')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> CUT+DRIVE</div>
                             <div class="button ga-03" v-on:click="mixer('apply')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE</div>
-                            <div class="button ga-04 destructive" v-on:click="vmixState('recv')"><span class="icon"><i class="fa-solid fa-download"></i></span> RECV</div>
-                            <div class="button ga-05 destructive" v-on:click="vmixState('send')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SEND</div>
+                            <div class="button ga-05 destructive" v-on:click="vmixState('restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
                         </div>
                     </div>
                     <div class="control-box control-box-ptz">
@@ -358,7 +357,7 @@
                         color: var(--color-std-fg-1)
                         font-size: 1.2vw
                         font-weight: 200
-                        margin-bottom: 1vw
+                        margin-bottom: 0.6vw
                     .control-grid
                         display: grid
                         gap: 0.2vw
