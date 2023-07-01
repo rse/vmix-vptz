@@ -22,8 +22,7 @@
                         <div class="title">MIXER &amp; STATE</div>
                         <div class="control-grid control-grid-global">
                             <div class="button ga-01" v-on:click="mixer('cut')"><span class="icon"><i class="fa-solid fa-cut"></i></span> CUT</div>
-                            <div class="button ga-02" v-on:click="mixer('drive')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> CUT+DRIVE</div>
-                            <div class="button ga-03" v-on:click="mixer('apply')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE</div>
+                            <div class="button ga-02" v-on:click="mixer('drive')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE</div>
                             <div class="button ga-05 destructive" v-on:click="vmixState('restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
                         </div>
                     </div>
