@@ -356,8 +356,8 @@ export default class REST {
                 const op = req.params.op
                 if (op === "cut")
                     await this.vmix.cut()
-                else if (op === "drive" || op === "apply")
-                    await this.vmix.drive(op)
+                else if (op === "drive")
+                    await this.vmix.drive()
                 else
                     return Boom.badRequest("invalid mixer operation")
                 return h.response().code(204)

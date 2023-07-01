@@ -793,7 +793,7 @@ export default class VMix extends EventEmitter {
     }
 
     /*  drive preview into program  */
-    async drive (mode: "apply" | "cut" = "cut") {
+    async drive () {
         /*  determine program and preview inputs  */
         const program = this.active.program.B !== "" ? this.active.program.B : this.active.program.A
         const preview = this.active.preview.B !== "" ? this.active.preview.B : this.active.preview.A
@@ -881,52 +881,33 @@ export default class VMix extends EventEmitter {
         const previewXYZ = await this.state.getVPTZ(previewCam, ptz, previewVPTZ)
         const programXYZ = await this.state.getVPTZ(programCam, ptz, programVPTZ)
 
-        /*  perform drive operation (individual phase 1/2)  */
-        if (mode === "apply") {
-            /*  mode 1: apply VPTZ of preview directly onto program  */
+        /*  remember original VPTZ of preview  */
+        const tempXYZ = cloneXYZ(previewXYZ)
 
-            /*  determine drive path from program to preview  */
-            path = pathCalc(programXYZ, previewXYZ, fps, duration)
+        /*  apply VPTZ of program to preview  */
+        previewXYZ.x    = programXYZ.x
+        previewXYZ.y    = programXYZ.y
+        previewXYZ.zoom = programXYZ.zoom
+        const cmds = [] as Array<vMixCommand>
+        cmds.push({ Function: "SetPanX", Input: preview, Value: previewXYZ.x.toString() })
+        cmds.push({ Function: "SetPanY", Input: preview, Value: previewXYZ.y.toString() })
+        cmds.push({ Function: "SetZoom", Input: preview, Value: previewXYZ.zoom.toString() })
+        this.vmixCommand(this.vmix1, cmds)
+        await AsyncDelay(100)
 
-            /*  apply drive path to program  */
-            input = program
-            cam   = programCam
-            vptz  = programVPTZ
-        }
-        else if (mode === "cut") {
-            /*  mode 2: temporarily apply VPTZ of program to preview,
-                cut preview into program and apply previous VPTZ again  */
+        /*  cut preview into program  */
+        this.vmixCommand(this.vmix2, { Function: "Cut" })
+        await AsyncDelay(50)
 
-            /*  remember original VPTZ of preview  */
-            const tempXYZ = cloneXYZ(previewXYZ)
+        /*  determine drive path from program (which was the preview) to original preview  */
+        path = pathCalc(previewXYZ, tempXYZ, fps, duration)
 
-            /*  apply VPTZ of program to preview  */
-            previewXYZ.x    = programXYZ.x
-            previewXYZ.y    = programXYZ.y
-            previewXYZ.zoom = programXYZ.zoom
-            const cmds = [] as Array<vMixCommand>
-            cmds.push({ Function: "SetPanX", Input: preview, Value: previewXYZ.x.toString() })
-            cmds.push({ Function: "SetPanY", Input: preview, Value: previewXYZ.y.toString() })
-            cmds.push({ Function: "SetZoom", Input: preview, Value: previewXYZ.zoom.toString() })
-            this.vmixCommand(this.vmix1, cmds)
-            await AsyncDelay(100)
+        /*  apply drive path to program (which was the preview)  */
+        input = preview
+        cam   = previewCam
+        vptz  = previewVPTZ
 
-            /*  cut preview into program  */
-            this.vmixCommand(this.vmix2, { Function: "Cut" })
-            await AsyncDelay(50)
-
-            /*  determine drive path from program (which was the preview) to original preview  */
-            path = pathCalc(previewXYZ, tempXYZ, fps, duration)
-
-            /*  apply drive path to program (which was the preview)  */
-            input = preview
-            cam   = previewCam
-            vptz  = previewVPTZ
-        }
-        else
-            throw new Error("invalid drive mode")
-
-        /*  perform drive operation (common phase 2/2)  */
+        /*  perform drive operation  */
         await AsyncLoop(() => {
             if (path.length > 0) {
                 const xyz = path.shift()!
