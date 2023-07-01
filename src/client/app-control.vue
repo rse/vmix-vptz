@@ -31,13 +31,13 @@
                             CAM+PTZ ACTIVATE
                         </div>
                         <div v-if="ptzMode === 'save'" class="title">
-                            CAM+PTZ STORE
+                            CAM+PTZ STORE/UPDATE
                         </div>
                         <div v-if="ptzMode === 'reset'" class="title">
-                            CAM+PTZ RESET
+                            CAM+VPTZ RESET (STD)
                         </div>
                         <div v-if="ptzMode === 'clear'" class="title">
-                            CAM+PTZ CLEAR
+                            CAM+VPTZ RESET (MAX)
                         </div>
                         <div class="control-grid control-grid-ptz">
                             <div class="button ga-01"
