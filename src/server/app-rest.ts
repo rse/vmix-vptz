@@ -286,14 +286,15 @@ export default class REST {
         /*  change PTZ  */
         this.server.route({
             method: "GET",
-            path: "/ptz/{ptz}/{cam}/{op}/{arg}",
+            path: "/ptz/{ptz}/{cam}/{op}/{arg}/{speed}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const cam   = req.params.cam
                 const ptz   = req.params.ptz
                 const op    = req.params.op
                 const arg   = req.params.arg
+                const speed = req.params.speed
                 queue = queue.then(() => {
-                    return this.vmix.changePTZ(cam, ptz, op, arg)
+                    return this.vmix.changePTZ(cam, ptz, op, arg, speed)
                 })
                 return h.response().code(204)
             }
@@ -304,14 +305,15 @@ export default class REST {
         /*  change VPTZ  */
         this.server.route({
             method: "GET",
-            path: "/vptz/{cam}/{vptz}/{op}/{arg}",
+            path: "/vptz/{cam}/{vptz}/{op}/{arg}/{speed}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const cam   = req.params.cam
                 const vptz  = req.params.vptz
                 const op    = req.params.op
                 const arg   = req.params.arg
+                const speed = req.params.speed
                 queue = queue.then(() => {
-                    return this.vmix.changeVPTZ(cam, vptz, op, arg)
+                    return this.vmix.changeVPTZ(cam, vptz, op, arg, speed)
                 })
                 return h.response().code(204)
             }

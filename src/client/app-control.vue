@@ -23,7 +23,7 @@
                         <div class="control-grid control-grid-global">
                             <div class="button ga-01" v-on:click="mixer('cut')"><span class="icon"><i class="fa-solid fa-cut"></i></span> CUT</div>
                             <div class="button ga-02" v-on:click="mixer('drive')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE</div>
-                            <div class="button ga-05 destructive" v-on:click="vmixState('restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
+                            <div class="button ga-05 destructive" v-on:click="(el) => vmixState(el, 'restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
                         </div>
                     </div>
                     <div class="control-box control-box-ptz">
@@ -129,10 +129,10 @@
                     </div>
                     <div class="control-box control-box-joystick">
                         <div v-if="adjustMode === 'ptz'" class="title">
-                            PTZ ADJUST: <span class="context">CAM{{ previewCam }} / {{ previewCam != '' ? state[previewCam].ptz + previewCam : '' }}</span>
+                            PTZ ADJUST: <span class="context">CAM{{ previewCam }} / {{ previewCam != '' ? previewCam + state[previewCam].ptz : '' }}</span>
                         </div>
                         <div v-if="adjustMode === 'vptz'" class="title">
-                            VPTZ ADJUST: <span class="context">CAM{{ previewCam }} / {{ previewCam != '' ? state[previewCam].ptz + previewCam : '' }} / {{ previewView }}</span>
+                            VPTZ ADJUST: <span class="context">CAM{{ previewCam }} / {{ previewCam != '' ? previewCam + state[previewCam].ptz : '' }} / {{ previewView }}</span>
                         </div>
                         <div class="control-grid control-grid-joystick">
                             <div class="button ga-01"
@@ -192,6 +192,26 @@
                             <div class="button ga-14"
                                 v-on:click="joystick('zoom', 'increase')">
                                 <span class="icon"><i class="fa-solid fa-circle-plus"></i></span>
+                            </div>
+                            <div class="button ga-15 destructive"
+                                v-bind:class="{ disabled: adjustMode !== 'ptz' }"
+                                v-on:click="(el) => ptzUpdate(el)">
+                                SAVE
+                            </div>
+                            <div class="button ga-16"
+                                v-bind:class="{ active: adjustSpeed === 'fast' }"
+                                v-on:click="adjustSpeed = 'fast'">
+                                FAST
+                            </div>
+                            <div class="button ga-17"
+                                v-bind:class="{ active: adjustSpeed === 'med' }"
+                                v-on:click="adjustSpeed = 'med'">
+                                MED
+                            </div>
+                            <div class="button ga-18"
+                                v-bind:class="{ active: adjustSpeed === 'slow' }"
+                                v-on:click="adjustSpeed = 'slow'">
+                                SLOW
                             </div>
                         </div>
                     </div>
@@ -416,6 +436,18 @@
                         grid-area: ga-11
                     .control-grid .ga-12
                         grid-area: ga-12
+                    .control-grid .ga-13
+                        grid-area: ga-13
+                    .control-grid .ga-14
+                        grid-area: ga-14
+                    .control-grid .ga-15
+                        grid-area: ga-15
+                    .control-grid .ga-16
+                        grid-area: ga-16
+                    .control-grid .ga-17
+                        grid-area: ga-17
+                    .control-grid .ga-18
+                        grid-area: ga-18
                     .control-grid-global
                         grid-template-columns: calc(1fr + 2vw) 1fr
                         grid-template-rows:    1fr 1fr 1fr
@@ -509,12 +541,12 @@
                                 background: var(--color-cb4-bg)
                                 color: var(--color-cb4-fg)
                     .control-grid-joystick
-                        grid-template-columns: 4fr 4fr 4fr 4fr
+                        grid-template-columns: 4fr 4fr 4fr 4fr 4fr
                         grid-template-rows:    4fr 4fr 4fr 4fr
-                        grid-template-areas:   "ga-01 ga-03 ga-04 ga-05" \
-                            "ga-01 ga-06 ga-07 ga-08" \
-                            "ga-02 ga-09 ga-10 ga-11" \
-                            "ga-02 ga-12 ga-13 ga-14"
+                        grid-template-areas:   "ga-01 ga-03 ga-04 ga-05 ga-15" \
+                            "ga-01 ga-06 ga-07 ga-08 ga-16" \
+                            "ga-02 ga-09 ga-10 ga-11 ga-17" \
+                            "ga-02 ga-12 ga-13 ga-14 ga-18"
                         .button
                             font-size: 1.5vw
                             .icon
@@ -526,8 +558,14 @@
                                 justify-content: center
                                 align-items: center
                                 margin-right: 0.5vw
+                                font-size: 1.0vw
                                 .icon
                                     padding-right: 0
+                            &.ga-15,
+                            &.ga-16,
+                            &.ga-17,
+                            &.ga-18
+                                font-size: 1.0vw
                 .control-box-ptz
                     grid-area: ctrl1
                 .control-box-global
@@ -595,7 +633,8 @@ export default defineComponent({
         programView: "",
         previewCam:  "",
         previewView: "",
-        adjustMode:  "ptz"
+        adjustMode:  "ptz",
+        adjustSpeed: "med"
     }),
     async created () {
     },
@@ -656,22 +695,32 @@ export default defineComponent({
             await this.api(`/vptz/${cam}/${vptz}/select`)
         },
         async joystick (op: string, arg: string) {
-            const cam  = this.previewCam
-            const ptz  = this.state[cam].ptz
-            const vptz = this.previewView
+            const cam   = this.previewCam
+            const ptz   = this.state[cam].ptz
+            const vptz  = this.previewView
+            const speed = this.adjustSpeed
             if (this.adjustMode === "ptz")
-                await this.api(`/ptz/${ptz}/${cam}/${op}/${arg}`)
+                await this.api(`/ptz/${ptz}/${cam}/${op}/${arg}/${speed}`)
             else if (this.adjustMode === "vptz")
-                await this.api(`/vptz/${cam}/${vptz}/${op}/${arg}`)
+                await this.api(`/vptz/${cam}/${vptz}/${op}/${arg}/${speed}`)
         },
         async mixer (op: string) {
             await this.api(`/mixer/${op}`)
         },
-        async vmixState (op: string) {
+        async vmixState (el: MouseEvent, op: string) {
+            const div = (el.target) as HTMLDivElement
+            this.animate(div)
             await this.api(`/state/${op}`)
         },
         async xyz (cam: string, data: { vptz: string, x: number, y: number, zoom: number }) {
             await this.api(`/vptz/${cam}/${data.vptz}/xyz/${data.x}/${data.y}/${data.zoom}`)
+        },
+        async ptzUpdate (el: MouseEvent) {
+            const div = (el.target) as HTMLDivElement
+            this.animate(div)
+            const cam = this.previewCam
+            const ptz = this.state[cam].ptz
+            await this.api(`/ptz/${ptz}/${cam}/save`)
         }
     }
 })

@@ -506,7 +506,7 @@ export default class VMix extends EventEmitter {
     }
 
     /*  change physical PTZ  */
-    async changePTZ (cam: string, ptz: string, op: string, arg: string) {
+    async changePTZ (cam: string, ptz: string, op: string, arg: string, speed: string) {
         /*  sanity check arguments  */
         if (!this.cfg.idCAMs.find((id) => id === cam))
             throw new Error(`invalid CAM id "${cam}"`)
@@ -516,9 +516,9 @@ export default class VMix extends EventEmitter {
             throw new Error("invalid operation")
 
         /*  constants  */
-        const moveSpeed  = 0.5
+        const moveSpeed  = (speed === "fast" ? 1.0 : (speed === "med" ? 0.5 : 0.25))
         const moveTime   = 0.5
-        const zoomSpeed  = 0.5
+        const zoomSpeed  = (speed === "fast" ? 1.0 : (speed === "med" ? 0.5 : 0.25))
         const zoomTime   = 0.5
 
         /*  variables  */
@@ -614,7 +614,7 @@ export default class VMix extends EventEmitter {
     }
 
     /*  change virtual PTZ  */
-    async changeVPTZ (cam: string, vptz: string, op: string, arg: string) {
+    async changeVPTZ (cam: string, vptz: string, op: string, arg: string, speed: string) {
         /*  sanity check arguments  */
         if (!this.cfg.idCAMs.find((id) => id === cam))
             throw new Error(`invalid CAM id "${cam}"`)
@@ -627,8 +627,8 @@ export default class VMix extends EventEmitter {
         const fps        = 30
         const duration   = 500
         const steps      = duration / (1000 / fps)
-        const deltaPan   = 0.05
-        const deltaZoom  = 0.05
+        const deltaPan   = (speed === "fast" ? 0.300 : (speed === "med" ? 0.150 : 0.050))
+        const deltaZoom  = (speed === "fast" ? 0.300 : (speed === "med" ? 0.150 : 0.050))
 
         /*  variables  */
         let cmd1: CMD | null = null
