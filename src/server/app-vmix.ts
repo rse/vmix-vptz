@@ -859,19 +859,20 @@ export default class VMix extends EventEmitter {
                 zoom: src.zoom + ((dst.zoom - src.zoom) / 2)
             }
 
-            /*  calculate mid state resize zoom factor  */
-            while (factor < 1.0) {
-                /*  new proposed zoom  */
-                const Z = mid.zoom * factor
-
+            /*  calculate waypoint state resize zoom factor  */
+            const insideCanvas = (X: number, Y: number, zoom: number) => {
                 /*  project situation on real canvas  */
-                const x = ((W / 2) + (W * (1 / Z) * (-mid.x / 2)) - ((W * (1 / Z)) / 2))
-                const y = ((H / 2) - (H * (1 / Z) * (-mid.y / 2)) - ((H * (1 / Z)) / 2))
-                const w = W * (1 / Z)
-                const h = H * (1 / Z)
+                const x = ((W / 2) + (W * (1 / zoom) * (-X / 2)) - ((W * (1 / zoom)) / 2))
+                const y = ((H / 2) - (H * (1 / zoom) * (-Y / 2)) - ((H * (1 / zoom)) / 2))
+                const w = W * (1 / zoom)
+                const h = H * (1 / zoom)
 
-                /*  if it already fits, keep the zoom factor  */
-                if (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
+                /*  determine whether it fits into canvas  */
+                return (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
+            }
+            while (factor < 1.0) {
+                /*  if mid waypoint already fits, keep this maximum zoom factor  */
+                if (insideCanvas(mid.x, mid.y, mid.zoom * factor))
                     break
 
                 /*  else further reduce zoom by a small step  */
@@ -893,21 +894,22 @@ export default class VMix extends EventEmitter {
             const easeOutCubic   = (x: number) => 1 - Math.pow(1 - x, 3)
             const easeInOutCubic = (x: number) => x < 0.5 ? 4 * Math.pow(x, 3) : 1 - Math.pow(-2 * x + 2, 3) / 2
             const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
+            const easeInOutCirc  = (x: number) => x < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
 
             /*  ease in to mid state  */
             while (i < k) {
-                state.x    = src.x    + ((mid.x    - src.x)    * easeInCubic(i / k, 3))
-                state.y    = src.y    + ((mid.y    - src.y)    * easeInCubic(i / k, 3))
-                state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInOutCubic(i / k, 3))
+                state.x    = src.x    + ((mid.x    - src.x)    * easeInCubic(i / k))
+                state.y    = src.y    + ((mid.y    - src.y)    * easeInCubic(i / k))
+                state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInOutCubic(i / k))
                 path.push(cloneXYZ(state))
                 i++
             }
 
             /*  ease out from mid state  */
             while (i < steps) {
-                state.x    = mid.x    + ((dst.x    - mid.x)    * easeOutCubic((i - k) / k, 3))
-                state.y    = mid.y    + ((dst.y    - mid.y)    * easeOutCubic((i - k) / k, 3))
-                state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeInOutCubic((i - k) / k, 3))
+                state.x    = mid.x    + ((dst.x    - mid.x)    * easeOutCubic((i - k) / k))
+                state.y    = mid.y    + ((dst.y    - mid.y)    * easeOutCubic((i - k) / k))
+                state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeInOutCubic((i - k) / k))
                 path.push(cloneXYZ(state))
                 i++
             }
