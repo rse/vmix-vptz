@@ -713,10 +713,7 @@ export default defineComponent({
             const ptz   = this.state[cam].ptz
             const vptz  = this.previewView
             const speed = this.adjustSpeed
-            if (this.adjustMode === "ptz")
-                await this.api(`/ptz/${ptz}/${cam}/${op}/${arg}/${speed}`)
-            else if (this.adjustMode === "vptz")
-                await this.api(`/vptz/${cam}/${vptz}/${op}/${arg}/${speed}`)
+            await this.api(`/joystick/${this.adjustMode}/${cam}/${ptz}/${vptz}/${op}/${arg}/${speed}`)
         },
         async mixer (op: string, speed = "med") {
             await this.api(`/mixer/${op}/${speed}`)

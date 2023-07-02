@@ -312,18 +312,25 @@ export default class REST {
             }
         })
 
-        /*  change PTZ  */
+        /*  change PTZ/VPTZ (joystick)  */
         this.server.route({
             method: "GET",
-            path: "/ptz/{ptz}/{cam}/{op}/{arg}/{speed}",
+            path: "/joystick/{mode}/{cam}/{ptz}/{vptz}/{op}/{arg}/{speed}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const mode  = req.params.mode
                 const cam   = req.params.cam
                 const ptz   = req.params.ptz
+                const vptz  = req.params.vptz
                 const op    = req.params.op
                 const arg   = req.params.arg
                 const speed = req.params.speed
                 queue = queue.then(() => {
-                    return this.vmix.changePTZ(cam, ptz, op, arg, speed)
+                    if (mode === "ptz")
+                        return this.vmix.changePTZ(cam, ptz, op, arg, speed)
+                    else if (mode === "vptz")
+                        return this.vmix.changeVPTZ(cam, vptz, op, arg, speed)
+                    else
+                        throw new Error("invalid mode")
                 }).catch((err) => {
                     this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
@@ -332,25 +339,6 @@ export default class REST {
         })
 
         /*  ==== Endpoint: VPTZ Adjustment ====  */
-
-        /*  change VPTZ  */
-        this.server.route({
-            method: "GET",
-            path: "/vptz/{cam}/{vptz}/{op}/{arg}/{speed}",
-            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
-                const cam   = req.params.cam
-                const vptz  = req.params.vptz
-                const op    = req.params.op
-                const arg   = req.params.arg
-                const speed = req.params.speed
-                queue = queue.then(() => {
-                    return this.vmix.changeVPTZ(cam, vptz, op, arg, speed)
-                }).catch((err) => {
-                    this.log.log(0, `HAPI: error: ${err.toString()}`)
-                })
-                return h.response().code(204)
-            }
-        })
 
         /*  set VPTZ x/y/zoom  */
         this.server.route({
