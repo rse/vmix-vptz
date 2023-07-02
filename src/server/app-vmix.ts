@@ -176,14 +176,14 @@ export default class VMix extends EventEmitter {
                 this.vmixCommand(this.vmix2, "XML")
         }
         this.vmix1.on("tally", AsyncCallback(async (data: string) => {
-            this.log.log(2, "vMix: received TALLY status on vMix #1")
+            this.log.log(3, "vMix: received TALLY status on vMix #1")
             onTallyStatus("A", data)
         }, (err: Error) => {
             this.log.log(0, `vMix: on tally status of vMix #1: ${err.toString()}`)
         }))
         if (this.vmix2 !== null) {
             this.vmix2.on("tally", AsyncCallback(async (data: string) => {
-                this.log.log(2, "vMix: received TALLY status on vMix #2")
+                this.log.log(3, "vMix: received TALLY status on vMix #2")
                 onTallyStatus("B", data)
             }, (err: Error) => {
                 this.log.log(0, `vMix: on tally status of vMix #2: ${err.toString()}`)
@@ -230,14 +230,14 @@ export default class VMix extends EventEmitter {
             this.notifyState()
         }
         this.vmix1.on("xml", AsyncCallback(async (xml: string) => {
-            this.log.log(2, "vMix: received XML status on vMix #1")
+            this.log.log(3, "vMix: received XML status on vMix #1")
             onXmlStatus("A", xml)
         }, (err: Error) => {
             this.log.log(0, `vMix: on XML status of vMix #1: ${err.toString()}`)
         }))
         if (this.vmix2 !== null) {
             this.vmix2.on("xml", AsyncCallback(async (xml: string) => {
-                this.log.log(2, "vMix: received XML status on vMix #2")
+                this.log.log(3, "vMix: received XML status on vMix #2")
                 onXmlStatus("B", xml)
             }, (err: Error) => {
                 this.log.log(0, `vMix: on XML status of vMix #2: ${err.toString()}`)
