@@ -22,7 +22,9 @@
                         <div class="title">MIXER &amp; STATE</div>
                         <div class="control-grid control-grid-global">
                             <div class="button ga-01" v-on:click="mixer('cut')"><span class="icon"><i class="fa-solid fa-cut"></i></span> CUT</div>
-                            <div class="button ga-02" v-on:click="mixer('drive')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE</div>
+                            <div class="button ga-02" v-on:click="mixer('drive', 'fast')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE <span class="hint">(FAST)</span></div>
+                            <div class="button ga-03" v-on:click="mixer('drive', 'med')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE <span class="hint">(MED)</span></div>
+                            <div class="button ga-04" v-on:click="mixer('drive', 'slow')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE <span class="hint">(SLOW)</span></div>
                             <div class="button ga-05 destructive" v-on:click="(el) => vmixState(el, 'restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
                         </div>
                     </div>
@@ -450,15 +452,26 @@
                         grid-area: ga-18
                     .control-grid-global
                         grid-template-columns: calc(1fr + 2vw) 1fr
-                        grid-template-rows:    1fr 1fr 1fr
-                        grid-template-areas:   "ga-01 ga-04" "ga-02 ga-05" "ga-03 ."
+                        grid-template-rows:    1fr 1fr 1fr 1fr
+                        grid-template-areas:   "ga-01 ga-05" "ga-02 ga-05" "ga-03 ga-05" "ga-04 ga-05"
                         .button
                             font-size: 1.5vw
                             text-align: left
                             &.ga-01,
                             &.ga-02,
-                            &.ga-03
+                            &.ga-03,
+                            &.ga-04
                                 margin-right: 2vw
+                                .hint
+                                    font-weight: 200
+                                    font-size: 1.0vw
+                            &.ga-05
+                                font-size: 2vw
+                                width: 7vw
+                                display: flex
+                                flex-direction: row
+                                justify-content: center
+                                align-items: center
                     .control-grid-ptz
                         grid-template-columns: calc(6fr + 0.5vw) 6fr 6fr 6fr 6fr 6fr 6fr
                         grid-template-rows:    8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr
@@ -705,8 +718,8 @@ export default defineComponent({
             else if (this.adjustMode === "vptz")
                 await this.api(`/vptz/${cam}/${vptz}/${op}/${arg}/${speed}`)
         },
-        async mixer (op: string) {
-            await this.api(`/mixer/${op}`)
+        async mixer (op: string, speed = "med") {
+            await this.api(`/mixer/${op}/${speed}`)
         },
         async vmixState (el: MouseEvent, op: string) {
             const div = (el.target) as HTMLDivElement

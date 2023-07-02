@@ -830,7 +830,7 @@ export default class VMix extends EventEmitter {
     }
 
     /*  drive preview into program  */
-    async drive () {
+    async drive (speed: string) {
         /*  determine program and preview inputs  */
         const program = this.active.program.B !== "" ? this.active.program.B : this.active.program.A
         const preview = this.active.preview.B !== "" ? this.active.preview.B : this.active.preview.A
@@ -905,7 +905,7 @@ export default class VMix extends EventEmitter {
 
         /*  driving configuration  */
         const fps      = 30
-        const duration = 1000
+        const duration = (speed === "fast" ? 1000 : (speed === "mid" ? 2000 : 4000))
 
         /*  driving parameters  */
         let cam   = ""
@@ -940,7 +940,7 @@ export default class VMix extends EventEmitter {
         path = pathCalc(previewXYZ, tempXYZ, fps, duration)
         if (path.length <= 0)
             throw new Error("invalid path calculated")
-        let xyzLast = path[path.length - 1]
+        const xyzLast = path[path.length - 1]
 
         /*  apply drive path to program (which was the preview)  */
         input = preview
