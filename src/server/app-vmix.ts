@@ -111,6 +111,10 @@ export default class VMix extends EventEmitter {
         for (const cam of this.cfg.idCAMs) {
             const ptz = await this.state.getPTZ(cam)
             this.cam2ptz.set(cam, ptz)
+            for (const vptz of this.cfg.idVPTZs) {
+                const xyz = await this.state.getVPTZ(cam, ptz, vptz)
+                this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+            }
         }
 
         /*  establish connection to vMix instance(s)  */
@@ -850,15 +854,15 @@ export default class VMix extends EventEmitter {
         const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 1.5) => {
             /*  calculate mid state  */
             const mid = {
-                x:    src.x    + Math.round((dst.x    - src.x   ) / 2),
-                y:    src.y    + Math.round((dst.y    - src.y   ) / 2),
-                zoom: src.zoom + Math.round((dst.zoom - src.zoom) / 2)
+                x:    src.x    + ((dst.x    - src.x   ) / 2),
+                y:    src.y    + ((dst.y    - src.y   ) / 2),
+                zoom: src.zoom + ((dst.zoom - src.zoom) / 2)
             }
 
             /*  calculate mid state resize factor  */
             while (factor >= 1.0) {
-                const x = mid.x - Math.round(((mid.zoom * W * factor) - mid.zoom * W) / 2)
-                const y = mid.y - Math.round(((mid.zoom * H * factor) - mid.zoom * H) / 2)
+                const x = mid.x - (((mid.zoom * W * factor) - mid.zoom * W) / 2)
+                const y = mid.y - (((mid.zoom * H * factor) - mid.zoom * H) / 2)
                 const w = mid.zoom * W * factor
                 const h = mid.zoom * H * factor
                 if (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
@@ -867,9 +871,9 @@ export default class VMix extends EventEmitter {
             }
 
             /*  resize mid state  */
-            mid.x = mid.x - Math.round(((mid.zoom * W * factor) - mid.zoom * W) / 2)
-            mid.y = mid.y - Math.round(((mid.zoom * H * factor) - mid.zoom * H) / 2)
-            mid.zoom = Math.round(mid.zoom * factor)
+            mid.x = mid.x - (((mid.zoom * W * factor) - mid.zoom * W) / 2)
+            mid.y = mid.y - (((mid.zoom * H * factor) - mid.zoom * H) / 2)
+            mid.zoom = (mid.zoom * factor)
 
             /*  initialize loop  */
             const path = [] as Array<XYZ>
@@ -880,18 +884,18 @@ export default class VMix extends EventEmitter {
 
             /*  ease in to mid state  */
             while (i < k) {
-                state.x    = src.x    + Math.round( (mid.x    - src.x)    * Math.pow(i / k, 3) )
-                state.y    = src.y    + Math.round( (mid.y    - src.y)    * Math.pow(i / k, 3) )
-                state.zoom = src.zoom + Math.round( (mid.zoom - src.zoom) * Math.pow(i / k, 3) )
+                state.x    = src.x    + ( (mid.x    - src.x)    * Math.pow(i / k, 3) )
+                state.y    = src.y    + ( (mid.y    - src.y)    * Math.pow(i / k, 3) )
+                state.zoom = src.zoom + ( (mid.zoom - src.zoom) * Math.pow(i / k, 3) )
                 path.push(cloneXYZ(state))
                 i++
             }
 
             /*  ease out from mid state  */
             while (i < steps) {
-                state.x    = mid.x    + Math.round( (dst.x    - mid.x)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
-                state.y    = mid.y    + Math.round( (dst.y    - mid.y)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
-                state.zoom = mid.zoom + Math.round( (dst.zoom - mid.zoom) * (1 - Math.pow(1 - ((i - k) / k), 3)) )
+                state.x    = mid.x    + ( (dst.x    - mid.x)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
+                state.y    = mid.y    + ( (dst.y    - mid.y)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
+                state.zoom = mid.zoom + ( (dst.zoom - mid.zoom) * (1 - Math.pow(1 - ((i - k) / k), 3)) )
                 path.push(cloneXYZ(state))
                 i++
             }
@@ -934,6 +938,9 @@ export default class VMix extends EventEmitter {
 
         /*  determine drive path from program (which was the preview) to original preview  */
         path = pathCalc(previewXYZ, tempXYZ, fps, duration)
+        if (path.length <= 0)
+            throw new Error("invalid path calculated")
+        let xyzLast = path[path.length - 1]
 
         /*  apply drive path to program (which was the preview)  */
         input = preview
@@ -959,7 +966,7 @@ export default class VMix extends EventEmitter {
                 this.vmixCommand(this.vmix1, cmds)
             }
         }, (cancelled) => {
-            this.state.setVPTZ(cam, ptz, vptz, path[path.length - 1])
+            this.state.setVPTZ(cam, ptz, vptz, xyzLast)
             this.notifyState(false)
         }, { duration, fps })
     }

@@ -206,7 +206,7 @@ export default class REST {
                         notifyData = null
                         notifyState(data)
                     }
-                }, 33 / 2)
+                }, 33)
             }
         })
 
