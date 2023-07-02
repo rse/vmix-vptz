@@ -851,11 +851,12 @@ export default class VMix extends EventEmitter {
         const cloneXYZ = (xyz: XYZ) => ({ ...xyz } as XYZ)
 
         /*  helper functions: easing  */
+        const easeInSine     = (x: number) => 1 - Math.cos((x * Math.PI) / 2)
+        const easeOutSine    = (x: number) => Math.sin((x * Math.PI) / 2)
+        const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
         const easeInCubic    = (x: number) => Math.pow(x, 3)
         const easeOutCubic   = (x: number) => 1 - Math.pow(1 - x, 3)
         const easeInOutCubic = (x: number) => x < 0.5 ? 4 * Math.pow(x, 3) : 1 - Math.pow(-2 * x + 2, 3) / 2
-        const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
-        const easeInOutCirc  = (x: number) => x < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
 
         /*  helper function: determine whether an areas is entirely within the canvas  */
         const insideCanvas = (X: number, Y: number, zoom: number, W: number, H: number) => {
@@ -870,7 +871,7 @@ export default class VMix extends EventEmitter {
         }
 
         /*  helper function: calculate path from source to destination XYZ  */
-        const pathCalcTry = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
+        const pathCalcTry = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75, force = false) => {
             /*  calculate mid state  */
             const mid = {
                 x:    src.x    + ((dst.x    - src.x   ) / 2),
@@ -893,7 +894,7 @@ export default class VMix extends EventEmitter {
                 state.x    = src.x    + ((mid.x    - src.x)    * easeInCubic(i / k))
                 state.y    = src.y    + ((mid.y    - src.y)    * easeInCubic(i / k))
                 state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInOutSine(i / k))
-                if (!insideCanvas(state.x, state.y, state.zoom, W, H))
+                if (!insideCanvas(state.x, state.y, state.zoom, W, H) && !force)
                     return null
                 path.push(cloneXYZ(state))
                 i++
@@ -904,7 +905,7 @@ export default class VMix extends EventEmitter {
                 state.x    = mid.x    + ((dst.x    - mid.x)    * easeOutCubic((i - k) / k))
                 state.y    = mid.y    + ((dst.y    - mid.y)    * easeOutCubic((i - k) / k))
                 state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeInOutSine((i - k) / k))
-                if (!insideCanvas(state.x, state.y, state.zoom, W, H))
+                if (!insideCanvas(state.x, state.y, state.zoom, W, H) && !force)
                     return null
                 path.push(cloneXYZ(state))
                 i++
@@ -919,17 +920,13 @@ export default class VMix extends EventEmitter {
         const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
             let path = null as Array<XYZ> | null
             while (factor < 1.0) {
-                console.log("PATHCALC", factor)
-                path = pathCalcTry(src, dst, fps, duration, W, H, factor)
+                path = pathCalcTry(src, dst, fps, duration, W, H, factor, false)
                 if (path !== null)
                     break
                 factor += 0.001
             }
-            if (path === null) {
-                path = [] as Array<XYZ>
-                path.push(src)
-                path.push(dst)
-            }
+            if (path === null)
+                path = pathCalcTry(src, dst, fps, duration, W, H, 1.0, true)!
             return path
         }
 
