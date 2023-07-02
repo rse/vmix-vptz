@@ -850,8 +850,27 @@ export default class VMix extends EventEmitter {
         /*  helper function: clone a XYZ object  */
         const cloneXYZ = (xyz: XYZ) => ({ ...xyz } as XYZ)
 
+        /*  helper functions: easing  */
+        const easeInCubic    = (x: number) => Math.pow(x, 3)
+        const easeOutCubic   = (x: number) => 1 - Math.pow(1 - x, 3)
+        const easeInOutCubic = (x: number) => x < 0.5 ? 4 * Math.pow(x, 3) : 1 - Math.pow(-2 * x + 2, 3) / 2
+        const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
+        const easeInOutCirc  = (x: number) => x < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
+
+        /*  helper function: determine whether an areas is entirely within the canvas  */
+        const insideCanvas = (X: number, Y: number, zoom: number, W: number, H: number) => {
+            /*  project situation on real canvas  */
+            const x = ((W / 2) + (W * (1 / zoom) * (-X / 2)) - ((W * (1 / zoom)) / 2))
+            const y = ((H / 2) - (H * (1 / zoom) * (-Y / 2)) - ((H * (1 / zoom)) / 2))
+            const w = W * (1 / zoom)
+            const h = H * (1 / zoom)
+
+            /*  determine whether it fits into canvas  */
+            return (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
+        }
+
         /*  helper function: calculate path from source to destination XYZ  */
-        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
+        const pathCalcTry = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
             /*  calculate mid state  */
             const mid = {
                 x:    src.x    + ((dst.x    - src.x   ) / 2),
@@ -859,28 +878,8 @@ export default class VMix extends EventEmitter {
                 zoom: src.zoom + ((dst.zoom - src.zoom) / 2)
             }
 
-            /*  calculate waypoint state resize zoom factor  */
-            const insideCanvas = (X: number, Y: number, zoom: number) => {
-                /*  project situation on real canvas  */
-                const x = ((W / 2) + (W * (1 / zoom) * (-X / 2)) - ((W * (1 / zoom)) / 2))
-                const y = ((H / 2) - (H * (1 / zoom) * (-Y / 2)) - ((H * (1 / zoom)) / 2))
-                const w = W * (1 / zoom)
-                const h = H * (1 / zoom)
-
-                /*  determine whether it fits into canvas  */
-                return (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
-            }
-            while (factor < 1.0) {
-                /*  if mid waypoint already fits, keep this maximum zoom factor  */
-                if (insideCanvas(mid.x, mid.y, mid.zoom * factor))
-                    break
-
-                /*  else further reduce zoom by a small step  */
-                factor += 0.001
-            }
-
-            /*  resize mid state  */
-            mid.zoom = mid.zoom * factor
+            /*  adjust mid state zoom factor  */
+            mid.zoom *= factor
 
             /*  initialize loop  */
             const path = [] as Array<XYZ>
@@ -889,18 +888,13 @@ export default class VMix extends EventEmitter {
             const k = Math.round(steps / 2)
             let i = 0
 
-            /*  easing helper functions  */
-            const easeInCubic    = (x: number) => Math.pow(x, 3)
-            const easeOutCubic   = (x: number) => 1 - Math.pow(1 - x, 3)
-            const easeInOutCubic = (x: number) => x < 0.5 ? 4 * Math.pow(x, 3) : 1 - Math.pow(-2 * x + 2, 3) / 2
-            const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
-            const easeInOutCirc  = (x: number) => x < 0.5 ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2 : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2
-
             /*  ease in to mid state  */
             while (i < k) {
                 state.x    = src.x    + ((mid.x    - src.x)    * easeInCubic(i / k))
                 state.y    = src.y    + ((mid.y    - src.y)    * easeInCubic(i / k))
-                state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInOutCubic(i / k))
+                state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInOutSine(i / k))
+                if (!insideCanvas(state.x, state.y, state.zoom, W, H))
+                    return null
                 path.push(cloneXYZ(state))
                 i++
             }
@@ -909,17 +903,39 @@ export default class VMix extends EventEmitter {
             while (i < steps) {
                 state.x    = mid.x    + ((dst.x    - mid.x)    * easeOutCubic((i - k) / k))
                 state.y    = mid.y    + ((dst.y    - mid.y)    * easeOutCubic((i - k) / k))
-                state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeInOutCubic((i - k) / k))
+                state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeInOutSine((i - k) / k))
+                if (!insideCanvas(state.x, state.y, state.zoom, W, H))
+                    return null
                 path.push(cloneXYZ(state))
                 i++
             }
 
+            /*  always finish with exact destination  */
+            path.push(cloneXYZ(dst))
+            return path
+        }
+
+        /*  helper function: calculate path from source to destination XYZ  */
+        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
+            let path = null as Array<XYZ> | null
+            while (factor < 1.0) {
+                console.log("PATHCALC", factor)
+                path = pathCalcTry(src, dst, fps, duration, W, H, factor)
+                if (path !== null)
+                    break
+                factor += 0.001
+            }
+            if (path === null) {
+                path = [] as Array<XYZ>
+                path.push(src)
+                path.push(dst)
+            }
             return path
         }
 
         /*  driving configuration  */
         const fps      = 30
-        const duration = (speed === "fast" ? 1000 : (speed === "mid" ? 2000 : 4000))
+        const duration = (speed === "fast" ? 2000 : (speed === "med" ? 3000 : 5000))
 
         /*  driving parameters  */
         let cam   = ""
