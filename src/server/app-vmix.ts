@@ -69,6 +69,15 @@ const AsyncLoop = (step: () => void, finish: (cancelled: boolean) => void, _opti
     return { promise, cancel }
 }
 
+/*  asynchronous callback utility  */
+const AsyncCallback = (doAction: (...args: any[]) => Promise<void>, onError: (err: Error) => void) => {
+    return async (...args: any[]) => {
+        doAction(...args).catch((err: Error) => {
+            onError(err)
+        })
+    }
+}
+
 /*  the vMix management class  */
 export default class VMix extends EventEmitter {
     /*  internals  */
@@ -135,21 +144,25 @@ export default class VMix extends EventEmitter {
                 /* this.restoreState() */
             }
         }
-        this.vmix1.on("connect", async () => {
+        this.vmix1.on("connect", AsyncCallback(async () => {
             this.log.log(2, "vMix: connection established to vMix #1")
             await AsyncDelay(100)
             this.vmixCommand(this.vmix1, "XML")
             this.vmixCommand(this.vmix1, "SUBSCRIBE TALLY")
             onConnect()
-        })
+        }, (err: Error) => {
+            this.log.log(0, `vMix: on connect to vMix #1: ${err.toString()}`)
+        }))
         if (this.vmix2 !== null) {
-            this.vmix2.on("connect", async () => {
+            this.vmix2.on("connect", AsyncCallback(async () => {
                 this.log.log(2, "vMix: connection established to vMix #2")
                 await AsyncDelay(100)
                 this.vmixCommand(this.vmix2, "XML")
                 this.vmixCommand(this.vmix2, "SUBSCRIBE TALLY")
                 onConnect()
-            })
+            }, (err: Error) => {
+                this.log.log(0, `vMix: on connect to vMix #2: ${err.toString()}`)
+            }))
         }
 
         /*  react on custom TALLY events  */
@@ -162,15 +175,19 @@ export default class VMix extends EventEmitter {
             if (this.vmix2 !== null)
                 this.vmixCommand(this.vmix2, "XML")
         }
-        this.vmix1.on("tally", (data: string) => {
+        this.vmix1.on("tally", AsyncCallback(async (data: string) => {
             this.log.log(2, "vMix: received TALLY status on vMix #1")
             onTallyStatus("A", data)
-        })
+        }, (err: Error) => {
+            this.log.log(0, `vMix: on tally status of vMix #1: ${err.toString()}`)
+        }))
         if (this.vmix2 !== null) {
-            this.vmix2.on("tally", (data: string) => {
+            this.vmix2.on("tally", AsyncCallback(async (data: string) => {
                 this.log.log(2, "vMix: received TALLY status on vMix #2")
                 onTallyStatus("B", data)
-            })
+            }, (err: Error) => {
+                this.log.log(0, `vMix: on tally status of vMix #2: ${err.toString()}`)
+            }))
         }
 
         /*  react on custom XML events  */
@@ -212,15 +229,19 @@ export default class VMix extends EventEmitter {
 
             this.notifyState()
         }
-        this.vmix1.on("xml", (xml: string) => {
+        this.vmix1.on("xml", AsyncCallback(async (xml: string) => {
             this.log.log(2, "vMix: received XML status on vMix #1")
             onXmlStatus("A", xml)
-        })
+        }, (err: Error) => {
+            this.log.log(0, `vMix: on XML status of vMix #1: ${err.toString()}`)
+        }))
         if (this.vmix2 !== null) {
-            this.vmix2.on("xml", (xml: string) => {
+            this.vmix2.on("xml", AsyncCallback(async (xml: string) => {
                 this.log.log(2, "vMix: received XML status on vMix #2")
                 onXmlStatus("B", xml)
-            })
+            }, (err: Error) => {
+                this.log.log(0, `vMix: on XML status of vMix #2: ${err.toString()}`)
+            }))
         }
 
         /*  react on standard socket close events  */
