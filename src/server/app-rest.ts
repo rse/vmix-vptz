@@ -196,7 +196,7 @@ export default class REST {
             const msg = JSON.stringify({ cmd: "STATE", arg: { state } })
             for (const info of wsPeers.values()) {
                 if (info.cam === "all" || cams.get(info.cam) === true) {
-                    this.log.log(2, `WebSocket: notify: peer=${info.peer} cam=${info.cam}`)
+                    this.log.log(3, `WebSocket: notify: peer=${info.peer} cam=${info.cam}`)
                     if (info.ws.readyState === WebSocket.OPEN)
                         info.ws.send(msg)
                 }
