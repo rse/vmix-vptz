@@ -888,20 +888,26 @@ export default class VMix extends EventEmitter {
             const k = Math.round(steps / 2)
             let i = 0
 
+            /*  easing helper functions  */
+            const easeInCubic    = (x: number) => Math.pow(x, 3)
+            const easeOutCubic   = (x: number) => 1 - Math.pow(1 - x, 3)
+            const easeInOutCubic = (x: number) => x < 0.5 ? 4 * Math.pow(x, 3) : 1 - Math.pow(-2 * x + 2, 3) / 2
+            const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
+
             /*  ease in to mid state  */
             while (i < k) {
-                state.x    = src.x    + ( (mid.x    - src.x)    * Math.pow(i / k, 3) )
-                state.y    = src.y    + ( (mid.y    - src.y)    * Math.pow(i / k, 3) )
-                state.zoom = src.zoom + ( (mid.zoom - src.zoom) * Math.pow(i / k, 3) )
+                state.x    = src.x    + ((mid.x    - src.x)    * easeInCubic(i / k, 3))
+                state.y    = src.y    + ((mid.y    - src.y)    * easeInCubic(i / k, 3))
+                state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInOutCubic(i / k, 3))
                 path.push(cloneXYZ(state))
                 i++
             }
 
             /*  ease out from mid state  */
             while (i < steps) {
-                state.x    = mid.x    + ( (dst.x    - mid.x)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
-                state.y    = mid.y    + ( (dst.y    - mid.y)    * (1 - Math.pow(1 - ((i - k) / k), 3)) )
-                state.zoom = mid.zoom + ( (dst.zoom - mid.zoom) * (1 - Math.pow(1 - ((i - k) / k), 3)) )
+                state.x    = mid.x    + ((dst.x    - mid.x)    * easeOutCubic((i - k) / k, 3))
+                state.y    = mid.y    + ((dst.y    - mid.y)    * easeOutCubic((i - k) / k, 3))
+                state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeInOutCubic((i - k) / k, 3))
                 path.push(cloneXYZ(state))
                 i++
             }
