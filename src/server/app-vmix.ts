@@ -879,7 +879,7 @@ export default class VMix extends EventEmitter {
             }
 
             /*  resize mid state  */
-            mid.zoom = (mid.zoom * factor)
+            mid.zoom = mid.zoom * factor
 
             /*  initialize loop  */
             const path = [] as Array<XYZ>
