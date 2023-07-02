@@ -851,7 +851,7 @@ export default class VMix extends EventEmitter {
         const cloneXYZ = (xyz: XYZ) => ({ ...xyz } as XYZ)
 
         /*  helper function: calculate path from source to destination XYZ  */
-        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 1.5) => {
+        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
             /*  calculate mid state  */
             const mid = {
                 x:    src.x    + ((dst.x    - src.x   ) / 2),
@@ -859,20 +859,30 @@ export default class VMix extends EventEmitter {
                 zoom: src.zoom + ((dst.zoom - src.zoom) / 2)
             }
 
-            /*  calculate mid state resize factor  */
-            while (factor >= 1.0) {
-                const x = mid.x - (((mid.zoom * W * factor) - mid.zoom * W) / 2)
-                const y = mid.y - (((mid.zoom * H * factor) - mid.zoom * H) / 2)
-                const w = mid.zoom * W * factor
-                const h = mid.zoom * H * factor
+            /*  calculate mid state resize zoom factor  */
+            while (factor < 1.0) {
+                /*  new proposed zoom  */
+                const Z = mid.zoom * factor
+
+                /*  project situation on real canvas  */
+                const x = ((W / 2) +
+                    (W * (1 / Z) * (-mid.x / 2)) -
+                    ((W * (1 / Z)) / 2))
+                const y = ((H / 2) -
+                    (H * (1 / Z) * (-mid.y / 2)) -
+                    ((H * (1 / Z)) / 2))
+                const w = W * (1 / Z)
+                const h = H * (1 / Z)
+
+                /*  if it still fits, keep the zoom factor  */
                 if (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
                     break
-                factor -= 0.01
+
+                /*  else further reduce zoom by a small step  */
+                factor += 0.001
             }
 
             /*  resize mid state  */
-            mid.x = mid.x - (((mid.zoom * W * factor) - mid.zoom * W) / 2)
-            mid.y = mid.y - (((mid.zoom * H * factor) - mid.zoom * H) / 2)
             mid.zoom = (mid.zoom * factor)
 
             /*  initialize loop  */
