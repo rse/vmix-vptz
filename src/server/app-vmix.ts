@@ -850,7 +850,7 @@ export default class VMix extends EventEmitter {
         /*  helper function: clone a XYZ object  */
         const cloneXYZ = (xyz: XYZ) => ({ ...xyz } as XYZ)
 
-        /*  helper functions: easing  */
+        /*  helper functions: easings  */
         const easeInSine     = (x: number) => 1 - Math.cos((x * Math.PI) / 2)
         const easeOutSine    = (x: number) => Math.sin((x * Math.PI) / 2)
         const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
@@ -860,17 +860,17 @@ export default class VMix extends EventEmitter {
 
         /*  helper function: determine whether an areas is entirely within the canvas  */
         const insideCanvas = (X: number, Y: number, zoom: number, W: number, H: number) => {
-            /*  project situation on real canvas  */
+            /*  project area onto real canvas  */
             const x = ((W / 2) + (W * (1 / zoom) * (-X / 2)) - ((W * (1 / zoom)) / 2))
             const y = ((H / 2) - (H * (1 / zoom) * (-Y / 2)) - ((H * (1 / zoom)) / 2))
             const w = W * (1 / zoom)
             const h = H * (1 / zoom)
 
-            /*  determine whether it fits into canvas  */
+            /*  determine whether area it fits into canvas  */
             return (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
         }
 
-        /*  helper function: calculate path from source to destination XYZ  */
+        /*  helper function: calculate path from source to destination XYZ (try the mid zoom factor)  */
         const pathCalcTry = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75, force = false) => {
             /*  calculate mid state  */
             const mid = {
@@ -919,14 +919,19 @@ export default class VMix extends EventEmitter {
         /*  helper function: calculate path from source to destination XYZ  */
         const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
             let path = null as Array<XYZ> | null
+
+            /*  try to find a reasonable path with a potentially increased zoom factor (up to 1.0)  */
             while (factor < 1.0) {
                 path = pathCalcTry(src, dst, fps, duration, W, H, factor, false)
                 if (path !== null)
                     break
                 factor += 0.001
             }
+
+            /*  fallback: forced path at zoom factor 1.0  */
             if (path === null)
                 path = pathCalcTry(src, dst, fps, duration, W, H, 1.0, true)!
+
             return path
         }
 
@@ -965,8 +970,6 @@ export default class VMix extends EventEmitter {
 
         /*  determine drive path from program (which was the preview) to original preview  */
         path = pathCalc(previewXYZ, tempXYZ, fps, duration)
-        if (path.length <= 0)
-            throw new Error("invalid path calculated")
         const xyzLast = path[path.length - 1]
 
         /*  apply drive path to program (which was the preview)  */
