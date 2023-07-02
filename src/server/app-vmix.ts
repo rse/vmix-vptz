@@ -865,16 +865,12 @@ export default class VMix extends EventEmitter {
                 const Z = mid.zoom * factor
 
                 /*  project situation on real canvas  */
-                const x = ((W / 2) +
-                    (W * (1 / Z) * (-mid.x / 2)) -
-                    ((W * (1 / Z)) / 2))
-                const y = ((H / 2) -
-                    (H * (1 / Z) * (-mid.y / 2)) -
-                    ((H * (1 / Z)) / 2))
+                const x = ((W / 2) + (W * (1 / Z) * (-mid.x / 2)) - ((W * (1 / Z)) / 2))
+                const y = ((H / 2) - (H * (1 / Z) * (-mid.y / 2)) - ((H * (1 / Z)) / 2))
                 const w = W * (1 / Z)
                 const h = H * (1 / Z)
 
-                /*  if it still fits, keep the zoom factor  */
+                /*  if it already fits, keep the zoom factor  */
                 if (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
                     break
 
