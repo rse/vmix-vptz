@@ -112,7 +112,7 @@ export default defineComponent({
             this.log("ERROR", "failed to state")
 
         /*  establish server connection  */
-        const ws = new RecWebSocket(this.wsURL + "/control", [], {
+        const ws = new RecWebSocket(this.wsURL + `/${this.mode}/${this.options.cam ?? "all"}`, [], {
             reconnectionDelayGrowFactor: 1.3,
             maxReconnectionDelay:        4000,
             minReconnectionDelay:        1000,

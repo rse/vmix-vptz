@@ -20,6 +20,7 @@ import WebSocket      from "ws"
 import Pkg            from "./app-pkg"
 import Argv           from "./app-argv"
 import Log            from "./app-log"
+import Cfg            from "./app-cfg"
 import VMix           from "./app-vmix"
 
 import { StateType }  from "../common/app-state"
@@ -31,6 +32,7 @@ export default class REST {
         private pkg:    Pkg,
         private argv:   Argv,
         private log:    Log,
+        private cfg:    Cfg,
         private vmix:   VMix
     ) {}
 
@@ -123,7 +125,8 @@ export default class REST {
             ctx:  wsPeerCtx
             ws:   WebSocket
             req:  http.IncomingMessage
-            peer: string
+            peer: string,
+            cam:  string
         }
         const wsPeers = new Map<string, wsPeerInfo>()
         const stats = {
@@ -131,7 +134,7 @@ export default class REST {
         }
         this.server.route({
             method: "POST",
-            path:   "/ws/{peer}",
+            path:   "/ws/{peer}/{cam}",
             options: {
                 plugins: {
                     websocket: {
@@ -143,26 +146,29 @@ export default class REST {
                             const ctx: wsPeerCtx            = args.ctx
                             const ws:  WebSocket            = args.ws
                             const req: http.IncomingMessage = args.req
-                            const m = req.url?.match(/^\/ws\/(control|overlay)$/) ?? null
+                            console.log(req.url)
+                            const m = req.url?.match(/^\/ws\/(control|overlay)\/(.+)$/) ?? null
                             const peer = m !== null ? m[1] : "unknown"
+                            const cam  = m !== null ? m[2] : "all"
                             const id = `${req.socket.remoteAddress}:${req.socket.remotePort}`
                             ctx.id = id
-                            wsPeers.set(id, { ctx, ws, req, peer })
+                            wsPeers.set(id, { ctx, ws, req, peer, cam })
                             if (stats.peers[peer] === undefined)
                                 stats.peers[peer] = 0
                             stats.peers[peer]++
-                            this.log.log(2, `WebSocket: connect: remote=${id}`)
+                            this.log.log(2, `WebSocket: connect: remote=${id} peer=${peer} cam=${cam}`)
                         },
 
                         /*  on WebSocket connection close  */
                         disconnect: (args: any) => {
                             const ctx: wsPeerCtx = args.ctx
                             const id = ctx.id
-                            const peer = wsPeers.get(id)?.peer ?? ""
+                            const peer = wsPeers.get(id)?.peer ?? "unknown"
+                            const cam  = wsPeers.get(id)?.cam  ?? "all"
                             if (stats.peers[peer] !== undefined)
                                 stats.peers[peer]--
                             wsPeers.delete(id)
-                            this.log.log(2, `WebSocket: disconnect: remote=${id}`)
+                            this.log.log(2, `WebSocket: disconnect: remote=${id} peer=${peer} cam=${cam}`)
                         }
                     }
                 }
@@ -186,25 +192,40 @@ export default class REST {
         })
 
         /*  notify clients about state  */
-        const notifyState = (state: StateType) => {
+        const notifyState = (state: StateType, cams: Map<string, boolean>) => {
             const msg = JSON.stringify({ cmd: "STATE", arg: { state } })
-            for (const info of wsPeers.values())
-                if (info.ws.readyState === WebSocket.OPEN)
-                    info.ws.send(msg)
+            for (const info of wsPeers.values()) {
+                if (info.cam === "all" || cams.get(info.cam) === true) {
+                    this.log.log(2, `WebSocket: notify: peer=${info.peer} cam=${info.cam}`)
+                    if (info.ws.readyState === WebSocket.OPEN)
+                        info.ws.send(msg)
+                }
+            }
         }
 
         /*  forward state changes to clients  */
         let notifyTimer: ReturnType<typeof setTimeout> | null = null
         let notifyData:  StateType | null = null
-        this.vmix.on("state-change", async (cached = false) => {
+        let notifyCams = new Map<string, boolean>()
+        this.vmix.on("state-change", async ({ cached = false, cams = "*" }) => {
+            for (const cam of cams.split(",")) {
+                if (cam === "*") {
+                    for (const c of this.cfg.idCAMs)
+                        notifyCams.set(c, true)
+                }
+                else
+                    notifyCams.set(cam, true)
+            }
             notifyData = await this.vmix.getState(cached)
             if (notifyTimer === null) {
                 notifyTimer = setTimeout(() => {
                     notifyTimer = null
                     if (notifyData !== null) {
                         const data = notifyData
+                        const cams = notifyCams
                         notifyData = null
-                        notifyState(data)
+                        notifyCams = new Map<string, boolean>()
+                        notifyState(data, cams)
                     }
                 }, 33 * 2)
             }

@@ -231,7 +231,7 @@ export default class VMix extends EventEmitter {
             n = XPath.select1("/vmix/preview/text()", doc).toString()
             this.active.preview[instance] = this.inputs.get(`${instance}:${n}`)?.name ?? ""
 
-            this.notifyState()
+            this.notifyState(false, "all")
         }
         this.vmix1.on("xml", AsyncCallback(async (xml: string) => {
             this.log.log(3, "vMix: received XML status on vMix #1")
@@ -307,15 +307,11 @@ export default class VMix extends EventEmitter {
                 }
             }
         }
-        /*
-        state["2"].vptz["C-C"].preview = true // FIXME: Temporary Hack
-        state["3"].vptz["W-C"].program = true // FIXME: Temporary Hack
-        */
         return state
     }
 
-    notifyState (cached = false) {
-        this.emit("state-change", cached)
+    notifyState (cached = false, cams = "all") {
+        this.emit("state-change", { cached, cams })
     }
 
     /*  backup state from vMix (FIXME: NOW UNUSED)  */
@@ -421,7 +417,7 @@ export default class VMix extends EventEmitter {
             this.vmixCommand(this.vmix1, cmds)
         })
 
-        this.notifyState()
+        this.notifyState(false, cam)
     }
 
     /*  store all physical PTZ of a camera  */
@@ -484,7 +480,7 @@ export default class VMix extends EventEmitter {
             }
             this.vmixCommand(this.vmix1, cmds)
         })
-        this.notifyState()
+        this.notifyState(false, cam)
     }
 
     /*  clear all physical PTZ of a camera  */
@@ -517,7 +513,7 @@ export default class VMix extends EventEmitter {
             }
             this.vmixCommand(this.vmix1, cmds)
         })
-        this.notifyState()
+        this.notifyState(false, cam)
     }
 
     /*  send command to vMix  */
@@ -765,11 +761,11 @@ export default class VMix extends EventEmitter {
                 mod1(xyz)
             if (mod2 !== null && xyz !== undefined)
                 mod2(xyz)
-            this.notifyState(true)
+            this.notifyState(true, cam)
         }, (cancelled) => {
             if (xyz !== undefined)
                 this.state.setVPTZ(cam, ptz, vptz, xyz)
-            this.notifyState(false)
+            this.notifyState(false, cam)
         }, { duration, fps })
     }
 
@@ -808,7 +804,7 @@ export default class VMix extends EventEmitter {
         this.vmixCommand(this.vmix1, cmds)
 
         /*  notify clients  */
-        this.notifyState(false)
+        this.notifyState(false, cam)
     }
 
     /*  select virtual PTZ for preview  */
@@ -821,12 +817,14 @@ export default class VMix extends EventEmitter {
 
         /*  send input to preview  */
         const input = this.cfg.inputNameVPTZ(cam, vptz)
-        await this.vmixCommand(this.vmix2, { Function: "PreviewInput", Input: input })
+        const vmix = this.vmix2 !== null ? this.vmix2 : this.vmix1
+        await this.vmixCommand(vmix, { Function: "PreviewInput", Input: input })
     }
 
     /*  cut preview into program  */
     async cut () {
-        await this.vmixCommand(this.vmix2, { Function: "Cut" })
+        const vmix = this.vmix2 !== null ? this.vmix2 : this.vmix1
+        await this.vmixCommand(vmix, { Function: "Cut" })
     }
 
     /*  drive preview into program  */
@@ -965,7 +963,8 @@ export default class VMix extends EventEmitter {
         await AsyncDelay(100)
 
         /*  cut preview into program  */
-        this.vmixCommand(this.vmix2, { Function: "Cut" })
+        const vmix = this.vmix2 !== null ? this.vmix2 : this.vmix1
+        this.vmixCommand(vmix, { Function: "Cut" })
         await AsyncDelay(50)
 
         /*  determine drive path from program (which was the preview) to original preview  */
@@ -986,7 +985,7 @@ export default class VMix extends EventEmitter {
                 const cam  = this.cfg.camOfInputName(input)
                 const vptz = this.cfg.vptzOfInputName(input)
                 this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
-                this.notifyState(true)
+                this.notifyState(true, cam)
 
                 /*  change vMix  */
                 const cmds = [] as Array<vMixCommand>
@@ -997,7 +996,7 @@ export default class VMix extends EventEmitter {
             }
         }, (cancelled) => {
             this.state.setVPTZ(cam, ptz, vptz, xyzLast)
-            this.notifyState(false)
+            this.notifyState(false, cam)
         }, { duration, fps })
     }
 }
