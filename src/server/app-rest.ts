@@ -206,7 +206,7 @@ export default class REST {
                         notifyData = null
                         notifyState(data)
                     }
-                }, 33)
+                }, 33 * 2)
             }
         })
 
@@ -357,10 +357,16 @@ export default class REST {
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const op    = req.params.op
                 const speed = req.params.speed
-                if (op === "cut")
-                    await this.vmix.cut()
-                else if (op === "drive")
-                    await this.vmix.drive(speed)
+                if (op === "cut") {
+                    queue = queue.then(() => {
+                        return this.vmix.cut()
+                    })
+                }
+                else if (op === "drive") {
+                    queue = queue.then(() => {
+                        return this.vmix.drive(speed)
+                    })
+                }
                 else
                     return Boom.badRequest("invalid mixer operation")
                 return h.response().code(204)
