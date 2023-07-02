@@ -710,10 +710,9 @@ export default defineComponent({
         },
         async joystick (op: string, arg: string) {
             const cam   = this.previewCam
-            const ptz   = this.state[cam].ptz
-            const vptz  = this.previewView
+            const vptz  = this.adjustMode === "vptz" ? this.previewView : "-"
             const speed = this.adjustSpeed
-            await this.api(`/joystick/${this.adjustMode}/${cam}/${ptz}/${vptz}/${op}/${arg}/${speed}`)
+            await this.api(`/joystick/${this.adjustMode}/${cam}/${vptz}/${op}/${arg}/${speed}`)
         },
         async mixer (op: string, speed = "med") {
             await this.api(`/mixer/${op}/${speed}`)

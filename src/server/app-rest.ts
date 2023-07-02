@@ -315,18 +315,17 @@ export default class REST {
         /*  change PTZ/VPTZ (joystick)  */
         this.server.route({
             method: "GET",
-            path: "/joystick/{mode}/{cam}/{ptz}/{vptz}/{op}/{arg}/{speed}",
+            path: "/joystick/{mode}/{cam}/{vptz}/{op}/{arg}/{speed}",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const mode  = req.params.mode
                 const cam   = req.params.cam
-                const ptz   = req.params.ptz
                 const vptz  = req.params.vptz
                 const op    = req.params.op
                 const arg   = req.params.arg
                 const speed = req.params.speed
                 queue = queue.then(() => {
                     if (mode === "ptz")
-                        return this.vmix.changePTZ(cam, ptz, op, arg, speed)
+                        return this.vmix.changePTZ(cam, op, arg, speed)
                     else if (mode === "vptz")
                         return this.vmix.changeVPTZ(cam, vptz, op, arg, speed)
                     else

@@ -527,12 +527,10 @@ export default class VMix extends EventEmitter {
     }
 
     /*  change physical PTZ  */
-    async changePTZ (cam: string, ptz: string, op: string, arg: string, speed: string) {
+    async changePTZ (cam: string, op: string, arg: string, speed: string) {
         /*  sanity check arguments  */
         if (!this.cfg.idCAMs.find((id) => id === cam))
             throw new Error(`invalid CAM id "${cam}"`)
-        if (!this.cfg.idPTZs.find((id) => id === ptz))
-            throw new Error(`invalid PTZ id "${ptz}"`)
         if (op !== "pan" && op !== "zoom")
             throw new Error("invalid operation")
 
@@ -615,6 +613,9 @@ export default class VMix extends EventEmitter {
         }
         else
             throw new Error("invalid operation")
+
+        /*  determine physical PTZ of camera  */
+        const ptz = this.cam2ptz.get(cam) ?? this.cfg.idPTZs[0]
 
         /*  determine and execute first vMix command  */
         const inputCAM = this.cfg.inputNamePTZ(cam, ptz)
