@@ -240,6 +240,8 @@ export default class REST {
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 queue = queue.then(() => {
                     return this.vmix.backupState()
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -252,6 +254,8 @@ export default class REST {
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 queue = queue.then(() => {
                     return this.vmix.restoreState()
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -277,6 +281,8 @@ export default class REST {
                         return this.vmix.resetPTZAll(ptz)
                     else if (mode === "clear")
                         return this.vmix.clearPTZAll(ptz)
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -299,6 +305,8 @@ export default class REST {
                         return this.vmix.resetPTZCam(ptz, cam)
                     else if (mode === "clear")
                         return this.vmix.clearPTZCam(ptz, cam)
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -316,6 +324,8 @@ export default class REST {
                 const speed = req.params.speed
                 queue = queue.then(() => {
                     return this.vmix.changePTZ(cam, ptz, op, arg, speed)
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -335,6 +345,8 @@ export default class REST {
                 const speed = req.params.speed
                 queue = queue.then(() => {
                     return this.vmix.changeVPTZ(cam, vptz, op, arg, speed)
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -352,6 +364,8 @@ export default class REST {
                 const zoom  = parseFloat(req.params.zoom)
                 queue = queue.then(() => {
                     return this.vmix.xyzVPTZ(cam, vptz, x, y, zoom)
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -366,6 +380,8 @@ export default class REST {
                 const vptz  = req.params.vptz
                 queue = queue.then(() => {
                     return this.vmix.selectVPTZ(cam, vptz)
+                }).catch((err) => {
+                    this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
                 return h.response().code(204)
             }
@@ -381,11 +397,15 @@ export default class REST {
                 if (op === "cut") {
                     queue = queue.then(() => {
                         return this.vmix.cut()
+                    }).catch((err) => {
+                        this.log.log(0, `HAPI: error: ${err.toString()}`)
                     })
                 }
                 else if (op === "drive") {
                     queue = queue.then(() => {
                         return this.vmix.drive(speed)
+                    }).catch((err) => {
+                        this.log.log(0, `HAPI: error: ${err.toString()}`)
                     })
                 }
                 else
