@@ -613,12 +613,14 @@ export default class VMix extends EventEmitter {
             else
                 throw new Error("invalid argument")
         }
+        else
+            throw new Error("invalid operation")
 
         /*  determine and execute first vMix command  */
         const inputCAM = this.cfg.inputNamePTZ(cam, ptz)
-        const vmixCmd1 = { Function: cmd1!.f, Input: inputCAM } as vMixCommand
-        if (cmd1!.v !== undefined && cmd1!.v !== "")
-            vmixCmd1.Value = cmd1!.v
+        const vmixCmd1 = { Function: cmd1.f, Input: inputCAM } as vMixCommand
+        if (cmd1.v !== undefined && cmd1.v !== "")
+            vmixCmd1.Value = cmd1.v
         await this.vmixCommand(this.vmix1, vmixCmd1)
 
         /*  determine and execute optional delay  */
@@ -627,9 +629,9 @@ export default class VMix extends EventEmitter {
 
         /*  determine and execute optional second vMix command  */
         if (cmd2 !== null) {
-            const vmixCmd2 = { Function: cmd2!.f, Input: inputCAM } as vMixCommand
-            if (cmd2!.v !== undefined && cmd2!.v !== "")
-                vmixCmd2.Value = cmd2!.v
+            const vmixCmd2 = { Function: cmd2.f, Input: inputCAM } as vMixCommand
+            if (cmd2.v !== undefined && cmd2.v !== "")
+                vmixCmd2.Value = cmd2.v
             await this.vmixCommand(this.vmix1, vmixCmd2)
         }
 
@@ -732,11 +734,13 @@ export default class VMix extends EventEmitter {
             else
                 throw new Error("invalid argument")
         }
+        else
+            throw new Error("invalid operation")
 
         /*  determine vMix commands  */
         const input = this.cfg.inputNameVPTZ(cam, vptz)
         const cmds = [] as Array<vMixCommand>
-        cmds.push({ Function: cmd1!.f, Input: input, Value: cmd1!.v })
+        cmds.push({ Function: cmd1.f, Input: input, Value: cmd1.v })
         if (cmd2 !== null)
             cmds.push({ Function: cmd2.f, Input: input, Value: cmd2.v })
 
@@ -753,12 +757,14 @@ export default class VMix extends EventEmitter {
         /*  finally perform VPTZ adjustment operation  */
         await AsyncLoop(async () => {
             this.vmixCommand(this.vmix1, cmds)
-            mod1!(xyz!)
-            if (mod2 !== null)
-                mod2!(xyz!)
+            if (mod1 !== null && xyz !== undefined)
+                mod1(xyz)
+            if (mod2 !== null && xyz !== undefined)
+                mod2(xyz)
             this.notifyState(true)
         }, (cancelled) => {
-            this.state.setVPTZ(cam, ptz, vptz, xyz!)
+            if (xyz !== undefined)
+                this.state.setVPTZ(cam, ptz, vptz, xyz)
             this.notifyState(false)
         }, { duration, fps })
     }

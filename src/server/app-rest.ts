@@ -143,7 +143,7 @@ export default class REST {
                             const ctx: wsPeerCtx            = args.ctx
                             const ws:  WebSocket            = args.ws
                             const req: http.IncomingMessage = args.req
-                            const m = req.url!.match(/^\/ws\/(control|overlay)$/)
+                            const m = req.url?.match(/^\/ws\/(control|overlay)$/) ?? null
                             const peer = m !== null ? m[1] : "unknown"
                             const id = `${req.socket.remoteAddress}:${req.socket.remotePort}`
                             ctx.id = id
@@ -158,7 +158,7 @@ export default class REST {
                         disconnect: (args: any) => {
                             const ctx: wsPeerCtx = args.ctx
                             const id = ctx.id
-                            const peer = wsPeers.get(id)!.peer
+                            const peer = wsPeers.get(id)?.peer ?? ""
                             if (stats.peers[peer] !== undefined)
                                 stats.peers[peer]--
                             wsPeers.delete(id)
@@ -196,7 +196,7 @@ export default class REST {
         /*  forward state changes to clients  */
         let notifyTimer: ReturnType<typeof setTimeout> | null = null
         let notifyData:  StateType | null = null
-        this.vmix!.on("state-change", async (cached = false) => {
+        this.vmix.on("state-change", async (cached = false) => {
             notifyData = await this.vmix.getState(cached)
             if (notifyTimer === null) {
                 notifyTimer = setTimeout(() => {
@@ -369,11 +369,14 @@ export default class REST {
 
     async start () {
         /*  start service  */
-        await this.server!.start()
-        this.log.log(2, `started HTTP network service: http://${this.argv.httpAddr}:${this.argv.httpPort}`)
+        if (this.server !== null) {
+            await this.server.start()
+            this.log.log(2, `started HTTP network service: http://${this.argv.httpAddr}:${this.argv.httpPort}`)
+        }
     }
 
     async shutdown () {
+        /*  stop service  */
         if (this.server !== null) {
             this.log.log(2, "stopping HTTP network service")
             await this.server.stop()
