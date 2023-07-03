@@ -94,6 +94,7 @@ export default class VMix extends EventEmitter {
     }
     private cam2ptz  = new Map<string, string>()
     private vptz2xyz = new Map<string, XYZ>()
+    private changePTZTimer: ReturnType<typeof setTimeout> | null = null
 
     /*  foreigns (injected)  */
     constructor (
@@ -657,9 +658,13 @@ export default class VMix extends EventEmitter {
 
         /*  finally persist PTZ information in vMix
             on both CAMx-W-V (for instant use) and CAMx-W-V-y (for later reuse)  */
-        await AsyncDelay(250)
-        this.vmixCommand(this.vmix1, { Function: "PTZUpdateVirtualInput", Input: inputCAM })
-        this.vmixCommand(this.vmix1, { Function: "PTZUpdateVirtualInput", Input: inputPTZ })
+        if (this.changePTZTimer !== null)
+            clearTimeout(this.changePTZTimer)
+        this.changePTZTimer = setTimeout(() => {
+            this.changePTZTimer = null
+            this.vmixCommand(this.vmix1, { Function: "PTZUpdateVirtualInput", Input: inputCAM })
+            this.vmixCommand(this.vmix1, { Function: "PTZUpdateVirtualInput", Input: inputPTZ })
+        }, 2000)
     }
 
     /*  change virtual PTZ  */
