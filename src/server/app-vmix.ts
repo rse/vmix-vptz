@@ -520,8 +520,21 @@ export default class VMix extends EventEmitter {
 
     /*  send command to vMix  */
     async vmixCommand (vmix: vMixAPI.ConnectionTCP | null, cmds: string | Array<string> | vMixCommand | Array<vMixCommand>) {
-        if (vmix !== null && vmix.connected())
+        if (vmix !== null && vmix.connected()) {
+            if (typeof cmds === "string")
+                this.log.log(3, `vMix: sending command: "${cmds}"`)
+            else if (typeof cmds === "object" && !(cmds instanceof Array))
+                this.log.log(3, `vMix: sending command: "${JSON.stringify(cmds)}"`)
+            else if (typeof cmds === "object" && cmds instanceof Array) {
+                for (const cmd of cmds) {
+                    if (typeof cmd === "string")
+                        this.log.log(3, `vMix: sending command: "${cmd}"`)
+                    else if (typeof cmd === "object" && !(cmd instanceof Array))
+                        this.log.log(3, `vMix: sending command: "${JSON.stringify(cmd)}"`)
+                }
+            }
             await vmix.send(clone(cmds))
+        }
         else {
             const remote = (vmix?.socket().remoteAddress ?? "unknown") + ":" + (vmix?.socket().remotePort ?? "unknown")
             this.log.log(1, `vMix: failed to send command(s) to ${remote} -- (still) not connected`)
