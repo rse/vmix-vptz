@@ -726,7 +726,7 @@ export default defineComponent({
             await this.api(`/vptz/${cam}/${data.vptz}/xyz/${data.x}/${data.y}/${data.zoom}`)
         },
         async ptzUpdate (el: MouseEvent) {
-            if (this.ptzMode !== "ptz")
+            if (this.adjustMode !== "ptz")
                 return
             const div = (el.target) as HTMLDivElement
             this.animate(div)
