@@ -398,7 +398,7 @@ export default class VMix extends EventEmitter {
         const input1 = this.cfg.inputNamePTZ(cam, ptz)
         const input2 = this.cfg.inputNameCAM(cam)
         this.vmixCommand(this.vmix1, [
-            { Function: "PTZMoveToVirtualInputPosition", Input: input1 },
+            { Function: "PTZMoveToVirtualInputPosition", Input: input1 }
         ])
         await AsyncDelay(6 * 1000)
         this.vmixCommand(this.vmix1, [
