@@ -259,6 +259,9 @@
                     </div>
                 </div>
             </div>
+            <div v-show="banner !== ''" class="banner">
+                {{ banner }}
+            </div>
         </div>
 
         <!--  FOOTER  -->
@@ -311,6 +314,20 @@
         flex-direction: row
         justify-content: center
         align-items: center
+        position: relative
+        .banner
+            position: absolute
+            top: calc(50% - 10vw)
+            left: 0
+            width: 100vw
+            height: 20vw
+            background-color: var(--color-sig-bg-3)
+            color: var(--color-sig-fg-3)
+            font-size: 6.0vw
+            font-weight: bold
+            line-height: 20vw
+            text-align: center
+            z-index: 200
         .overlay-container
             flex-grow: 1
             display: flex
@@ -648,7 +665,8 @@ export default defineComponent({
         previewCam:  "",
         previewView: "",
         adjustMode:  "ptz",
-        adjustSpeed: "med"
+        adjustSpeed: "med",
+        banner:      ""
     }),
     async created () {
     },
@@ -702,6 +720,12 @@ export default defineComponent({
             if (this.ptzMode !== "load") {
                 const div = (el.target) as HTMLDivElement
                 this.animate(div)
+            }
+            else if (this.ptzMode === "load") {
+                this.banner = "LOADING NEW PTZ..."
+                setTimeout(() => {
+                    this.banner = ""
+                }, 6 * 1000)
             }
         },
         async vptz (vptz: string) {
