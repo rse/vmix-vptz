@@ -399,7 +399,10 @@ export default class VMix extends EventEmitter {
         const input2 = this.cfg.inputNameCAM(cam)
         this.vmixCommand(this.vmix1, [
             { Function: "PTZMoveToVirtualInputPosition", Input: input1 },
-            { Function: "PTZUpdateVirtualInput",         Input: input2 }
+        ])
+        await AsyncDelay(6 * 1000)
+        this.vmixCommand(this.vmix1, [
+            { Function: "PTZUpdateVirtualInput", Input: input2 }
         ])
 
         /*  load corresponding VPTZ settings and update vMix VirtualSet inputs  */
@@ -633,7 +636,8 @@ export default class VMix extends EventEmitter {
         const ptz = this.cam2ptz.get(cam) ?? this.cfg.idPTZs[0]
 
         /*  determine and execute first vMix command  */
-        const inputCAM = this.cfg.inputNamePTZ(cam, ptz)
+        const inputCAM = this.cfg.inputNameCAM(cam)
+        const inputPTZ = this.cfg.inputNamePTZ(cam, ptz)
         const vmixCmd1 = { Function: cmd1.f, Input: inputCAM } as vMixCommand
         if (cmd1.v !== undefined && cmd1.v !== "")
             vmixCmd1.Value = cmd1.v
@@ -651,11 +655,11 @@ export default class VMix extends EventEmitter {
             await this.vmixCommand(this.vmix1, vmixCmd2)
         }
 
-        /*  finally persist PTZ information in vMix  */
-        const inputPTZ = this.cfg.inputNamePTZ(cam, ptz)
-        this.vmixCommand(this.vmix1, [
-            { Function: "PTZUpdateVirtualInput", Input: inputPTZ }
-        ])
+        /*  finally persist PTZ information in vMix
+            on both CAMx-W-V (for instant use) and CAMx-W-V-y (for later reuse)  */
+        await AsyncDelay(250)
+        this.vmixCommand(this.vmix1, { Function: "PTZUpdateVirtualInput", Input: inputCAM })
+        this.vmixCommand(this.vmix1, { Function: "PTZUpdateVirtualInput", Input: inputPTZ })
     }
 
     /*  change virtual PTZ  */
