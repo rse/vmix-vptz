@@ -254,7 +254,7 @@
                         <app-overlay
                             ref="overlay-cam5"
                             v-bind:options="{ cam: '5', scale: 1.0, opacity: 1.00 }"
-                            v-on:moved="(data) => xyz('5', data)"
+                            v-on:xyz="(data) => xyz('5', data)"
                         ></app-overlay>
                     </div>
                 </div>
