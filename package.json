@@ -1,8 +1,8 @@
 {
     "private":         true,
     "name":            "vMix-VPTZ",
-    "version":         "0.9.7",
-    "x-date":          "2023-07-03",
+    "version":         "0.9.8",
+    "x-date":          "2023-07-12",
     "homepage":        "https://github.com/rse/vmix-vptz",
     "description":     "vMix Virtual PTZ",
     "author": {
