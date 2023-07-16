@@ -146,7 +146,6 @@ export default class REST {
                             const ctx: wsPeerCtx            = args.ctx
                             const ws:  WebSocket            = args.ws
                             const req: http.IncomingMessage = args.req
-                            console.log(req.url)
                             const m = req.url?.match(/^\/ws\/(control|overlay)\/(.+)$/) ?? null
                             const peer = m !== null ? m[1] : "unknown"
                             const cam  = m !== null ? m[2] : "all"
