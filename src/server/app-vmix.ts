@@ -315,39 +315,6 @@ export default class VMix extends EventEmitter {
         this.emit("state-change", { cached, cams })
     }
 
-    /*  backup state from vMix (FIXME: NOW UNUSED)  */
-    async backupState () {
-        /*  index all inputs by name  */
-        const index = new Map<string, vMixInput>()
-        for (const input of this.inputs.values())
-            if (input.type === "VirtualSet")
-                index.set(input.name, input)
-
-        /*  use a transaction to...  */
-        this.state.transaction(async () => {
-            /*  ...iterate over all cameras and their current physical PTZ...  */
-            for (const cam of this.cfg.idCAMs) {
-                const ptz = this.cam2ptz.get(cam)
-                if (ptz === undefined)
-                    continue
-                this.log.log(2, `vMix: backup/receive vMix state of camera "${cam}" and physical PTZ "${ptz}"`)
-
-                /*  iterate over all corresponding virtual PTZ...  */
-                for (const vptz of this.cfg.idVPTZs) {
-                    const name = this.cfg.inputNameVPTZ(cam, vptz)
-                    const input = index.get(name)
-                    if (input === undefined)
-                        continue
-
-                    /*  ...and persist the current XYZ information  */
-                    await this.state.setVPTZ(cam, ptz, vptz, input.xyz)
-                }
-            }
-        })
-
-        this.notifyState()
-    }
-
     /*  restore persisted state to vMix  */
     async restoreState () {
         /*  use a transaction to...  */
