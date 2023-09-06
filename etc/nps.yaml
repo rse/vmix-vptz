@@ -36,7 +36,7 @@ scripts:
                             vite --config etc/vite-client.ts build --logLevel info --mode development --watch
     build-server:           tsc --project etc/tsc-server.json
     build-server-dev:       tsc --project etc/tsc-server.json --sourceMap
-    build-server-dev-watch: tsc --project etc/tsc-server.json --sourceMap --watch
+    build-server-dev-watch: nodemon --exec "npm start build-server-dev" --watch src/server --ext ts --delay 1.0
 
     #   start server run-time
     server-delay:           delay 8.0
