@@ -848,45 +848,66 @@ export default class VMix extends EventEmitter {
         const easeOutCubic   = (x: number) => 1 - Math.pow(1 - x, 3)
         const easeInOutCubic = (x: number) => x < 0.5 ? 4 * Math.pow(x, 3) : 1 - Math.pow(-2 * x + 2, 3) / 2
 
-        /*  helper function: determine whether an areas is entirely within the canvas  */
-        const insideCanvas = (X: number, Y: number, zoom: number, W: number, H: number) => {
-            /*  project area onto real canvas  */
-            const x = ((W / 2) + (W * (1 / zoom) * (-X / 2)) - ((W * (1 / zoom)) / 2))
-            const y = ((H / 2) - (H * (1 / zoom) * (-Y / 2)) - ((H * (1 / zoom)) / 2))
-            const w = W * (1 / zoom)
-            const h = H * (1 / zoom)
+        /*  helper function: determine path of max zoom levels corresponding a path of x/y coordinates.
+            Notice: vMix operates on a canvas with x/y in the range [-2...+2], the visible canvas is
+            always the range [-1...+1], the zoom is in the range [0...5], as a result, x/y + 1 ensures
+            the object is still fully within the visible canvas.  */
+        const maxZoom = (path: XYZ[]) => {
+            const mzoom = [] as Array<number>
+            for (const state of path) {
+                /*  calculate maximum x/y zoom levels  */
+                let mxz = Math.abs(state.x) + 1.0
+                let myz = Math.abs(state.y) + 1.0
 
-            /*  determine whether area it fits into canvas  */
-            return (x >= 0 && (x + w) <= W && y >= 0 && (y + h) <= H)
+                /*  round maximum x/y zoom levels  */
+                mxz = Math.round(mxz * 10000000) / 10000000
+                myz = Math.round(myz * 10000000) / 10000000
+
+                /*  worst zoom wins  */
+                mzoom.push(Math.max(mxz, myz))
+            }
+            return mzoom
         }
 
-        /*  helper function: calculate path from source to destination XYZ (try the mid zoom factor)  */
-        const pathCalcTry = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75, force = false) => {
-            /*  calculate mid state  */
-            const mid = {
-                x:    src.x    + ((dst.x    - src.x   ) / 2),
-                y:    src.y    + ((dst.y    - src.y   ) / 2),
-                zoom: src.zoom + ((dst.zoom - src.zoom) / 2)
+        /*  helper function: limit zoom levels on a path to the maximum  */
+        const limitZoomsOfPath = (path: XYZ[]) => {
+            /*  calculate maximum zoom possible  */
+            const mz: number[] = maxZoom(path)
+            for (let i = 0; i < path.length; i++) {
+                if (path[i].zoom < mz[i])
+                    path[i].zoom = mz[i]
             }
+            return path
+        }
 
-            /*  adjust mid state zoom factor  */
-            mid.zoom *= factor
-
+        /*  helper function: calculate path from source to destination XYZ
+            (with maximum optical and minimum vMix zoom level under the constraint
+            that we are, at each point on the path, optically within the visible canvas)  */
+        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number) => {
             /*  initialize loop  */
-            const path = [] as Array<XYZ>
+            const path1 = [] as Array<XYZ>
+            const path2 = [] as Array<XYZ>
             const state = cloneXYZ(src)
             const steps = Math.round(duration / (1000 / fps))
             const k = Math.round(steps / 2)
-            let i = 0
+
+            /*  calculate mid state  */
+            const mid = {
+                x:    src.x    + ((dst.x    - src.x   ) * k / steps),
+                y:    src.y    + ((dst.y    - src.y   ) * k / steps),
+                zoom: src.zoom + ((dst.zoom - src.zoom) * k / steps)
+            }
 
             /*  ease in to mid state  */
+            let i = 0
             while (i < k) {
                 state.x    = src.x    + ((mid.x    - src.x)    * easeInCubic(i / k))
                 state.y    = src.y    + ((mid.y    - src.y)    * easeInCubic(i / k))
-                state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInOutSine(i / k))
-                if (!insideCanvas(state.x, state.y, state.zoom, W, H) && !force)
-                    return null
-                path.push(cloneXYZ(state))
+                state.zoom = src.zoom + ((mid.zoom - src.zoom) * easeInSine(i / k))
+                state.x    = Math.round(state.x    * 10000000) / 10000000
+                state.y    = Math.round(state.y    * 10000000) / 10000000
+                state.zoom = Math.round(state.zoom * 10000000) / 10000000
+                path1.push(cloneXYZ(state))
                 i++
             }
 
@@ -894,40 +915,20 @@ export default class VMix extends EventEmitter {
             while (i < steps) {
                 state.x    = mid.x    + ((dst.x    - mid.x)    * easeOutCubic((i - k) / k))
                 state.y    = mid.y    + ((dst.y    - mid.y)    * easeOutCubic((i - k) / k))
-                state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeInOutSine((i - k) / k))
-                if (!insideCanvas(state.x, state.y, state.zoom, W, H) && !force)
-                    return null
-                path.push(cloneXYZ(state))
+                state.zoom = mid.zoom + ((dst.zoom - mid.zoom) * easeOutSine((i - k) / k))
+                state.x    = Math.round(state.x    * 10000000) / 10000000
+                state.y    = Math.round(state.y    * 10000000) / 10000000
+                state.zoom = Math.round(state.zoom * 10000000) / 10000000
+                path2.push(cloneXYZ(state))
                 i++
             }
 
-            /*  always finish with exact destination  */
-            path.push(cloneXYZ(dst))
-            return path
-        }
-
-        /*  helper function: calculate path from source to destination XYZ  */
-        const pathCalc = (src: XYZ, dst: XYZ, fps: number, duration: number, W = 3840, H = 2160, factor = 0.75) => {
-            let path = null as Array<XYZ> | null
-
-            /*  try to find a reasonable path with a potentially increased zoom factor (up to 1.0)  */
-            while (factor < 1.0) {
-                path = pathCalcTry(src, dst, fps, duration, W, H, factor, false)
-                if (path !== null)
-                    break
-                factor += 0.001
-            }
-
-            /*  fallback: forced path at zoom factor 1.0  */
-            if (path === null)
-                path = pathCalcTry(src, dst, fps, duration, W, H, 1.0, true)!
-
-            return path
+            return limitZoomsOfPath(path1).concat(limitZoomsOfPath(path2))
         }
 
         /*  driving configuration  */
         const fps      = 30
-        const duration = (speed === "fast" ? 2000 : (speed === "med" ? 3000 : 5000))
+        const duration = (speed === "fast" ? 1500 : (speed === "med" ? 2500 : 3500))
 
         /*  driving parameters  */
         let cam   = ""
