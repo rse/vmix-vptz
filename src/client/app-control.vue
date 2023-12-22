@@ -788,6 +788,7 @@ export default defineComponent({
                 return
             const div = (el.target) as HTMLDivElement
             this.animate(div)
+            this.raiseStatus("info", "Saving PTZ state", 1000)
             const cam = this.previewCam
             const ptz = this.state[cam].ptz
             await this.api(`/ptz/${ptz}/${cam}/save`)
