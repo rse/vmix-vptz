@@ -274,7 +274,6 @@
             <div class="status">
                 {{ status.kind === '' ? `${pkg.name} ${pkg.version} (${pkg["x-date"]})` : status.msg }}
             </div>
-
         </div>
     </div>
 </template>
