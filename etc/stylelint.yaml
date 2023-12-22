@@ -22,4 +22,5 @@ rules:
     stylus/number-no-trailing-zeros: null
     color-hex-length: null
     declaration-block-no-redundant-longhand-properties: null
+    selector-not-notation: null
 
