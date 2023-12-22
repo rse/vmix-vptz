@@ -117,9 +117,9 @@
                         <div class="control-grid control-grid-vptz">
                             <div class="button ga-01" v-bind:class="{ active: vptzCam === '1', preview: previewCam === '1', program: programCam === '1' }" v-on:click="vptzCam = '1'">CAM1</div>
                             <div class="button ga-02" v-bind:class="{ active: vptzCam === '2', preview: previewCam === '2', program: programCam === '2' }" v-on:click="vptzCam = '2'">CAM2</div>
-                            <div class="button ga-03" v-bind:class="{ active: vptzCam === '5', preview: previewCam === '5', program: programCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
-                            <div class="button ga-04" v-bind:class="{ active: vptzCam === '3', preview: previewCam === '3', program: programCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
-                            <div class="button ga-05" v-bind:class="{ active: vptzCam === '4', preview: previewCam === '4', program: programCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
+                            <div class="button ga-03" v-bind:class="{ active: vptzCam === '3', preview: previewCam === '3', program: programCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
+                            <div class="button ga-04" v-bind:class="{ active: vptzCam === '4', preview: previewCam === '4', program: programCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
+                            <div class="button ga-05" v-bind:class="{ active: vptzCam === '5', preview: previewCam === '5', program: programCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
                             <div class="button ga-06" v-bind:class="{ preview: previewView === 'C-L', program: programView === 'C-L', disabled: vptzCam === '' }" v-on:click="vptz('C-L')">C-L</div>
                             <div class="button ga-07" v-bind:class="{ preview: previewView === 'C-C', program: programView === 'C-C', disabled: vptzCam === '' }" v-on:click="vptz('C-C')">C-C</div>
                             <div class="button ga-08" v-bind:class="{ preview: previewView === 'C-R', program: programView === 'C-R', disabled: vptzCam === '' }" v-on:click="vptz('C-R')">C-R</div>
@@ -346,7 +346,7 @@
                 display: grid
                 grid-template-columns: 1fr 1fr 1fr
                 grid-template-rows:    1fr 1fr 1fr
-                grid-template-areas:   "ctrl1 cam5 ctrl2" "cam1 cam2 cam4" "ctrl3 cam3 ctrl4"
+                grid-template-areas:   "ctrl1 cam3 ctrl2" "cam1 cam2 cam5" "ctrl3 cam4 ctrl4"
                 gap: 0.3vw
                 .overlay-box
                     position: relative
