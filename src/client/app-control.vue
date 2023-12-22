@@ -265,10 +265,16 @@
         </div>
 
         <!--  FOOTER  -->
-        <div class="foot">
+        <div class="foot" v-bind:class="{
+            error:   status.kind === 'error',
+            warning: status.kind === 'warning',
+            info:    status.kind === 'info'
+        }">
+            <!--  Application Status Information  -->
             <div class="status">
-                {{ `${pkg.name} ${pkg.version} (${pkg["x-date"]})` }}
+                {{ status.kind === '' ? `${pkg.name} ${pkg.version} (${pkg["x-date"]})` : status.msg }}
             </div>
+
         </div>
     </div>
 </template>
@@ -421,16 +427,18 @@
                             &.destructive.active:not(.destructive-smart)
                                 background: var(--color-sig-bg-2)
                                 color: var(--color-sig-fg-2)
-                            &:hover:not(.disabled)
+                            &:hover:not(.disabled):not(.animate)
                                 background: var(--color-acc-bg-5) !important
                                 color: var(--color-acc-fg-5) !important
-                            &.destructive:hover:not(.disabled)
+                            &.destructive:hover:not(.disabled):not(.animate)
                                 background: var(--color-sig-bg-5) !important
                                 color: var(--color-sig-fg-5) !important
                             .icon
                                 padding-right: 0.5vw
                             &.animate
                                 animation: 1s linear flash
+                                background: var(--color-acc-bg-3)
+                                color: var(--color-acc-fg-5)
                     .control-grid .ga-01
                         grid-area: ga-01
                     .control-grid .ga-02
@@ -622,6 +630,18 @@
         flex-direction: row
         justify-content: center
         align-items: center
+        &.info
+            font-weight: normal
+            background-color: var(--color-acc-bg-3)
+            color: var(--color-acc-fg-5)
+        &.warning
+            font-weight: bold
+            background-color: var(--color-acc-bg-3)
+            color: var(--color-acc-fg-5)
+        &.error
+            font-weight: bold
+            background-color: var(--color-sig-bg-3)
+            color: var(--color-sig-fg-5)
         .status
             flex-grow: 1
 
@@ -646,6 +666,7 @@ import { StateType, StateSchema, StateDefault } from "../common/app-state"
 </script>
 
 <script lang="ts">
+let statusTimer: ReturnType<typeof setTimeout> | null = null
 export default defineComponent({
     name: "app-control",
     components: {
@@ -666,7 +687,8 @@ export default defineComponent({
         previewView: "",
         adjustMode:  "ptz",
         adjustSpeed: "med",
-        banner:      ""
+        banner:      "",
+        status:      { kind: "", msg: "" }
     }),
     async created () {
     },
@@ -707,6 +729,18 @@ export default defineComponent({
         },
         log (level: string, msg: string) {
             this.$emit("log", level, msg)
+        },
+        raiseStatus (kind: string, msg: string, duration = 4000) {
+            /*  raise a temporarily visible status message in the footer  */
+            this.status.kind = kind
+            this.status.msg  = msg
+            if (statusTimer !== null)
+                clearTimeout(statusTimer)
+            statusTimer = setTimeout(() => {
+                this.status.kind = ""
+                this.status.msg  = ""
+                statusTimer = null
+            }, duration)
         },
         async api (path: string, method = "GET") {
             await axios({ method, url: `${this.svUrl}${path}` })
