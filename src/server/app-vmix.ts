@@ -833,9 +833,9 @@ export default class VMix extends EventEmitter {
 
         /*  sanity check situation  */
         if (programCam !== previewCam)
-            throw new Error("program and preview inputs are not on same camera")
+            return this.cut()
         if (programVPTZ === "" || previewVPTZ === "")
-            throw new Error("program or preview inputs are not VPTZ inputs")
+            return this.cut()
 
         /*  helper function: clone a XYZ object  */
         const cloneXYZ = (xyz: XYZ) => ({ ...xyz } as XYZ)
