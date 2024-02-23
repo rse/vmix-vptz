@@ -204,9 +204,9 @@ export default class REST {
 
         /*  notify clients about internal events  */
         const notifyClient = (message: string) => {
-            const msg = JSON.stringify({ cmd: "NOTIFY", arg: { message } });
+            const msg = JSON.stringify({ cmd: "NOTIFY", arg: { message } })
             for (const info of wsPeers.values()) {
-                this.log.log(3, `WebSocket: notify: message=${message}`);
+                this.log.log(3, `WebSocket: notify: message=${message}`)
                 if (info.ws.readyState === WebSocket.OPEN)
                     info.ws.send(msg)
             }
@@ -315,7 +315,7 @@ export default class REST {
                 notifyClient("saveCurrentPTZ")
                 return h.response().code(204)
             }
-        }),
+        })
 
         /*  change PTZ/VPTZ (joystick)  */
         this.server.route({
