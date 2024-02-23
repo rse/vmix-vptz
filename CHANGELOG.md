@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - FEATURE: support externally triggered "SAVE" button
+- BUGFIX: switch DRIVE functionality from 30 to 120 fps to smoothen vMix
 
 1.2.1 (2024-01-03)
 ------------------

@@ -927,7 +927,7 @@ export default class VMix extends EventEmitter {
         }
 
         /*  driving configuration  */
-        const fps      = 30
+        const fps      = 120
         const duration = (speed === "fast" ? 1500 : (speed === "med" ? 2500 : 3500))
 
         /*  driving parameters  */
