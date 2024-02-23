@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.2.2 (2024-02-XX)
+------------------
+
+- FEATURE: support externally triggered "SAVE" button
+
 1.2.1 (2024-01-03)
 ------------------
 

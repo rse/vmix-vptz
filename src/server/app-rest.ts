@@ -202,6 +202,16 @@ export default class REST {
             }
         }
 
+        /*  notify clients about internal events  */
+        const notifyClient = (message: string) => {
+            const msg = JSON.stringify({ cmd: "NOTIFY", arg: { message } });
+            for (const info of wsPeers.values()) {
+                this.log.log(3, `WebSocket: notify: message=${message}`);
+                if (info.ws.readyState === WebSocket.OPEN)
+                    info.ws.send(msg)
+            }
+        }
+
         /*  forward state changes to clients  */
         let notifyTimer: ReturnType<typeof setTimeout> | null = null
         let notifyData:  StateType | null = null
@@ -296,6 +306,16 @@ export default class REST {
                 return h.response().code(204)
             }
         })
+
+        /*  PTZ action on single camera (which the UI currently has selected)  */
+        this.server.route({
+            method: "GET",
+            path: "/ptz/save",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                notifyClient("saveCurrentPTZ")
+                return h.response().code(204)
+            }
+        }),
 
         /*  change PTZ/VPTZ (joystick)  */
         this.server.route({

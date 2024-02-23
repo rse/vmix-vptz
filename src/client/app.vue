@@ -146,6 +146,8 @@ export default defineComponent({
                 else
                     this.log("WARNING", `invalid schema of received state: ${errors.join(", ")}`)
             }
+            else if (data.cmd === "NOTIFY" && data.arg.message === "saveCurrentPTZ")
+                (this.$refs.control as typeof AppControl).ptzUpdateRemote()
         })
     },
     methods: {
