@@ -5,6 +5,11 @@ ChangeLog
 1.3.0 (2024-02-23)
 ------------------
 
+- CLEANUP: source cleanups
+
+1.3.0 (2024-02-23)
+------------------
+
 - FEATURE: support externally triggered "SAVE" button
 - BUGFIX: switch DRIVE functionality from 30 to 120 fps to smoothen vMix
 - UPDATE: update dependencies
