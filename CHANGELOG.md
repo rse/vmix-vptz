@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.3.3 (2024-03-14)
+------------------
+
+- BUGFIX: downgrade Vite from 5.1.6 to 5.0.13 to fix index.html generation
+
 1.3.2 (2024-03-13)
 ------------------
 
