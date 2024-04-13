@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+1.3.4 (2024-04-14)
+------------------
+
+- UPDATE: finally upgrade to Vite 5.2.8 (with workaround applied)
+- UPDATE: update dependencies
+
 1.3.3 (2024-03-14)
 ------------------
 
