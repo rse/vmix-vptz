@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.4.0 (2024-05-03)
+------------------
+
+- FEATURE: ensure that on any VPTZ change, we never go out of the viewport (so no black borders are visible in vMix)
+
 1.3.6 (2024-04-20)
 ------------------
 

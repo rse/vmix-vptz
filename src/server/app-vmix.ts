@@ -654,12 +654,30 @@ export default class VMix extends EventEmitter {
         /*  variables  */
         let cmd1: CMD | null = null
         let cmd2: CMD | null = null
+        let cmd3: CMD | null = null
         let mod1: MOD | null = null
         let mod2: MOD | null = null
+        let mod3: MOD | null = null
+
+        /*  determine XYZ object  */
+        let xyz = this.vptz2xyz.get(`${cam}:${vptz}`)
+        if (xyz === undefined) {
+            xyz = { x: 0, y: 0, zoom: 1.0 }
+            this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
+        }
+
+        /*  calculate potentially change deltas  */
+        const deltaXY = deltaPan  / steps
+        const deltaZ  = deltaZoom / steps
+
+        /*  calculate effectively possible change deltas  */
+        const deltaUp    = xyz.y - deltaPan >  (1 - xyz.zoom) ? -deltaXY : (((1 - xyz.zoom) - xyz.y) / steps)
+        const deltaRight = xyz.x - deltaPan >  (1 - xyz.zoom) ? -deltaXY : (((1 - xyz.zoom) - xyz.x) / steps)
+        const deltaDown  = xyz.y + deltaPan < -(1 - xyz.zoom) ?  deltaXY : (((xyz.zoom - 1) - xyz.y) / steps)
+        const deltaLeft  = xyz.x + deltaPan < -(1 - xyz.zoom) ?  deltaXY : (((xyz.zoom - 1) - xyz.x) / steps)
 
         /*  dispatch according to operation  */
         if (op === "pan") {
-            const delta = deltaPan / steps
             if (arg === "reset") {
                 cmd1 = { f: "SetPanY", v: "0" }
                 cmd2 = { f: "SetPanX", v: "0" }
@@ -667,61 +685,78 @@ export default class VMix extends EventEmitter {
                 mod2 = (xyz: XYZ) => { xyz.x = 0 }
             }
             else if (arg === "up-left") {
-                cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
-                mod2 = (xyz: XYZ) => { xyz.x += delta }
+                cmd1 = { f: "SetPanY", v: `+=${deltaUp}` }
+                cmd2 = { f: "SetPanX", v: `+=${deltaLeft}` }
+                mod1 = (xyz: XYZ) => { xyz.y += deltaUp }
+                mod2 = (xyz: XYZ) => { xyz.x += deltaLeft }
             }
             else if (arg === "up") {
-                cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
+                cmd1 = { f: "SetPanY", v: `+=${deltaUp}` }
+                mod1 = (xyz: XYZ) => { xyz.y += deltaUp }
             }
             else if (arg === "up-right") {
-                cmd1 = { f: "SetPanY", v: `-=${delta}` }
-                cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y -= delta }
-                mod2 = (xyz: XYZ) => { xyz.x -= delta }
+                cmd1 = { f: "SetPanY", v: `+=${deltaUp}` }
+                cmd2 = { f: "SetPanX", v: `+=${deltaRight}` }
+                mod1 = (xyz: XYZ) => { xyz.y += deltaUp }
+                mod2 = (xyz: XYZ) => { xyz.x += deltaRight }
             }
             else if (arg === "left") {
-                cmd1 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.x += delta }
+                cmd1 = { f: "SetPanX", v: `+=${deltaLeft}` }
+                mod1 = (xyz: XYZ) => { xyz.x += deltaLeft }
             }
             else if (arg === "right") {
-                cmd1 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.x -= delta }
+                cmd1 = { f: "SetPanX", v: `+=${deltaRight}` }
+                mod1 = (xyz: XYZ) => { xyz.x += deltaRight }
             }
             else if (arg === "down-left") {
-                cmd1 = { f: "SetPanY", v: `+=${delta}` }
-                cmd2 = { f: "SetPanX", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
-                mod2 = (xyz: XYZ) => { xyz.x += delta }
+                cmd1 = { f: "SetPanY", v: `+=${deltaDown}` }
+                cmd2 = { f: "SetPanX", v: `+=${deltaLeft}` }
+                mod1 = (xyz: XYZ) => { xyz.y += deltaDown }
+                mod2 = (xyz: XYZ) => { xyz.x += deltaLeft }
             }
             else if (arg === "down") {
-                cmd1 = { f: "SetPanY", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
+                cmd1 = { f: "SetPanY", v: `+=${deltaDown}` }
+                mod1 = (xyz: XYZ) => { xyz.y += deltaDown }
             }
             else if (arg === "down-right") {
-                cmd1 = { f: "SetPanY", v: `+=${delta}` }
-                cmd2 = { f: "SetPanX", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.y += delta }
-                mod2 = (xyz: XYZ) => { xyz.x -= delta }
+                cmd1 = { f: "SetPanY", v: `+=${deltaDown}` }
+                cmd2 = { f: "SetPanX", v: `+=${deltaRight}` }
+                mod1 = (xyz: XYZ) => { xyz.y += deltaDown }
+                mod2 = (xyz: XYZ) => { xyz.x += deltaRight }
             }
             else
                 throw new Error("invalid argument")
         }
         else if (op === "zoom") {
-            const delta = deltaZoom / steps
             if (arg === "reset") {
                 cmd1 = { f: "SetZoom", v: "1.0" }
                 mod1 = (xyz: XYZ) => { xyz.zoom = 1.0 }
+                cmd2 = { f: "SetPanX", v: "0" }
+                mod2 = (xyz: XYZ) => { xyz.x = 0 }
+                cmd3 = { f: "SetPanY", v: "0" }
+                mod3 = (xyz: XYZ) => { xyz.y = 0 }
             }
             else if (arg === "decrease") {
-                cmd1 = { f: "SetZoom", v: `-=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.zoom -= delta }
+                const zoomAdjusted = Math.max(xyz.zoom - deltaZoom, 1)
+                const deltaZAdjusted = (xyz.zoom - zoomAdjusted) / steps
+                const absX = Math.abs(xyz.x)
+                if (zoomAdjusted - absX < 1) {
+                    const panX = (absX - (-1 + zoomAdjusted)) / steps
+                    cmd2 = { f: "SetPanX", v: `${xyz.x < 0 ? "+=" : "-="}${panX}` }
+                    mod2 = (xyz: XYZ) => { xyz.x += xyz.x < 0 ? panX : -panX }
+                }
+                const absY = Math.abs(xyz.y)
+                if (zoomAdjusted - absY < 1) {
+                    const panY = (absY - (-1 + zoomAdjusted)) / steps
+                    cmd3 = { f: "SetPanY", v: `${xyz.y < 0 ? "+=" : "-="}${panY}` }
+                    mod3 = (xyz: XYZ) => { xyz.y += xyz.y < 0 ? panY : -panY }
+                }
+                cmd1 = { f: "SetZoom", v: `-=${deltaZAdjusted}` }
+                mod1 = (xyz: XYZ) => { xyz.zoom -= deltaZAdjusted }
             }
             else if (arg === "increase") {
-                cmd1 = { f: "SetZoom", v: `+=${delta}` }
-                mod1 = (xyz: XYZ) => { xyz.zoom += delta }
+                cmd1 = { f: "SetZoom", v: `+=${deltaZ}` }
+                mod1 = (xyz: XYZ) => { xyz.zoom += deltaZ }
             }
             else
                 throw new Error("invalid argument")
@@ -735,13 +770,8 @@ export default class VMix extends EventEmitter {
         cmds.push({ Function: cmd1.f, Input: input, Value: cmd1.v })
         if (cmd2 !== null)
             cmds.push({ Function: cmd2.f, Input: input, Value: cmd2.v })
-
-        /*  determine XYZ object  */
-        let xyz = this.vptz2xyz.get(`${cam}:${vptz}`)
-        if (xyz === undefined) {
-            xyz = { x: 0, y: 0, zoom: 1.0 }
-            this.vptz2xyz.set(`${cam}:${vptz}`, xyz)
-        }
+        if (cmd3 !== null)
+            cmds.push({ Function: cmd3.f, Input: input, Value: cmd3.v })
 
         /*  determine physical PTZ of camera  */
         const ptz = this.cam2ptz.get(cam) ?? this.cfg.idPTZs[0]
@@ -753,6 +783,8 @@ export default class VMix extends EventEmitter {
                 mod1(xyz)
             if (mod2 !== null && xyz !== undefined)
                 mod2(xyz)
+            if (mod3 !== null && xyz !== undefined)
+                mod3(xyz)
             this.notifyState(true, cam)
         }, (cancelled) => {
             if (xyz !== undefined)
