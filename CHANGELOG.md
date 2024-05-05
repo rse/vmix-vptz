@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.4.2 (2024-05-05)
+------------------
+
+- CLEANUP: remove workaround for previously broken Node versions
+
 1.4.1 (2024-05-05)
 ------------------
 
