@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.4.1 (2024-05-05)
+------------------
+
+- CLEANUP: remove workaround for previously broken Vite
+
 1.4.0 (2024-05-03)
 ------------------
 
