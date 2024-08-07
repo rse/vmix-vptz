@@ -19,13 +19,13 @@
             <div class="overlay-container">
                 <div class="overlay-grid">
                     <div class="control-box control-box-sync">
-                        <div class="title">STATE</div>
+                        <div class="title">VMIX STATE</div>
                         <div class="control-grid control-grid-sync">
                             <div class="button ga-01 destructive" v-on:click="(ev) => vmixState(ev, 'restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
                         </div>
                     </div>
                     <div class="control-box control-box-global">
-                        <div class="title">MIXER</div>
+                        <div class="title">VMIX MIXER</div>
                         <div class="control-grid control-grid-global">
                             <div class="button ga-01" v-on:click="mixer('cut')"><span class="icon"><i class="fa-solid fa-cut"></i></span> CUT</div>
                             <div class="button ga-02" v-on:click="mixer('drive', 'fast')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE <span class="hint">(FAST)</span></div>
@@ -463,8 +463,6 @@
                     .control-grid .ga-18
                         grid-area: ga-18
                     .control-grid-sync
-                        width: 90%
-                        height: 90%
                         grid-template-columns: 1fr
                         grid-template-rows:    1fr
                         grid-template-areas:   "ga-01"
@@ -473,8 +471,8 @@
                             text-align: left
                             &.ga-01
                                 font-size: 2vw
-                                width: 9vw
-                                height: 9vw
+                                width: 10vw
+                                height: 10vw
                                 display: flex
                                 flex-direction: row
                                 justify-content: center
@@ -603,11 +601,6 @@
                                 margin-left: 0.5vw
                 .control-box-sync
                     grid-area: ctrl0
-                    width: 100%
-                    display: flex
-                    flex-direction: column
-                    justify-content: center
-                    align-items: center
                 .control-box-ptz
                     grid-area: ctrl1
                 .control-box-global
