@@ -2,10 +2,11 @@
 ChangeLog
 =========
 
-1.5.0 (2024-08-07)
+1.5.0 (2024-08-08)
 ------------------
 
 - CLEANUP: remove CAM5 from UI
+- UPDATE: update dependencies
 
 1.4.5 (2024-07-28)
 ------------------
