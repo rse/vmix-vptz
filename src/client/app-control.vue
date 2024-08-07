@@ -18,14 +18,19 @@
         <div class="body">
             <div class="overlay-container">
                 <div class="overlay-grid">
+                    <div class="control-box control-box-sync">
+                        <div class="title">STATE</div>
+                        <div class="control-grid control-grid-sync">
+                            <div class="button ga-01 destructive" v-on:click="(ev) => vmixState(ev, 'restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
+                        </div>
+                    </div>
                     <div class="control-box control-box-global">
-                        <div class="title">MIXER &amp; STATE</div>
+                        <div class="title">MIXER</div>
                         <div class="control-grid control-grid-global">
                             <div class="button ga-01" v-on:click="mixer('cut')"><span class="icon"><i class="fa-solid fa-cut"></i></span> CUT</div>
                             <div class="button ga-02" v-on:click="mixer('drive', 'fast')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE <span class="hint">(FAST)</span></div>
                             <div class="button ga-03" v-on:click="mixer('drive', 'med')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE <span class="hint">(MED)</span></div>
                             <div class="button ga-04" v-on:click="mixer('drive', 'slow')" v-bind:class="{ disabled: programCam !== previewCam }"><span class="icon"><i class="fa-solid fa-route"></i></span> DRIVE <span class="hint">(SLOW)</span></div>
-                            <div class="button ga-05 destructive" v-on:click="(ev) => vmixState(ev, 'restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
                         </div>
                     </div>
                     <div class="control-box control-box-ptz">
@@ -66,49 +71,41 @@
                             <div class="button ga-06 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'A', preview: state['2'].ptz === 'A' && previewCam === '2', program: state['2'].ptz === 'A' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'A', '2')">2A</div>
                             <div class="button ga-07 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'A', preview: state['3'].ptz === 'A' && previewCam === '3', program: state['3'].ptz === 'A' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'A', '3')">3A</div>
                             <div class="button ga-08 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'A', preview: state['4'].ptz === 'A' && previewCam === '4', program: state['4'].ptz === 'A' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'A', '4')">4A</div>
-                            <div class="button ga-09 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'A', preview: state['5'].ptz === 'A' && previewCam === '5', program: state['5'].ptz === 'A' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'A', '5')">5A</div>
                             <div class="button ga-10 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'A')">A</div>
                             <div class="button ga-11 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'B', preview: state['1'].ptz === 'B' && previewCam === '1', program: state['1'].ptz === 'B' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'B', '1')">1B</div>
                             <div class="button ga-12 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'B', preview: state['2'].ptz === 'B' && previewCam === '2', program: state['2'].ptz === 'B' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'B', '2')">2B</div>
                             <div class="button ga-13 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'B', preview: state['3'].ptz === 'B' && previewCam === '3', program: state['3'].ptz === 'B' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'B', '3')">3B</div>
                             <div class="button ga-14 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'B', preview: state['4'].ptz === 'B' && previewCam === '4', program: state['4'].ptz === 'B' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'B', '4')">4B</div>
-                            <div class="button ga-15 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'B', preview: state['5'].ptz === 'B' && previewCam === '5', program: state['5'].ptz === 'B' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'B', '5')">5B</div>
                             <div class="button ga-16 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'B')">B</div>
                             <div class="button ga-17 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'C', preview: state['1'].ptz === 'C' && previewCam === '1', program: state['1'].ptz === 'C' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'C', '1')">1C</div>
                             <div class="button ga-18 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'C', preview: state['2'].ptz === 'C' && previewCam === '2', program: state['2'].ptz === 'C' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'C', '2')">2C</div>
                             <div class="button ga-19 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'C', preview: state['3'].ptz === 'C' && previewCam === '3', program: state['3'].ptz === 'C' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'C', '3')">3C</div>
                             <div class="button ga-20 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'C', preview: state['4'].ptz === 'C' && previewCam === '4', program: state['4'].ptz === 'C' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'C', '4')">4C</div>
-                            <div class="button ga-21 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'C', preview: state['5'].ptz === 'C' && previewCam === '5', program: state['5'].ptz === 'C' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'C', '5')">5C</div>
                             <div class="button ga-22 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'C')">C</div>
                             <div class="button ga-23 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'D', preview: state['1'].ptz === 'D' && previewCam === '1', program: state['1'].ptz === 'D' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'D', '1')">1D</div>
                             <div class="button ga-24 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'D', preview: state['2'].ptz === 'D' && previewCam === '2', program: state['2'].ptz === 'D' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'D', '2')">2D</div>
                             <div class="button ga-25 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'D', preview: state['3'].ptz === 'D' && previewCam === '3', program: state['3'].ptz === 'D' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'D', '3')">3D</div>
                             <div class="button ga-26 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'D', preview: state['4'].ptz === 'D' && previewCam === '4', program: state['4'].ptz === 'D' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'D', '4')">4D</div>
-                            <div class="button ga-27 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'D', preview: state['5'].ptz === 'D' && previewCam === '5', program: state['5'].ptz === 'D' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'D', '5')">5D</div>
                             <div class="button ga-28 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'D')">D</div>
                             <div class="button ga-29 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'E', preview: state['1'].ptz === 'E' && previewCam === '1', program: state['1'].ptz === 'E' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'E', '1')">1E</div>
                             <div class="button ga-30 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'E', preview: state['2'].ptz === 'E' && previewCam === '2', program: state['2'].ptz === 'E' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'E', '2')">2E</div>
                             <div class="button ga-31 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'E', preview: state['3'].ptz === 'E' && previewCam === '3', program: state['3'].ptz === 'E' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'E', '3')">3E</div>
                             <div class="button ga-32 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'E', preview: state['4'].ptz === 'E' && previewCam === '4', program: state['4'].ptz === 'E' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'E', '4')">4E</div>
-                            <div class="button ga-33 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'E', preview: state['5'].ptz === 'E' && previewCam === '5', program: state['5'].ptz === 'E' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'E', '5')">5E</div>
                             <div class="button ga-34 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'E')">E</div>
                             <div class="button ga-35 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'F', preview: state['1'].ptz === 'F' && previewCam === '1', program: state['1'].ptz === 'F' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'F', '1')">1F</div>
                             <div class="button ga-36 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'F', preview: state['2'].ptz === 'F' && previewCam === '2', program: state['2'].ptz === 'F' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'F', '2')">2F</div>
                             <div class="button ga-37 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'F', preview: state['3'].ptz === 'F' && previewCam === '3', program: state['3'].ptz === 'F' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'F', '3')">3F</div>
                             <div class="button ga-38 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'F', preview: state['4'].ptz === 'F' && previewCam === '4', program: state['4'].ptz === 'F' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'F', '4')">4F</div>
-                            <div class="button ga-39 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'F', preview: state['5'].ptz === 'F' && previewCam === '5', program: state['5'].ptz === 'F' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'F', '5')">5F</div>
                             <div class="button ga-40 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'F')">F</div>
                             <div class="button ga-41 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'G', preview: state['1'].ptz === 'G' && previewCam === '1', program: state['1'].ptz === 'G' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'G', '1')">1G</div>
                             <div class="button ga-42 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'G', preview: state['2'].ptz === 'G' && previewCam === '2', program: state['2'].ptz === 'G' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'G', '2')">2G</div>
                             <div class="button ga-43 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'G', preview: state['3'].ptz === 'G' && previewCam === '3', program: state['3'].ptz === 'G' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'G', '3')">3G</div>
                             <div class="button ga-44 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'G', preview: state['4'].ptz === 'G' && previewCam === '4', program: state['4'].ptz === 'G' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'G', '4')">4G</div>
-                            <div class="button ga-45 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'G', preview: state['5'].ptz === 'G' && previewCam === '5', program: state['5'].ptz === 'G' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'G', '5')">5G</div>
                             <div class="button ga-46 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'G')">G</div>
                             <div class="button ga-47 destructive-smart" v-bind:class="{ active: state['1'].ptz === 'H', preview: state['1'].ptz === 'H' && previewCam === '1', program: state['1'].ptz === 'H' && programCam === '1', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'H', '1')">1H</div>
                             <div class="button ga-48 destructive-smart" v-bind:class="{ active: state['2'].ptz === 'H', preview: state['2'].ptz === 'H' && previewCam === '2', program: state['2'].ptz === 'H' && programCam === '2', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'H', '2')">2H</div>
                             <div class="button ga-49 destructive-smart" v-bind:class="{ active: state['3'].ptz === 'H', preview: state['3'].ptz === 'H' && previewCam === '3', program: state['3'].ptz === 'H' && programCam === '3', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'H', '3')">3H</div>
                             <div class="button ga-50 destructive-smart" v-bind:class="{ active: state['4'].ptz === 'H', preview: state['4'].ptz === 'H' && previewCam === '4', program: state['4'].ptz === 'H' && programCam === '4', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'H', '4')">4H</div>
-                            <div class="button ga-51 destructive-smart" v-bind:class="{ active: state['5'].ptz === 'H', preview: state['5'].ptz === 'H' && previewCam === '5', program: state['5'].ptz === 'H' && programCam === '5', destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'H', '5')">5H</div>
                             <div class="button ga-52 destructive-smart" v-bind:class="{ destructive: ptzMode !== 'load' }" v-on:click="(ev) => ptz(ev, 'H')">H</div>
                         </div>
                     </div>
@@ -119,7 +116,6 @@
                             <div class="button ga-02" v-bind:class="{ active: vptzCam === '2', preview: previewCam === '2', program: programCam === '2' }" v-on:click="vptzCam = '2'">CAM2</div>
                             <div class="button ga-03" v-bind:class="{ active: vptzCam === '3', preview: previewCam === '3', program: programCam === '3' }" v-on:click="vptzCam = '3'">CAM3</div>
                             <div class="button ga-04" v-bind:class="{ active: vptzCam === '4', preview: previewCam === '4', program: programCam === '4' }" v-on:click="vptzCam = '4'">CAM4</div>
-                            <div class="button ga-05" v-bind:class="{ active: vptzCam === '5', preview: previewCam === '5', program: programCam === '5' }" v-on:click="vptzCam = '5'">CAM5</div>
                             <div class="button ga-06" v-bind:class="{ preview: previewView === 'C-L', program: programView === 'C-L', disabled: vptzCam === '' }" v-on:click="vptz('C-L')">C-L</div>
                             <div class="button ga-07" v-bind:class="{ preview: previewView === 'C-C', program: programView === 'C-C', disabled: vptzCam === '' }" v-on:click="vptz('C-C')">C-C</div>
                             <div class="button ga-08" v-bind:class="{ preview: previewView === 'C-R', program: programView === 'C-R', disabled: vptzCam === '' }" v-on:click="vptz('C-R')">C-R</div>
@@ -249,14 +245,6 @@
                             v-on:xyz="(data) => xyz('4', data)"
                         ></app-overlay>
                     </div>
-                    <div class="overlay-box overlay-cam5">
-                        <div class="title">CAM5</div>
-                        <app-overlay
-                            ref="overlay-cam5"
-                            v-bind:options="{ cam: '5', scale: 1.0, opacity: 1.00 }"
-                            v-on:xyz="(data) => xyz('5', data)"
-                        ></app-overlay>
-                    </div>
                 </div>
             </div>
             <div v-show="banner !== ''" class="banner">
@@ -351,7 +339,7 @@
                 display: grid
                 grid-template-columns: 1fr 1fr 1fr
                 grid-template-rows:    1fr 1fr 1fr
-                grid-template-areas:   "ctrl1 cam3 ctrl2" "cam1 cam2 cam5" "ctrl3 cam4 ctrl4"
+                grid-template-areas:   "ctrl0 cam2 ctrl2" "cam1 cam3 cam4" "ctrl1 ctrl3 ctrl4"
                 gap: 0.3vw
                 .overlay-box
                     position: relative
@@ -474,10 +462,27 @@
                         grid-area: ga-17
                     .control-grid .ga-18
                         grid-area: ga-18
+                    .control-grid-sync
+                        width: 90%
+                        height: 90%
+                        grid-template-columns: 1fr
+                        grid-template-rows:    1fr
+                        grid-template-areas:   "ga-01"
+                        .button
+                            font-size: 1.5vw
+                            text-align: left
+                            &.ga-01
+                                font-size: 2vw
+                                width: 9vw
+                                height: 9vw
+                                display: flex
+                                flex-direction: row
+                                justify-content: center
+                                align-items: center
                     .control-grid-global
-                        grid-template-columns: calc(1fr + 2vw) 1fr
+                        grid-template-columns: calc(1fr + 2vw)
                         grid-template-rows:    1fr 1fr 1fr 1fr
-                        grid-template-areas:   "ga-01 ga-05" "ga-02 ga-05" "ga-03 ga-05" "ga-04 ga-05"
+                        grid-template-areas:   "ga-01" "ga-02" "ga-03" "ga-04"
                         .button
                             font-size: 1.5vw
                             text-align: left
@@ -489,25 +494,18 @@
                                 .hint
                                     font-weight: 200
                                     font-size: 1.0vw
-                            &.ga-05
-                                font-size: 2vw
-                                width: 7vw
-                                display: flex
-                                flex-direction: row
-                                justify-content: center
-                                align-items: center
                     .control-grid-ptz
-                        grid-template-columns: calc(6fr + 0.5vw) 6fr 6fr 6fr 6fr 6fr 6fr
+                        grid-template-columns: calc(5fr + 0.5vw) 5fr 5fr 5fr 5fr 5fr
                         grid-template-rows:    8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr
                         grid-template-areas: \
-                            "ga-01 ga-05 ga-06 ga-07 ga-08 ga-09 ga-10" \
-                            "ga-01 ga-11 ga-12 ga-13 ga-14 ga-15 ga-16" \
-                            "ga-02 ga-17 ga-18 ga-19 ga-20 ga-21 ga-22" \
-                            "ga-02 ga-23 ga-24 ga-25 ga-26 ga-27 ga-28" \
-                            "ga-03 ga-29 ga-30 ga-31 ga-32 ga-33 ga-34" \
-                            "ga-03 ga-35 ga-36 ga-37 ga-38 ga-39 ga-40" \
-                            "ga-04 ga-41 ga-42 ga-43 ga-44 ga-45 ga-46" \
-                            "ga-04 ga-47 ga-48 ga-49 ga-50 ga-51 ga-52"
+                            "ga-01 ga-05 ga-06 ga-07 ga-08 ga-10" \
+                            "ga-01 ga-11 ga-12 ga-13 ga-14 ga-16" \
+                            "ga-02 ga-17 ga-18 ga-19 ga-20 ga-22" \
+                            "ga-02 ga-23 ga-24 ga-25 ga-26 ga-28" \
+                            "ga-03 ga-29 ga-30 ga-31 ga-32 ga-34" \
+                            "ga-03 ga-35 ga-36 ga-37 ga-38 ga-40" \
+                            "ga-04 ga-41 ga-42 ga-43 ga-44 ga-46" \
+                            "ga-04 ga-47 ga-48 ga-49 ga-50 ga-52"
                         .button
                             font-size: 1.1vw
                             line-height: 1vw
@@ -547,7 +545,7 @@
                     .control-grid-vptz
                         grid-template-columns: 5fr 5fr 5fr 5fr 5fr
                         grid-template-rows:    calc(4fr + 0.5vw) 4fr 4fr 4fr
-                        grid-template-areas:   "ga-01 ga-02 ga-03 ga-04 ga-05" \
+                        grid-template-areas:   "ga-01 ga-02 . ga-03 ga-04" \
                             ". ga-06 ga-07 ga-08 ." \
                             ". ga-09 ga-10 ga-11 ." \
                             ". . ga-12 . ."
@@ -556,8 +554,7 @@
                             &.ga-01,
                             &.ga-02,
                             &.ga-03,
-                            &.ga-04,
-                            &.ga-05
+                            &.ga-04
                                 margin-bottom: 0.8vw
                             &.preview
                                 background: var(--color-prv-bg)
@@ -604,6 +601,13 @@
                             &.ga-18
                                 font-size: 1.2vw
                                 margin-left: 0.5vw
+                .control-box-sync
+                    grid-area: ctrl0
+                    width: 100%
+                    display: flex
+                    flex-direction: column
+                    justify-content: center
+                    align-items: center
                 .control-box-ptz
                     grid-area: ctrl1
                 .control-box-global

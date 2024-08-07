@@ -48,7 +48,7 @@ export const StateSchemaPartial = StateSchema.replace(/:/g, "?:")
 
 /*  complete state default (all fields with default values)  */
 export const StateDefault = {} as StateType
-for (const cam of [ "1", "2", "3", "4", "5" ]) {
+for (const cam of [ "1", "2", "3", "4" ]) {
     StateDefault[cam] = { ptz: "", vptz: {} }
     for (const vptz of [ "C-L", "C-C", "C-R", "F-L", "F-C", "F-R", "W-C" ]) {
         StateDefault[cam].vptz[vptz] = {
