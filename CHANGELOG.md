@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+1.5.2 (2024-09-09)
+------------------
+
+- UPDATE: update dependencies
+- CLEANUP: get rid of deprecation warnings in stylelint
+
 1.5.1 (2024-08-25)
 ------------------
 

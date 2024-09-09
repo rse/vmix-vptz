@@ -24,3 +24,9 @@ rules:
     declaration-block-no-redundant-longhand-properties: null
     selector-not-notation: null
 
+    #   to get rid of deprecation warnings in "stylelint-stylus"
+    stylus/at-rule-name-space-after: null
+    stylus/selector-pseudo-class-case: null
+    stylus/no-eol-whitespace: null
+    stylus/selector-list-comma-space-before: null
+
