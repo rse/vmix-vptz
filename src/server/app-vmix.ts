@@ -737,7 +737,7 @@ export default class VMix extends EventEmitter {
                 mod3 = (xyz: XYZ) => { xyz.y = 0 }
             }
             else if (arg === "decrease") {
-                const zoomAdjusted = Math.max(xyz.zoom - deltaZoom, 1)
+                const zoomAdjusted = Math.max(xyz.zoom - deltaZoom, 1.0)
                 const deltaZAdjusted = (xyz.zoom - zoomAdjusted) / steps
                 const absX = Math.abs(xyz.x)
                 if (zoomAdjusted - absX < 1) {
@@ -755,8 +755,10 @@ export default class VMix extends EventEmitter {
                 mod1 = (xyz: XYZ) => { xyz.zoom -= deltaZAdjusted }
             }
             else if (arg === "increase") {
-                cmd1 = { f: "SetZoom", v: `+=${deltaZ}` }
-                mod1 = (xyz: XYZ) => { xyz.zoom += deltaZ }
+                const zoomAdjusted = Math.min(xyz.zoom + deltaZoom, 2.0)
+                const deltaZAdjusted = (zoomAdjusted - xyz.zoom) / steps
+                cmd1 = { f: "SetZoom", v: `+=${deltaZAdjusted}` }
+                mod1 = (xyz: XYZ) => { xyz.zoom += deltaZAdjusted }
             }
             else
                 throw new Error("invalid argument")

@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - UPDATE: update dependencies
+- IMPROVEMENT: ensure that Zoom-Ins stop at Full-HD (factor 2.0) to avoid blurring
 
 1.5.2 (2024-09-09)
 ------------------
