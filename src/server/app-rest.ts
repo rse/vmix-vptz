@@ -174,12 +174,11 @@ export default class REST {
             },
             handler: async (request: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 /*  on WebSocket message transfer  */
-                const { ctx, ws } = request.websocket()
                 if (typeof request.payload !== "object" || request.payload === null)
                     return Boom.badRequest("invalid request")
                 if (!ducky.validate(request.payload, "{ cmd: string, arg?: string }"))
                     return Boom.badRequest("invalid request")
-                const { cmd, arg } = request.payload as any satisfies { cmd: string, arg: any }
+                const { cmd } = request.payload as any satisfies { cmd: string, arg: any }
                 if (cmd === "STATE") {
                     const data = await this.vmix.getState(false)
                     const json = JSON.stringify({ cmd: "STATE", arg: { state: data } })

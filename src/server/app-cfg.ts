@@ -10,9 +10,6 @@ export default class Config {
     public idPTZs  = [ "A", "B", "C", "D", "E", "F", "G", "H" ] as const
     public idVPTZs = [ "C-L", "C-C", "C-R", "F-L", "F-C", "F-R", "W-C" ] as const
 
-    /*  creation  */
-    constructor () {}
-
     /*  initialization  */
     async init () {}
 

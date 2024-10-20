@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, toHandlerKey, toHandlers } from "vue"
+import { defineComponent } from "vue"
 import URI                 from "urijs"
 import RecWebSocket        from "reconnecting-websocket"
 import Ducky               from "ducky"

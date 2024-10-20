@@ -316,7 +316,7 @@
             height: 20vw
             background-color: var(--color-sig-bg-3)
             color: var(--color-sig-fg-3)
-            font-size: 6.0vw
+            font-size: 6vw
             font-weight: bold
             line-height: 20vw
             text-align: center
@@ -491,7 +491,7 @@
                                 margin-right: 2vw
                                 .hint
                                     font-weight: 200
-                                    font-size: 1.0vw
+                                    font-size: 1vw
                     .control-grid-ptz
                         grid-template-columns: calc(5fr + 0.5vw) 5fr 5fr 5fr 5fr 5fr
                         grid-template-rows:    8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr 8fr
@@ -658,7 +658,7 @@ import pkg                 from "../../package.json"
 import { defineComponent } from "vue"
 import axios               from "axios"
 import AppOverlay          from "./app-overlay.vue"
-import { StateType, StateSchema, StateDefault } from "../common/app-state"
+import { StateType, StateDefault } from "../common/app-state"
 </script>
 
 <script lang="ts">
@@ -672,6 +672,9 @@ export default defineComponent({
         options: { type: Object, default: new Map<string, string | boolean>() },
         svUrl:   { type: String, default: "" }
     },
+    emits: [
+        "log"
+    ],
     data: () => ({
         state: StateDefault as StateType,
         pkg,

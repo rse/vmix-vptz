@@ -16,7 +16,7 @@ import Argv         from "./app-argv"
 import Log          from "./app-log"
 import Cfg          from "./app-cfg"
 import State        from "./app-state"
-import type { PTZ, VPTZ, XYZ } from "./app-state"
+import type { XYZ } from "./app-state"
 import { StateDefault } from "../common/app-state"
 
 /*  define our vMix input type  */
@@ -668,7 +668,6 @@ export default class VMix extends EventEmitter {
 
         /*  calculate potentially change deltas  */
         const deltaXY = deltaPan  / steps
-        const deltaZ  = deltaZoom / steps
 
         /*  calculate effectively possible change deltas  */
         const deltaUp    = xyz.y - deltaPan >  (1 - xyz.zoom) ? -deltaXY : (((1 - xyz.zoom) - xyz.y) / steps)
@@ -877,10 +876,8 @@ export default class VMix extends EventEmitter {
         /*  helper functions: easings  */
         const easeInSine     = (x: number) => 1 - Math.cos((x * Math.PI) / 2)
         const easeOutSine    = (x: number) => Math.sin((x * Math.PI) / 2)
-        const easeInOutSine  = (x: number) => -(Math.cos(Math.PI * x) - 1) / 2
         const easeInCubic    = (x: number) => Math.pow(x, 3)
         const easeOutCubic   = (x: number) => 1 - Math.pow(1 - x, 3)
-        const easeInOutCubic = (x: number) => x < 0.5 ? 4 * Math.pow(x, 3) : 1 - Math.pow(-2 * x + 2, 3) / 2
 
         /*  helper function: determine path of max zoom levels corresponding a path of x/y coordinates.
             Notice: vMix operates on a canvas with x/y in the range [-2...+2], the visible canvas is

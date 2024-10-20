@@ -26,6 +26,7 @@ export interface VPTZ { /* virtual PTZ configuration  */
 }
 
 declare module "knex/types/tables" {
+    /* eslint no-unused-vars: off */
     interface Tables {
         ptz:  PTZ
         vptz: VPTZ
@@ -140,11 +141,9 @@ export default class State extends DB {
             throw new Error("database not opened")
         return this.atomic(async (knex) => {
             const rec = await knex("vptz").select([ "x", "y", "zoom" ]).where({ cam, ptz, vptz })
-            return (
-                rec.length === 1 ?
+            return (rec.length === 1 ?
                 { x: rec[0].x, y: rec[0].y, zoom: rec[0].zoom } as XYZ :
-                { x: 0, y: 0, zoom: 1.0 } as XYZ
-            )
+                { x: 0, y: 0, zoom: 1.0 } as XYZ)
         })
     }
     async setVPTZ (cam: string, ptz: string, vptz: string, xyz: XYZ) {

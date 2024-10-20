@@ -11,6 +11,7 @@ import Knex                    from "knex"
 import type { Knex as KnexNS } from "knex"
 import URI                     from "urijs"
 
+/* eslint no-unused-vars: off */
 enum DB_LogLevels { ERROR, WARNING, INFO, DEBUG }
 type DB_Options = { debug?: boolean }
 

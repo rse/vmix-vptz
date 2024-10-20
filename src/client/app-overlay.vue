@@ -121,6 +121,10 @@ export default defineComponent({
     props: {
         options: { type: Object, default: {} as { [ key: string ]: string | boolean } }
     },
+    emits: [
+        "log",
+        "xyz"
+    ],
     data: () => ({
         state: StateDefault as StateType,
         canvas: { w: 0, h: 0 },
