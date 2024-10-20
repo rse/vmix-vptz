@@ -11,18 +11,17 @@ extends:
 rules:
     stylus/indentation: 4
     shorthand-property-no-redundant-values: null
+    declaration-block-no-redundant-longhand-properties: null
     unit-allowed-list: [ "px", "pt", "%", "vh", "vw", "fr", "rem", "ms", "deg", "s" ]
     rule-empty-line-before: null
     no-descending-specificity: null
     custom-property-empty-line-before: null
+    media-feature-range-notation: null
+    selector-not-notation: null
     stylus/declaration-colon: null
     stylus/media-feature-colon: null
     stylus/single-line-comment: null
     stylus/selector-list-comma: "always"
-    stylus/number-no-trailing-zeros: null
-    color-hex-length: null
-    declaration-block-no-redundant-longhand-properties: null
-    selector-not-notation: null
 
     #   to get rid of deprecation warnings in "stylelint-stylus"
     stylus/at-rule-name-space-after: null

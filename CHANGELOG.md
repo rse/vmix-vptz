@@ -2,6 +2,13 @@
 ChangeLog
 =========
 
+1.6.0 (2024-10-20)
+------------------
+
+- CLEANUP: finally upgraded to ESLint 9
+- CLEANUP: finally upgraded to HTMLLint 0.8
+- UPDATE: update dependencies
+
 1.5.3 (2024-09-13)
 ------------------
 

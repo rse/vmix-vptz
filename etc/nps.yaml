@@ -5,6 +5,13 @@
 ##
 
 scripts:
+    #   make and apply patches
+    patch-make: >
+                            npm shrinkwrap &&
+                            patch-package --patch-dir package.d "@typescript-eslint/typescript-estree" htmllint-cli &&
+                            shx rm -f npm-shrinkwrap.json
+    patch-apply:            patch-package --patch-dir package.d
+
     #   multiview-style development dashboard
     dev: >
                             stmux -w always -m beep -e "built.in.+ms" --
@@ -18,27 +25,27 @@ scripts:
     lint:                   npm start lint-tsc lint-vue-tsc lint-eslint lint-stylelint lint-htmllint
     lint-tsc:               tsc --project etc/tsc-server.json --noEmit
     lint-vue-tsc:           vue-tsc --project etc/tsc-client.json --noEmit
-    lint-eslint:            eslint --config etc/eslint.yaml --ext ts,vue src/**/*.vue src/**/*.ts
+    lint-eslint:            eslint --config etc/eslint.mjs src/**/*.vue src/**/*.ts
     lint-stylelint:         stylelint --config etc/stylelint.yaml src/**/*.styl src/**/*.vue
     lint-htmllint:          htmllint --rc etc/htmllint.json src/**/*.html
 
     #   code compilation/transpiling (building)
     build:                  npm start build-client build-server
     build-dev:              npm start build-client-dev build-server-dev
-    build-client:           vite --config etc/vite-client.mts build --logLevel info --mode production
-    build-client-dev:       vite --config etc/vite-client.mts build --logLevel info --mode development
-    build-client-dev-watch: vite --config etc/vite-client.mts build --logLevel info --mode development --watch
-    build-server:           tsc --project etc/tsc-server.json
-    build-server-dev:       tsc --project etc/tsc-server.json --sourceMap
-    build-server-dev-watch: nodemon --exec "npm start build-server-dev" --watch src/server --ext ts --delay 1.0
+    build-client:           vite --config etc/vite-client.mts build --mode production
+    build-client-dev:       vite --config etc/vite-client.mts build --mode development
+    build-client-dev-watch: vite --config etc/vite-client.mts build --mode development --watch
+    build-server:           vite --config etc/vite-server.mts build --mode production
+    build-server-dev:       vite --config etc/vite-server.mts build --mode development
+    build-server-dev-watch: vite --config etc/vite-server.mts build --mode development --watch
 
     #   start server run-time
-    server-delay:           delay 8.0
+    server-delay:           delay 2.0
     server-dev: >
-                            cross-env NODE_OPTIONS="-r source-map-support/register"
+                            cross-env NODE_OPTIONS="--enable-source-maps"
                             nodemon --exec "npm start server" --watch dst/server --ext js --delay 1.0
     server: >
-                            node dst/server/index.js -v 2 -a 0.0.0.0 -p 12346
+                            node dst/server/index.mjs -v 2 -a 0.0.0.0 -p 12346
                             -A 10.0.0.21:8099 -B 10.0.0.22:8099
 
     #   cleanup filesystem

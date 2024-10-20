@@ -10,8 +10,8 @@
     <div class="app-control">
         <!--  HEADER  -->
         <div class="head">
-            <img class="logo" src="./app-icon.svg" alt="" />
-            VMIX VPTZ CONTROL
+            <img class="logo" src="./app-icon.svg?url" alt="" />
+            <b>vMix VPTZ</b> Control
         </div>
 
         <!--  BODY  -->
