@@ -1,8 +1,8 @@
 {
     "private":         true,
     "name":            "vMix-VPTZ",
-    "version":         "1.6.0",
-    "x-date":          "2024-10-20",
+    "version":         "1.6.1",
+    "x-date":          "2024-10-26",
     "homepage":        "https://github.com/rse/vmix-vptz",
     "description":     "vMix Virtual PTZ",
     "author": {
@@ -24,7 +24,7 @@
         "axios":                            "1.7.7",
         "reconnecting-websocket":           "4.4.0",
 
-        "@hapi/hapi":                       "21.3.10",
+        "@hapi/hapi":                       "21.3.12",
         "@hapi/boom":                       "10.0.1",
         "@hapi/inert":                      "7.1.0",
         "hapi-plugin-header":               "1.1.8",
@@ -34,7 +34,7 @@
         "node-vmix":                        "1.7.1",
         "vmix-js-utils":                    "4.0.19",
 
-        "@types/node":                      "22.7.7",
+        "@types/node":                      "22.8.1",
         "@types/clone":                     "2.1.4",
         "@types/hapi__inert":               "5.2.10",
         "@types/js-yaml":                   "4.0.9",
@@ -61,15 +61,15 @@
         "object-path":                      "0.11.8",
         "locks":                            "0.2.2",
         "knex":                             "3.1.0",
-        "better-sqlite3":                   "11.4.0",
+        "better-sqlite3":                   "11.5.0",
         "promise-retry":                    "2.0.1",
         "xpath-ts2":                        "1.4.2",
-        "awilix":                           "12.0.2"
+        "awilix":                           "12.0.3"
     },
     "devDependencies": {
-        "vite":                             "5.4.9",
-        "@typescript-eslint/eslint-plugin": "8.10.0",
-        "@typescript-eslint/parser":        "8.10.0",
+        "vite":                             "5.4.10",
+        "@typescript-eslint/eslint-plugin": "8.11.0",
+        "@typescript-eslint/parser":        "8.11.0",
         "@vitejs/plugin-vue":               "5.1.4",
         "@rollup/plugin-yaml":              "4.1.2",
         "vite-plugin-node-polyfills":       "0.22.0",
@@ -77,14 +77,14 @@
         "vite-svg-loader":                  "5.1.0",
         "@liuli-util/vite-plugin-node":     "0.9.0",
 
-        "@vue/eslint-config-typescript":    "14.1.1",
+        "@vue/eslint-config-typescript":    "14.1.3",
         "vue-eslint-parser":                "9.4.3",
         "eslint":                           "9.13.0",
         "@eslint/js":                       "9.13.0",
         "@types/eslint__js":                "8.42.3",
-        "neostandard":                      "0.11.6",
+        "neostandard":                      "0.11.7",
         "eslint-plugin-import":             "2.31.0",
-        "eslint-plugin-vue":                "9.29.0",
+        "eslint-plugin-vue":                "9.29.1",
 
         "htmllint":                         "0.8.0",
         "htmllint-cli":                     "0.0.7",
