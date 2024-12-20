@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - BUGFIX: fix timing in vMix PTZ communication
+- UPDATE: update dependencies
 
 1.6.1 (2024-10-26)
 ------------------
