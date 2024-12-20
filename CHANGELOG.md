@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.6.2 (2024-12-20)
+------------------
+
+- BUGFIX: fix timing in vMix PTZ communication
+
 1.6.1 (2024-10-26)
 ------------------
 

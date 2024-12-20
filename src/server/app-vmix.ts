@@ -984,7 +984,7 @@ export default class VMix extends EventEmitter {
         cmds.push({ Function: "SetPanY", Input: preview, Value: previewXYZ.y.toString() })
         cmds.push({ Function: "SetZoom", Input: preview, Value: previewXYZ.zoom.toString() })
         this.vmixCommand(this.vmix1, cmds)
-        await AsyncDelay(100)
+        await AsyncDelay(200)
 
         /*  cut preview into program  */
         const vmix = this.vmix2 !== null ? this.vmix2 : this.vmix1
