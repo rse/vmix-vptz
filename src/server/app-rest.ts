@@ -202,8 +202,8 @@ export default class REST {
         }
 
         /*  notify clients about internal events  */
-        const notifyClient = (message: string) => {
-            const msg = JSON.stringify({ cmd: "NOTIFY", arg: { message } })
+        const notifyClient = (message: string, data: any = {}) => {
+            const msg = JSON.stringify({ cmd: "NOTIFY", arg: { message, data } })
             for (const info of wsPeers.values()) {
                 this.log.log(3, `WebSocket: notify: message=${message}`)
                 if (info.ws.readyState === WebSocket.OPEN)
@@ -312,6 +312,17 @@ export default class REST {
             path: "/ptz/save",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 notifyClient("saveCurrentPTZ")
+                return h.response().code(204)
+            }
+        })
+
+        /*  PTZ action on single camera (known by controller)  */
+        this.server.route({
+            method: "GET",
+            path: "/ptz/save/{cam}",
+            handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
+                const cam  = req.params.cam
+                notifyClient("saveCurrentPTZ", { cam })
                 return h.response().code(204)
             }
         })

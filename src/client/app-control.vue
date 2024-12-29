@@ -786,18 +786,16 @@ export default defineComponent({
             if (this.adjustMode !== "ptz")
                 return
             const div = (ev.target) as HTMLDivElement
-            this.ptzUpdate(div)
-        },
-        async ptzUpdateRemote () {
-            if (this.adjustMode !== "ptz")
-                return
-            this.ptzUpdate(this.$refs.savePTZ as HTMLElement)
-        },
-        async ptzUpdate (div: HTMLElement) {
             this.animate(div)
-            this.raiseStatus("info", "Saving PTZ state", 1000)
             const cam = this.previewCam
             const ptz = this.state[cam].ptz
+            this.raiseStatus("info", `Saving PTZ state ${cam}${ptz}`, 1000)
+            await this.api(`/ptz/${ptz}/${cam}/save`)
+        },
+        async ptzUpdateRemote (data: any = {}) {
+            const cam = typeof data.cam === "string" ? data.cam : this.previewCam
+            const ptz = typeof data.ptz === "string" ? data.ptz : this.state[cam].ptz
+            this.raiseStatus("info", `Saving PTZ state ${cam}${ptz}`, 1000)
             await this.api(`/ptz/${ptz}/${cam}/save`)
         }
     }
