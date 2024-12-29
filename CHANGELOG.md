@@ -6,6 +6,7 @@ ChangeLog
 ------------------
 
 - IMPROVEMENT: add support for triggering a PTZ save for external PTZ controller
+- UPDATE: update dependencies
 
 1.6.2 (2024-12-20)
 ------------------

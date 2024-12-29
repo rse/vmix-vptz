@@ -47,7 +47,7 @@
         "@types/promise-retry":             "1.1.6",
 
         "clone":                            "2.1.2",
-        "chalk":                            "5.4.0",
+        "chalk":                            "5.4.1",
         "minimatch":                        "10.0.1",
         "js-yaml":                          "4.1.0",
         "eventemitter2":                    "6.4.9",
@@ -67,9 +67,9 @@
         "awilix":                           "12.0.4"
     },
     "devDependencies": {
-        "vite":                             "5.4.11",
-        "@typescript-eslint/eslint-plugin": "8.18.1",
-        "@typescript-eslint/parser":        "8.18.1",
+        "vite":                             "6.0.6",
+        "@typescript-eslint/eslint-plugin": "8.18.2",
+        "@typescript-eslint/parser":        "8.18.2",
         "@vitejs/plugin-vue":               "5.2.1",
         "@rollup/plugin-yaml":              "4.1.2",
         "vite-plugin-node-polyfills":       "0.22.0",
@@ -77,7 +77,7 @@
         "vite-svg-loader":                  "5.1.0",
         "@liuli-util/vite-plugin-node":     "0.9.0",
 
-        "@vue/eslint-config-typescript":    "14.1.4",
+        "@vue/eslint-config-typescript":    "14.2.0",
         "vue-eslint-parser":                "9.4.3",
         "eslint":                           "9.17.0",
         "@eslint/js":                       "9.17.0",
@@ -102,10 +102,14 @@
         "postcss-html":                     "1.7.0",
         "stylus":                           "0.64.0",
         "typescript":                       "5.7.2",
-        "vue-tsc":                          "2.1.10",
+        "vue-tsc":                          "2.2.0",
         "delay-cli":                        "2.0.0",
         "nps":                              "5.10.0",
         "cross-env":                        "7.0.3"
+    },
+    "overrides": {
+        "vite-plugin-node-polyfills":       { "vite": "^6.0.0" },
+        "@liuli-util/vite-plugin-node":     { "vite": "^6.0.0" }
     },
     "scripts": {
         "postinstall": "npm start patch-apply",
