@@ -339,8 +339,8 @@
                 display: grid
                 grid-template-columns: 1fr 1fr 1fr
                 grid-template-rows:    1fr 1fr 1fr
-                grid-template-areas:   "ctrl0 cam2 ctrl2" "cam1 cam3 cam4" "ctrl1 ctrl3 ctrl4"
-                gap: 0.3vw
+                grid-template-areas:   "ctrl0 cam3 ctrl2" "cam1 cam2 cam4" "ctrl1 ctrl3 ctrl4"
+                gap: 0.6vw
                 .overlay-box
                     position: relative
                     max-width: 100%
@@ -379,6 +379,8 @@
                     grid-area: cam5
                 .control-box
                     display: flex
+                    background-color: var(--color-std-bg-3)
+                    border-radius: 0.4vw
                     flex-direction: column
                     justify-content: center
                     align-items: center
@@ -393,7 +395,7 @@
                         display: grid
                         gap: 0.2vw
                         .button
-                            background: var(--color-std-bg-4)
+                            background-color: var(--color-std-bg-5)
                             color: var(--color-std-fg-4)
                             padding: 0.3vw 0.8vw 0.3vw 0.8vw
                             font-size: 1vw
@@ -402,11 +404,11 @@
                             cursor: pointer
                             border: 1px solid transparent
                             &.disabled
-                                background: var(--color-std-bg-3)
+                                background: var(--color-std-bg-4)
                                 color: var(--color-std-fg-1)
                                 cursor: not-allowed
                             &.disabled:hover
-                                background: var(--color-std-bg-3)
+                                background: var(--color-std-bg-4)
                                 color: var(--color-std-fg-1)
                             &.active
                                 background: var(--color-acc-bg-2)
@@ -424,7 +426,7 @@
                                 padding-right: 0.5vw
                             &.animate
                                 animation: 1s linear flash
-                                background: var(--color-acc-bg-3)
+                                background: var(--color-acc-bg-4)
                                 color: var(--color-acc-fg-5)
                     .control-grid .ga-01
                         grid-area: ga-01

@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+1.6.4 (2024-12-29)
+------------------
+
+- CLEANUP: switch CAM2 and CAM3 to better reflect our studio
+- CLEANUP: use a more consitent background color in the control grid
+
 1.6.3 (2024-12-29)
 ------------------
 
