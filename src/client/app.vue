@@ -149,6 +149,12 @@ export default defineComponent({
             else if (data.cmd === "NOTIFY") {
                 if (data.arg.message === "saveCurrentPTZ" && typeof data.arg.data === "object")
                     (this.$refs.control as typeof AppControl).ptzUpdateRemote(data.arg.data)
+                else if (data.arg.message === "ptzOperationStart" && typeof data.arg.data === "object")
+                    (this.$refs.control as typeof AppControl).ptzOperationStart(data.arg.data)
+                else if (data.arg.message === "ptzOperationEnd" && typeof data.arg.data === "object")
+                    (this.$refs.control as typeof AppControl).ptzOperationEnd(data.arg.data)
+                else if (data.arg.message === "stateRestore" && typeof data.arg.data === "object")
+                    (this.$refs.control as typeof AppControl).stateRestoreNotify()
             }
         })
     },

@@ -247,6 +247,7 @@ export default class REST {
             path: "/state/restore",
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 queue = queue.then(() => {
+                    notifyClient("stateRestore")
                     return this.vmix.restoreState()
                 }).catch((err) => {
                     this.log.log(0, `HAPI: error: ${err.toString()}`)
@@ -266,15 +267,17 @@ export default class REST {
             handler: async (req: HAPI.Request, h: HAPI.ResponseToolkit) => {
                 const ptz  = req.params.ptz
                 const mode = req.params.mode
-                queue = queue.then(() => {
+                queue = queue.then(async () => {
+                    notifyClient("ptzOperationStart", { ptz, mode })
                     if (mode === "load")
-                        return this.vmix.setPTZAll(ptz)
+                        await this.vmix.setPTZAll(ptz)
                     else if (mode === "save")
-                        return this.vmix.storePTZAll(ptz)
+                        await this.vmix.storePTZAll(ptz)
                     else if (mode === "reset")
-                        return this.vmix.resetPTZAll(ptz)
+                        await this.vmix.resetPTZAll(ptz)
                     else if (mode === "clear")
-                        return this.vmix.clearPTZAll(ptz)
+                        await this.vmix.clearPTZAll(ptz)
+                    notifyClient("ptzOperationEnd", { ptz, mode })
                 }).catch((err) => {
                     this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })
@@ -290,15 +293,17 @@ export default class REST {
                 const ptz  = req.params.ptz
                 const cam  = req.params.cam
                 const mode = req.params.mode
-                queue = queue.then(() => {
+                queue = queue.then(async () => {
+                    notifyClient("ptzOperationStart", { ptz, cam, mode })
                     if (mode === "load")
-                        return this.vmix.setPTZCam(ptz, cam)
+                        await this.vmix.setPTZCam(ptz, cam)
                     else if (mode === "save")
-                        return this.vmix.storePTZCam(ptz, cam)
+                        await this.vmix.storePTZCam(ptz, cam)
                     else if (mode === "reset")
-                        return this.vmix.resetPTZCam(ptz, cam)
+                        await this.vmix.resetPTZCam(ptz, cam)
                     else if (mode === "clear")
-                        return this.vmix.clearPTZCam(ptz, cam)
+                        await this.vmix.clearPTZCam(ptz, cam)
+                    notifyClient("ptzOperationEnd", { ptz, cam, mode })
                 }).catch((err) => {
                     this.log.log(0, `HAPI: error: ${err.toString()}`)
                 })

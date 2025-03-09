@@ -21,7 +21,7 @@
                     <div class="control-box control-box-sync">
                         <div class="title">VMIX STATE</div>
                         <div class="control-grid control-grid-sync">
-                            <div class="button ga-01 destructive" v-on:click="(ev) => vmixState(ev, 'restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
+                            <div class="button ga-01 destructive" v-bind:class="{ active: syncActive }" v-on:click="(ev) => vmixState(ev, 'restore')"><span class="icon"><i class="fa-solid fa-upload"></i></span> SYNC</div>
                         </div>
                     </div>
                     <div class="control-box control-box-global">
@@ -247,8 +247,7 @@
                     </div>
                 </div>
             </div>
-            <div v-show="banner !== ''" class="banner">
-                {{ banner }}
+            <div v-show="banner !== ''" class="banner" v-html="banner">
             </div>
         </div>
 
@@ -310,6 +309,10 @@
         position: relative
         .banner
             position: absolute
+            display: flex
+            flex-direction: column
+            align-items: center
+            justify-content: center
             top: calc(50% - 10vw)
             left: 0
             width: 100vw
@@ -318,7 +321,7 @@
             color: var(--color-sig-fg-3)
             font-size: 6vw
             font-weight: bold
-            line-height: 20vw
+            line-height: 6vw
             text-align: center
             z-index: 200
         .overlay-container
@@ -689,7 +692,8 @@ export default defineComponent({
         adjustMode:  "ptz",
         adjustSpeed: "med",
         banner:      "",
-        status:      { kind: "", msg: "" }
+        status:      { kind: "", msg: "" },
+        syncActive:  false
     }),
     async created () {
     },
@@ -756,12 +760,6 @@ export default defineComponent({
                 const div = (el.target) as HTMLDivElement
                 this.animate(div)
             }
-            else if (this.ptzMode === "load") {
-                this.banner = "LOADING NEW PTZ..."
-                setTimeout(() => {
-                    this.banner = ""
-                }, 6 * 1000)
-            }
         },
         async vptz (vptz: string) {
             const cam = this.vptzCam
@@ -781,6 +779,11 @@ export default defineComponent({
             this.animate(div)
             await this.api(`/state/${op}`)
         },
+        async stateRestoreNotify () {
+            this.raiseStatus("info", "SYNC: Restoring vMix State", 1000)
+            this.syncActive = true
+            setTimeout(() => { this.syncActive = false }, 1000)
+        },
         async xyz (cam: string, data: { vptz: string, x: number, y: number, zoom: number }) {
             await this.api(`/vptz/${cam}/${data.vptz}/xyz/${data.x}/${data.y}/${data.zoom}`)
         },
@@ -799,6 +802,28 @@ export default defineComponent({
             const ptz = typeof data.ptz === "string" ? data.ptz : this.state[cam].ptz
             this.raiseStatus("info", `Saving PTZ state ${cam}${ptz}`, 1000)
             await this.api(`/ptz/${ptz}/${cam}/save`)
+        },
+        async ptzOperationStart (data: any = {}) {
+            const cam  = typeof data.cam  === "string" ? data.cam  : ""
+            const ptz  = typeof data.ptz  === "string" ? data.ptz  : ""
+            const mode = typeof data.mode === "string" ? data.mode : ""
+            if (cam !== "" && ptz !== "")
+                this.raiseStatus("info", `PTZ ${mode} operation on CAM ${cam}, PTZ ${ptz}`, 2000)
+            else if (ptz !== "")
+                this.raiseStatus("info", `PTZ ${mode} operation on CAM 1-4, PTZ ${ptz}`, 2000)
+            if (mode === "load") {
+                if (cam !== "" && ptz !== "")
+                    this.banner = `Loading new PTZ on<br/>CAM ${cam}, PTZ ${ptz}`
+                else if (ptz !== "")
+                    this.banner = `Loading new PTZ on<br/>CAM 1-4, PTZ ${ptz}`
+            }
+        },
+        async ptzOperationEnd (data: any = {}) {
+            const cam  = typeof data.cam  === "string" ? data.cam  : ""
+            const ptz  = typeof data.ptz  === "string" ? data.ptz  : ""
+            const mode = typeof data.mode === "string" ? data.mode : ""
+            if (mode === "load")
+                this.banner = ""
         }
     }
 })

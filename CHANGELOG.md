@@ -2,6 +2,11 @@
 ChangeLog
 =========
 
+1.6.6 (2025-03-09)
+------------------
+
+- IMPROVEMENT: indicate more server changes in GUI
+
 1.6.5 (2025-03-09)
 ------------------
 
