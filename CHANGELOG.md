@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+1.6.8 (2025-04-17)
+------------------
+
+- UPDATE: update dependencies
+- CLEANUP: cleanup dependencies
+
 1.6.7 (2025-03-27)
 ------------------
 
