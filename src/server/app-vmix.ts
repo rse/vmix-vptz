@@ -347,7 +347,7 @@ export default class VMix extends EventEmitter {
     /*  activate all physical PTZ of a camera  */
     async setPTZAll (ptz: string) {
         this.log.log(2, `vMix: activating physical PTZ "${ptz}" of all cameras`)
-        let promises = []
+        const promises = []
         for (const cam of this.cfg.idCAMs)
             promises.push(this.setPTZCam(ptz, cam))
         return Promise.all(promises)

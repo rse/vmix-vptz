@@ -819,8 +819,10 @@ export default defineComponent({
             }
         },
         async ptzOperationEnd (data: any = {}) {
+            /*
             const cam  = typeof data.cam  === "string" ? data.cam  : ""
             const ptz  = typeof data.ptz  === "string" ? data.ptz  : ""
+            */
             const mode = typeof data.mode === "string" ? data.mode : ""
             if (mode === "load")
                 this.banner = ""
