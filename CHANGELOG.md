@@ -2,7 +2,7 @@
 ChangeLog
 =========
 
-1.7.0 (2025-06-11)
+1.7.0 (2025-06-12)
 ------------------
 
 - IMPROVEMENT: use "rolldown-vite" instead of "vite" for 2x faster build
