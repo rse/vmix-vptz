@@ -2,6 +2,12 @@
 ChangeLog
 =========
 
+1.7.2 (2025-07-06)
+------------------
+
+- UPDATE: update dependencies
+- IMPROVEMENT: replace "nps" with "stx" for NPM scripting
+
 1.7.1 (2025-06-25)
 ------------------
 
