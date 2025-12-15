@@ -218,7 +218,7 @@
                         <app-overlay
                             ref="overlay-cam1"
                             v-bind:options="{ cam: '1', scale: 1.0, opacity: 1.00 }"
-                            v-on:xyz="(data) => xyz('1', data)"
+                            v-on:xyz="(data: any) => xyz('1', data)"
                         ></app-overlay>
                     </div>
                     <div class="overlay-box overlay-cam2">
@@ -226,7 +226,7 @@
                         <app-overlay
                             ref="overlay-cam2"
                             v-bind:options="{ cam: '2', scale: 1.0, opacity: 1.00 }"
-                            v-on:xyz="(data) => xyz('2', data)"
+                            v-on:xyz="(data: any) => xyz('2', data)"
                         ></app-overlay>
                     </div>
                     <div class="overlay-box overlay-cam3">
@@ -234,7 +234,7 @@
                         <app-overlay
                             ref="overlay-cam3"
                             v-bind:options="{ cam: '3', scale: 1.0, opacity: 1.00 }"
-                            v-on:xyz="(data) => xyz('3', data)"
+                            v-on:xyz="(data: any) => xyz('3', data)"
                         ></app-overlay>
                     </div>
                     <div class="overlay-box overlay-cam4">
@@ -242,7 +242,7 @@
                         <app-overlay
                             ref="overlay-cam4"
                             v-bind:options="{ cam: '4', scale: 1.0, opacity: 1.00 }"
-                            v-on:xyz="(data) => xyz('4', data)"
+                            v-on:xyz="(data: any) => xyz('4', data)"
                         ></app-overlay>
                     </div>
                 </div>
